@@ -2,52 +2,105 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Gaming Ecosystem</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>OrbitUp Ecosystem</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #000; color: #39FF14; font-family: 'sans-serif'; }
-        .neon-border { border: 1px solid #39FF14; box-shadow: 0 0 10px #39FF14; }
-        .neon-text { text-shadow: 0 0 5px #39FF14; }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
+        body { background-color: #000; color: #39FF14; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .neon-glow { box-shadow: 0 0 15px rgba(57, 255, 20, 0.5); border: 1px solid #39FF14; }
+        .splash { position: fixed; top: 0; left: 0; w-full: 100%; h-full: 100%; background: #000; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
+        .hidden-screen { opacity: 0; pointer-events: none; }
+        #crash-canvas { width: 100%; height: 150px; background: rgba(57, 255, 20, 0.05); border-radius: 12px; }
     </style>
 </head>
-<body class="p-4 flex flex-col items-center min-h-screen">
-    
-    <div class="w-full flex justify-between items-center mb-8">
-        <h1 class="neon-text font-bold text-xl">NEON ECO</h1>
-        <div id="user-name" class="text-sm opacity-80">Загрузка...</div>
-    </div>
+<body>
 
-    <div class="w-full glass neon-border rounded-2xl p-6 mb-6 text-center">
-        <p class="text-gray-400 text-sm uppercase">Баланс Stars</p>
-        <h2 class="text-4xl font-black my-2">⭐ 1,250</h2>
-        <button class="bg-[#39FF14] text-black font-bold py-2 px-6 rounded-full mt-2 hover:scale-105 transition">Пополнить</button>
-    </div>
-
-    <div class="grid grid-cols-2 gap-4 w-full">
-        <div class="glass neon-border rounded-xl p-4 flex flex-col items-center">
-            <span class="text-3xl mb-2">📈</span>
-            <span class="font-bold">CRASH</span>
-        </div>
-        <div class="glass neon-border rounded-xl p-4 flex flex-col items-center opacity-50">
-            <span class="text-3xl mb-2">🎁</span>
-            <span class="font-bold">CASES</span>
+    <div id="splash" class="splash h-screen w-screen">
+        <div class="text-6xl mb-4">🚀</div>
+        <h1 class="text-2xl font-black tracking-widest neon-text">ORBIT UP</h1>
+        <div class="mt-8 w-48 h-1 bg-gray-800 rounded-full overflow-hidden">
+            <div class="h-full bg-[#39FF14] animate-[pulse_1.5s_infinite]"></div>
         </div>
     </div>
+
+    <div id="lang-screen" class="hidden-screen fixed inset-0 flex flex-col items-center justify-center z-50 bg-black p-6">
+        <h2 class="text-xl mb-6 uppercase tracking-tighter">Choose Language / Выберите язык</h2>
+        <button onclick="startApp('en')" class="w-full neon-glow p-4 mb-4 rounded-xl font-bold">ENGLISH</button>
+        <button onclick="startApp('ru')" class="w-full neon-glow p-4 rounded-xl font-bold">РУССКИЙ</button>
+    </div>
+
+    <main id="main-content" class="hidden-screen p-4 opacity-0 transition-opacity duration-1000">
+        <div class="flex justify-between items-center mb-6">
+            <span class="text-sm font-mono" id="user-tag">@loading...</span>
+            <div class="neon-glow px-3 py-1 rounded-full text-xs">ONLINE</div>
+        </div>
+
+        <div class="bg-zinc-900 rounded-3xl p-6 mb-6 text-center border border-zinc-800">
+            <p class="text-zinc-500 text-xs uppercase tracking-widest mb-1">Total Balance</p>
+            <h2 class="text-4xl font-black text-white mb-4">⭐ <span id="balance">1250</span></h2>
+            <div class="flex gap-2">
+                <button class="flex-1 bg-[#39FF14] text-black font-bold py-3 rounded-2xl active:scale-95 transition">ПОПОЛНИТЬ</button>
+                <button class="flex-1 border border-zinc-700 text-white font-bold py-3 rounded-2xl active:scale-95 transition">NFT</button>
+            </div>
+        </div>
+
+        <div class="bg-zinc-900 rounded-3xl p-4 border border-zinc-800">
+            <div class="flex justify-between mb-2">
+                <span class="text-xs font-bold text-[#39FF14]">CRASH LIVE</span>
+                <span id="multiplier" class="text-xl font-black text-white">1.00x</span>
+            </div>
+            <canvas id="crash-canvas"></canvas>
+            <button class="w-full mt-4 bg-zinc-800 py-3 rounded-xl font-bold text-zinc-400">ИГРАТЬ (СКОРО)</button>
+        </div>
+    </main>
 
     <script>
-        // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Развернуть на весь экран
+        tg.expand();
 
-        // Вывод имени пользователя
-        const userField = document.getElementById('user-name');
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            userField.innerText = `@${tg.initDataUnsafe.user.username}`;
-        } else {
-            userField.innerText = "Guest Mode";
+        // Логика переключения экранов
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('splash').classList.add('hidden-screen');
+                document.getElementById('lang-screen').classList.remove('hidden-screen');
+                document.getElementById('lang-screen').classList.add('opacity-100');
+            }, 3000); // 3 секунды сплэш-скрин
+        };
+
+        function startApp(lang) {
+            document.getElementById('lang-screen').classList.add('hidden-screen');
+            const main = document.getElementById('main-content');
+            main.classList.remove('hidden-screen');
+            setTimeout(() => main.style.opacity = '1', 100);
+            
+            if(tg.initDataUnsafe?.user) {
+                document.getElementById('user-tag').innerText = `@${tg.initDataUnsafe.user.username}`;
+            }
+            startCrashDemo();
+        }
+
+        // Демо-анимация графика Crash
+        function startCrashDemo() {
+            const canvas = document.getElementById('crash-canvas');
+            const ctx = canvas.getContext('2d');
+            let x = 0;
+            let m = 1.0;
+
+            function animate() {
+                if (x > canvas.width) { x = 0; m = 1.0; ctx.clearRect(0,0, canvas.width, canvas.height); }
+                ctx.strokeStyle = '#39FF14';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(x, canvas.height - (m * 10));
+                x += 1;
+                m += 0.01;
+                ctx.lineTo(x, canvas.height - (m * 10));
+                ctx.stroke();
+                document.getElementById('multiplier').innerText = m.toFixed(2) + 'x';
+                requestAnimationFrame(animate);
+            }
+            animate();
         }
     </script>
 </body>
