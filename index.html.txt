@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Gaming Ecosystem</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #000; color: #39FF14; font-family: 'sans-serif'; }
+        .neon-border { border: 1px solid #39FF14; box-shadow: 0 0 10px #39FF14; }
+        .neon-text { text-shadow: 0 0 5px #39FF14; }
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="p-4 flex flex-col items-center min-h-screen">
+    
+    <div class="w-full flex justify-between items-center mb-8">
+        <h1 class="neon-text font-bold text-xl">NEON ECO</h1>
+        <div id="user-name" class="text-sm opacity-80">Загрузка...</div>
+    </div>
+
+    <div class="w-full glass neon-border rounded-2xl p-6 mb-6 text-center">
+        <p class="text-gray-400 text-sm uppercase">Баланс Stars</p>
+        <h2 class="text-4xl font-black my-2">⭐ 1,250</h2>
+        <button class="bg-[#39FF14] text-black font-bold py-2 px-6 rounded-full mt-2 hover:scale-105 transition">Пополнить</button>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 w-full">
+        <div class="glass neon-border rounded-xl p-4 flex flex-col items-center">
+            <span class="text-3xl mb-2">📈</span>
+            <span class="font-bold">CRASH</span>
+        </div>
+        <div class="glass neon-border rounded-xl p-4 flex flex-col items-center opacity-50">
+            <span class="text-3xl mb-2">🎁</span>
+            <span class="font-bold">CASES</span>
+        </div>
+    </div>
+
+    <script>
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Развернуть на весь экран
+
+        // Вывод имени пользователя
+        const userField = document.getElementById('user-name');
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            userField.innerText = `@${tg.initDataUnsafe.user.username}`;
+        } else {
+            userField.innerText = "Guest Mode";
+        }
+    </script>
+</body>
+</html>
