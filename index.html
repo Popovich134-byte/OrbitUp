@@ -3,193 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>OrbitUp | High-Tech Ecosystem</title>
+    <title>OrbitUp Premium Ecosystem</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #39FF14; --dark: #050505; }
-        body { background-color: var(--dark); color: white; font-family: 'Inter', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
-        .neon-text { font-family: 'Orbitron', sans-serif; color: var(--neon); text-shadow: 0 0 10px rgba(57, 255, 20, 0.7); }
-        .neon-border { border: 1px solid var(--neon); box-shadow: 0 0 15px rgba(57, 255, 20, 0.2); }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .nav-item.active { color: var(--neon); }
-        .page { display: none; animation: fadeIn 0.4s ease; }
+        :root { --neon: #39FF14; --dark-bg: #0a0a0a; --glass: rgba(255, 255, 255, 0.05); }
+        body { background-color: var(--dark-bg); color: white; font-family: 'Montserrat', sans-serif; overflow-x: hidden; margin: 0; }
+        .neon-text { font-family: 'Orbitron', sans-serif; color: var(--neon); text-shadow: 0 0 15px rgba(57, 255, 20, 0.6); }
+        .glass-panel { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; }
+        .btn-primary { background: var(--neon); color: black; font-weight: 800; transition: all 0.3s; box-shadow: 0 0 20px rgba(57, 255, 20, 0.3); }
+        .btn-primary:active { transform: scale(0.95); box-shadow: 0 0 5px var(--neon); }
+        
+        /* Анимации переходов */
+        .page { display: none; animation: slideIn 0.5s ease-out; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        canvas { width: 100%; height: 180px; border-radius: 15px; background: radial-gradient(circle at center, #111, #000); }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .tab-active { color: var(--neon); border-top: 2px solid var(--neon); }
     </style>
 </head>
 <body>
 
-    <div id="splash" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center transition-opacity duration-700">
-        <div class="relative">
-            <div class="w-24 h-24 border-4 border-[#39FF14] rounded-full animate-ping opacity-20"></div>
-            <div class="absolute inset-0 flex items-center justify-center text-5xl">🚀</div>
-        </div>
-        <h1 class="neon-text mt-6 text-3xl font-black tracking-widest">ORBIT UP</h1>
-        <p class="text-zinc-500 text-xs mt-2 uppercase tracking-[0.3em]">Loading Ecosystem...</p>
+    <div id="screen-welcome" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-6 text-center">
+        <div class="animate-bounce text-6xl mb-6">💎</div>
+        <h1 class="neon-text text-2xl mb-2">ORBIT UP PROJECT</h1>
+        <p class="text-zinc-400 font-light italic">Добро пожаловать в будущее гейминга</p>
     </div>
 
-    <header class="p-4 flex justify-between items-center sticky top-0 bg-black/80 backdrop-blur-md z-40">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-[#39FF14] flex items-center justify-center text-black font-bold">O</div>
-            <span class="font-bold text-sm tracking-tighter" id="user-name">USER</span>
+    <div id="screen-lang" class="page fixed inset-0 z-[90] bg-black flex flex-col items-center justify-center p-8">
+        <h2 class="neon-text text-xl mb-10 text-center">Выберите язык / Select Language</h2>
+        <div class="w-full space-y-4">
+            <button onclick="setLang('ru')" class="w-full glass-panel p-5 text-lg font-bold hover:bg-white/5">🇷🇺 РУССКИЙ</button>
+            <button onclick="setLang('en')" class="w-full glass-panel p-5 text-lg font-bold hover:bg-white/5">🇺🇸 ENGLISH</button>
         </div>
-        <div class="flex items-center gap-2 bg-zinc-900 px-3 py-1.5 rounded-full border border-zinc-800">
-            <span class="text-[#39FF14] text-xs">⭐</span>
-            <span class="font-bold text-sm" id="balance-val">1,250</span>
-        </div>
-    </header>
+    </div>
 
-    <section id="home" class="page active p-4">
-        <div class="glass rounded-3xl p-4 mb-6 relative overflow-hidden">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="neon-text text-sm uppercase">Crash Game Live</h2>
-                <div id="multiplier" class="text-3xl font-black italic text-white">1.00x</div>
-            </div>
-            <canvas id="crash-canvas"></canvas>
-            <div class="mt-4 flex gap-2">
-                <input type="number" placeholder="Bet Amount" class="flex-1 bg-black border border-zinc-800 rounded-xl px-4 text-white focus:outline-none focus:border-[#39FF14]">
-                <button onclick="tg.HapticFeedback.impactOccurred('medium')" class="bg-[#39FF14] text-black font-black px-6 py-3 rounded-xl uppercase text-sm">Bet</button>
-            </div>
-        </div>
+    <div id="app-shell" class="hidden">
         
-        <div class="grid grid-cols-2 gap-4">
-            <div class="glass p-4 rounded-2xl flex flex-col items-center">
-                <span class="text-2xl mb-1">📈</span>
-                <span class="text-[10px] text-zinc-500">PLAYERS</span>
-                <span class="font-bold">1,402</span>
+        <header class="p-5 flex justify-between items-center sticky top-0 z-30 bg-black/50 backdrop-blur-md">
+            <div onclick="showPage('profile')" class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-green-500 to-emerald-900 border border-white/20"></div>
+                <span id="username" class="font-bold text-sm tracking-widest uppercase">USER</span>
             </div>
-            <div class="glass p-4 rounded-2xl flex flex-col items-center">
-                <span class="text-2xl mb-1">💰</span>
-                <span class="text-[10px] text-zinc-500">JACKPOT</span>
-                <span class="font-bold text-[#39FF14]">42.5k</span>
+            <div onclick="showPage('wallet')" class="glass-panel px-4 py-2 flex items-center gap-2 border-[#39FF14]/30">
+                <span class="text-[#39FF14]">⭐</span>
+                <span id="main-balance" class="font-bold">2,500</span>
             </div>
-        </div>
-    </section>
+        </header>
 
-    <section id="cases" class="page p-4">
-        <h2 class="neon-text mb-4">Exclusive Lootboxes</h2>
-        <div class="space-y-4">
-            <div class="glass p-4 rounded-3xl flex items-center justify-between border-l-4 border-yellow-500">
-                <div class="flex items-center gap-4">
-                    <div class="text-4xl">📦</div>
-                    <div>
-                        <h3 class="font-bold">GOLDEN CASE</h3>
-                        <p class="text-xs text-zinc-500">Rare NFTs inside</p>
-                    </div>
+        <nav class="fixed bottom-0 left-0 right-0 h-20 glass-panel rounded-t-3xl rounded-b-none border-t border-white/10 flex justify-around items-center z-50 px-4">
+            <button onclick="showPage('home')" class="nav-btn flex flex-col items-center gap-1 opacity-50"><span class="text-xl">🚀</span><span class="text-[9px] uppercase font-bold">Crash</span></button>
+            <button onclick="showPage('cases')" class="nav-btn flex flex-col items-center gap-1 opacity-50"><span class="text-xl">📦</span><span class="text-[9px] uppercase font-bold">Cases</span></button>
+            <button onclick="showPage('gifts')" class="nav-btn flex flex-col items-center gap-1 opacity-50"><span class="text-xl">🎁</span><span class="text-[9px] uppercase font-bold">Gifts</span></button>
+            <button onclick="showPage('trade')" class="nav-btn flex flex-col items-center gap-1 opacity-50"><span class="text-xl">🔄</span><span class="text-[9px] uppercase font-bold">Trade</span></button>
+            <button onclick="showPage('profile')" class="nav-btn flex flex-col items-center gap-1 opacity-50"><span class="text-xl">👤</span><span class="text-[9px] uppercase font-bold">Menu</span></button>
+        </nav>
+
+        <main id="page-home" class="page p-5 pb-24 active">
+            <div class="glass-panel p-6 mb-6 overflow-hidden relative">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-xs font-bold text-zinc-500 uppercase tracking-widest">Live Multiplier</span>
+                    <span id="multiplier" class="text-4xl font-black neon-text italic">1.00x</span>
                 </div>
-                <button class="bg-yellow-500 text-black px-4 py-2 rounded-lg font-bold text-xs">50 ⭐</button>
-            </div>
-            <div class="glass p-4 rounded-3xl flex items-center justify-between border-l-4 border-[#39FF14]">
-                <div class="flex items-center gap-4">
-                    <div class="text-4xl">🧪</div>
-                    <div>
-                        <h3 class="font-bold">NEON BOX</h3>
-                        <p class="text-xs text-zinc-500">Multiplier boosts</p>
-                    </div>
+                <canvas id="crash-chart" class="w-full h-40 mb-4"></canvas>
+                <div class="flex gap-3">
+                    <input type="number" placeholder="Сумма..." class="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 text-white outline-none focus:border-[#39FF14]">
+                    <button class="btn-primary px-8 py-3 rounded-xl uppercase text-xs">Ставка</button>
                 </div>
-                <button class="bg-[#39FF14] text-black px-4 py-2 rounded-lg font-bold text-xs">20 ⭐</button>
             </div>
-        </div>
-    </section>
+        </main>
 
-    <section id="market" class="page p-4 text-center">
-        <h2 class="neon-text mb-6">TON NFT Market</h2>
-        <div class="grid grid-cols-2 gap-4">
-            <div class="glass p-2 rounded-2xl">
-                <div class="aspect-square bg-gradient-to-br from-zinc-800 to-black rounded-xl mb-2 flex items-center justify-center text-4xl">💎</div>
-                <p class="text-xs font-bold">Orbit Shark #1</p>
-                <p class="text-[10px] text-[#39FF14] mb-2">12.5 TON</p>
-                <button class="w-full bg-white/10 py-1.5 rounded-lg text-[10px] font-bold uppercase">Buy Now</button>
+        <main id="page-gifts" class="page p-5 pb-24">
+            <h2 class="neon-text text-lg mb-6 uppercase">Маркет подарков (NFT)</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-panel p-3">
+                    <div class="aspect-square rounded-xl bg-gradient-to-b from-zinc-800 to-black mb-3 flex items-center justify-center text-5xl">🧧</div>
+                    <p class="font-bold text-sm">Legendary Pack</p>
+                    <p class="text-[#39FF14] font-bold text-xs mb-3">5.0 TON</p>
+                    <button class="w-full bg-white/5 py-2 rounded-lg text-[10px] uppercase font-bold">Купить</button>
+                </div>
+                <div class="glass-panel p-3">
+                    <div class="aspect-square rounded-xl bg-gradient-to-b from-zinc-800 to-black mb-3 flex items-center justify-center text-5xl">🔮</div>
+                    <p class="font-bold text-sm">Mystic Orb</p>
+                    <p class="text-[#39FF14] font-bold text-xs mb-3">1.2 TON</p>
+                    <button class="w-full bg-white/5 py-2 rounded-lg text-[10px] uppercase font-bold">Купить</button>
+                </div>
             </div>
-            <div class="glass p-2 rounded-2xl">
-                <div class="aspect-square bg-gradient-to-br from-zinc-800 to-black rounded-xl mb-2 flex items-center justify-center text-4xl">🔥</div>
-                <p class="text-xs font-bold">Neon Pulse #4</p>
-                <p class="text-[10px] text-[#39FF14] mb-2">8.0 TON</p>
-                <button class="w-full bg-white/10 py-1.5 rounded-lg text-[10px] font-bold uppercase">Buy Now</button>
-            </div>
-        </div>
-    </section>
+        </main>
 
-    <nav class="fixed bottom-0 left-0 right-0 h-20 glass border-t border-white/10 flex items-center justify-around px-6 z-50 backdrop-blur-xl">
-        <button onclick="showPage('home')" class="nav-item active flex flex-col items-center gap-1">
-            <span class="text-xl">🎮</span>
-            <span class="text-[10px] font-bold uppercase tracking-widest">Play</span>
-        </button>
-        <button onclick="showPage('cases')" class="nav-item flex flex-col items-center gap-1">
-            <span class="text-xl">📦</span>
-            <span class="text-[10px] font-bold uppercase tracking-widest">Cases</span>
-        </button>
-        <button onclick="showPage('market')" class="nav-item flex flex-col items-center gap-1">
-            <span class="text-xl">💎</span>
-            <span class="text-[10px] font-bold uppercase tracking-widest">Market</span>
-        </button>
-    </nav>
+        <main id="page-trade" class="page p-5 pb-24">
+            <h2 class="neon-text text-lg mb-4 uppercase">Trade System</h2>
+            <div class="glass-panel p-6 text-center">
+                <div class="flex justify-around items-center mb-6">
+                    <div class="w-16 h-16 rounded-2xl border-2 border-dashed border-zinc-700 flex items-center justify-center text-zinc-600">You</div>
+                    <span class="text-2xl animate-pulse">🔄</span>
+                    <div class="w-16 h-16 rounded-2xl border-2 border-dashed border-zinc-700 flex items-center justify-center text-zinc-600">Peer</div>
+                </div>
+                <button class="w-full btn-primary py-4 rounded-2xl">Создать предложение</button>
+            </div>
+        </main>
+
+        <main id="page-wallet" class="page p-5 pb-24">
+            <h2 class="neon-text text-lg mb-6 uppercase">Finance Management</h2>
+            <div class="glass-panel p-6 mb-4">
+                <p class="text-xs text-zinc-500 mb-1">Доступно для вывода</p>
+                <p class="text-2xl font-bold mb-6">2,500 ⭐ / 0.00 TON</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <button class="btn-primary py-3 rounded-xl text-xs uppercase">Пополнить</button>
+                    <button class="border border-zinc-700 py-3 rounded-xl text-xs uppercase">Вывести</button>
+                </div>
+            </div>
+            <div class="glass-panel p-4 flex items-center justify-between">
+                <span class="text-sm">Оплата картой</span>
+                <span class="text-[#39FF14] text-xs">Доступно</span>
+            </div>
+        </main>
+
+    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.backgroundColor = "#000000";
 
-        // Splash screen delay
+        // 1. Логика Сплэш-экрана и выбора языка
         setTimeout(() => {
-            document.getElementById('splash').style.opacity = '0';
-            setTimeout(() => document.getElementById('splash').remove(), 700);
-        }, 2500);
+            const welcome = document.getElementById('screen-welcome');
+            welcome.style.opacity = '0';
+            setTimeout(() => {
+                welcome.remove();
+                document.getElementById('screen-lang').classList.add('active');
+            }, 500);
+        }, 4000); // 4 секунды приветствия
 
-        // Navigation
+        function setLang(lang) {
+            tg.HapticFeedback.notificationOccurred('success');
+            document.getElementById('screen-lang').remove();
+            document.getElementById('app-shell').classList.remove('hidden');
+            if(tg.initDataUnsafe?.user) {
+                document.getElementById('username').innerText = tg.initDataUnsafe.user.first_name;
+            }
+            startCrash();
+        }
+
+        // 2. Навигация между страницами
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            event.currentTarget.classList.add('active');
-            tg.HapticFeedback.selectionChanged();
+            document.getElementById('page-' + pageId).classList.add('active');
+            
+            // Стилизация кнопок навигации
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.style.opacity = '0.5');
+            event.currentTarget.style.opacity = '1';
+            
+            tg.HapticFeedback.impactOccurred('light');
         }
 
-        // Crash Game Logic
-        const canvas = document.getElementById('crash-canvas');
-        const ctx = canvas.getContext('2d');
-        let multiplier = 1.0;
-        let points = [];
+        // 3. Игра CRASH (Визуализация)
+        function startCrash() {
+            const canvas = document.getElementById('crash-chart');
+            const ctx = canvas.getContext('2d');
+            let m = 1.0;
+            let pts = [];
 
-        function drawCrash() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = '#39FF14';
-            ctx.lineWidth = 4;
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = '#39FF14';
+            function animate() {
+                ctx.clearRect(0,0, canvas.width, canvas.height);
+                ctx.strokeStyle = '#39FF14';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                
+                pts.push(m);
+                if(pts.length > 50) pts.shift();
 
-            ctx.beginPath();
-            points.forEach((p, i) => {
-                const x = (i / 100) * canvas.width;
-                const y = canvas.height - (p * 20);
-                if(i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            });
-            ctx.stroke();
+                pts.forEach((p, i) => {
+                    const x = (i / 50) * canvas.width;
+                    const y = canvas.height - (p * 15);
+                    if(i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.stroke();
 
-            multiplier += 0.005;
-            points.push(multiplier);
-            if(points.length > 100) points.shift();
-
-            document.getElementById('multiplier').innerText = multiplier.toFixed(2) + 'x';
-            
-            // Random crash simulation
-            if(Math.random() < 0.002) {
-                multiplier = 1.0;
-                points = [];
-                tg.HapticFeedback.notificationOccurred('error');
+                m += 0.005;
+                document.getElementById('multiplier').innerText = m.toFixed(2) + 'x';
+                
+                if(Math.random() < 0.003) { m = 1.0; pts = []; } // Симуляция краша
+                requestAnimationFrame(animate);
             }
-            
-            requestAnimationFrame(drawCrash);
-        }
-        drawCrash();
-
-        // User Init
-        if(tg.initDataUnsafe?.user) {
-            document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name.toUpperCase();
+            animate();
         }
     </script>
 </body>
