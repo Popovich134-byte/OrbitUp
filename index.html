@@ -2,165 +2,398 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>OrbitUp | Original Neon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>OrbitUp | Maximum Ecosystem</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;400;700;800&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #000; color: #39FF14; font-family: sans-serif; overflow-x: hidden; touch-action: manipulation; }
-        .neon-border { border: 1px solid #39FF14; box-shadow: 0 0 10px rgba(57, 255, 20, 0.4); }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
-        .page { display: none; }
-        .page.active { display: block; }
-        #crash-canvas { width: 100%; height: 180px; border-radius: 15px; background: #080808; }
-        .anim-spin { animation: spin 0.5s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        :root { --neon: #39FF14; --neon-dim: rgba(57, 255, 20, 0.3); --bg: #000000; }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        body { 
+            background-color: var(--bg); color: white; 
+            font-family: 'Inter', sans-serif; margin: 0; padding: 0;
+            overflow: hidden; height: 100vh;
+        }
+        .neon-text { font-family: 'Orbitron', sans-serif; color: var(--neon); text-shadow: 0 0 15px var(--neon-dim); }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .glass-neon { background: rgba(57, 255, 20, 0.02); border: 1px solid var(--neon-dim); backdrop-filter: blur(10px); }
+        
+        /* Плавные переходы страниц */
+        .page { 
+            position: absolute; inset: 0; padding: 20px; padding-bottom: 100px;
+            overflow-y: auto; display: none; opacity: 0; transform: scale(0.98); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .page.active { display: block; opacity: 1; transform: scale(1); }
+
+        /* Анимации */
+        @keyframes scanline { 0% { bottom: 100%; } 100% { bottom: -100%; } }
+        .scanline { position: absolute; width: 100%; height: 2px; background: var(--neon-dim); animation: scanline 8s linear infinite; opacity: 0.1; }
+        
+        .case-shake { animation: shake 0.4s ease-in-out infinite; }
+        @keyframes shake { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(3deg); } 75% { transform: rotate(-3deg); } }
+
+        /* График */
+        #crash-canvas { width: 100%; height: 220px; border-radius: 24px; }
+        
+        /* Кастомный скролл */
+        ::-webkit-scrollbar { width: 0px; }
     </style>
 </head>
-<body class="p-4">
+<body>
+    <div class="scanline"></div>
 
-    <div id="splash" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center">
-        <h1 style="text-shadow: 0 0 20px #39FF14" class="text-4xl font-black italic mb-2">ORBIT UP</h1>
-        <div class="w-10 h-1 bg-[#39FF14] animate-pulse"></div>
+    <div id="screen-welcome" class="fixed inset-0 z-[200] bg-black flex flex-col items-center justify-center p-10 text-center">
+        <div class="relative mb-10">
+            <div class="w-32 h-32 border-2 border-[#39FF14] rounded-full animate-ping opacity-20 absolute -inset-0"></div>
+            <div class="w-32 h-32 border border-[#39FF14] rounded-full flex items-center justify-center text-6xl">🚀</div>
+        </div>
+        <h1 class="neon-text text-3xl font-black italic mb-2 tracking-tighter">ORBIT UP</h1>
+        <p class="text-zinc-500 font-light tracking-[0.4em] uppercase text-[10px] animate-pulse">Initializing System...</p>
     </div>
 
-    <div id="lang-page" class="page fixed inset-0 bg-black flex flex-col items-center justify-center p-6">
-        <h2 class="text-xl mb-8 font-bold uppercase tracking-widest">Select Language</h2>
-        <button onclick="init('ru')" class="w-full glass neon-border p-5 rounded-2xl mb-4 font-bold">РУССКИЙ</button>
-        <button onclick="init('en')" class="w-full glass neon-border p-5 rounded-2xl font-bold">ENGLISH</button>
+    <div id="screen-lang" class="fixed inset-0 z-[190] bg-black flex flex-col items-center justify-center p-8 opacity-0 pointer-events-none transition-opacity duration-700">
+        <h2 class="neon-text text-xl mb-12 uppercase tracking-widest">Select Access Level</h2>
+        <div class="w-full space-y-4">
+            <button onclick="pickLang('RU')" class="w-full glass-neon p-6 rounded-3xl flex justify-between items-center group">
+                <span class="font-bold text-lg">РУССКИЙ</span>
+                <span class="opacity-0 group-focus:opacity-100 text-[#39FF14]">●</span>
+            </button>
+            <button onclick="pickLang('EN')" class="w-full glass-neon p-6 rounded-3xl flex justify-between items-center group">
+                <span class="font-bold text-lg">ENGLISH</span>
+                <span class="opacity-0 group-focus:opacity-100 text-[#39FF14]">●</span>
+            </button>
+        </div>
+        <button id="lang-next" onclick="enterApp()" class="hidden mt-12 w-full bg-[#39FF14] text-black font-black py-5 rounded-3xl shadow-[0_0_30px_rgba(57,255,20,0.4)] transition-all">
+            ПРОДОЛЖИТЬ / CONTINUE
+        </button>
     </div>
 
-    <div id="main-app" class="page">
-        <div class="flex justify-between items-center mb-6">
-            <span id="user-name" class="font-bold text-lg">LOADING...</span>
-            <div class="glass neon-border px-4 py-1 rounded-full text-sm font-black">⭐ <span id="balance">1000</span></div>
+    <div id="app-shell" class="hidden h-screen overflow-hidden">
+        
+        <header class="fixed top-0 left-0 right-0 p-6 z-50 flex justify-between items-center pointer-events-none">
+            <div class="glass px-4 py-2 rounded-2xl flex items-center gap-3 pointer-events-auto border-white/5">
+                <div class="w-6 h-6 rounded-full bg-gradient-to-br from-[#39FF14] to-green-900"></div>
+                <span id="header-user" class="text-[10px] font-black tracking-widest uppercase">GUEST</span>
+            </div>
+            <div onclick="openTab('wallet')" class="glass px-4 py-2 rounded-2xl flex items-center gap-2 pointer-events-auto border-[#39FF14]/20 bg-black/40">
+                <span class="text-[#39FF14] animate-pulse">⭐</span>
+                <span id="header-balance" class="font-black text-sm">1,250</span>
+            </div>
+        </header>
+
+        <nav class="fixed bottom-6 left-6 right-6 h-20 glass rounded-full border-white/10 flex justify-around items-center z-50 px-2 shadow-2xl">
+            <button onclick="openTab('crash')" class="nav-item w-12 h-12 flex flex-col items-center justify-center rounded-full transition-all active:scale-90" id="nav-crash">
+                <span class="text-xl">📈</span>
+            </button>
+            <button onclick="openTab('cases')" class="nav-item w-12 h-12 flex flex-col items-center justify-center rounded-full transition-all opacity-40" id="nav-cases">
+                <span class="text-xl">📦</span>
+            </button>
+            <button onclick="openTab('gifts')" class="nav-item w-12 h-12 flex flex-col items-center justify-center rounded-full transition-all opacity-40" id="nav-gifts">
+                <span class="text-xl">🎁</span>
+            </button>
+            <button onclick="openTab('trade')" class="nav-item w-12 h-12 flex flex-col items-center justify-center rounded-full transition-all opacity-40" id="nav-trade">
+                <span class="text-xl">🔄</span>
+            </button>
+            <button onclick="openTab('profile')" class="nav-item w-12 h-12 flex flex-col items-center justify-center rounded-full transition-all opacity-40" id="nav-profile">
+                <span class="text-xl">👤</span>
+            </button>
+        </nav>
+
+        <div id="page-crash" class="page active pt-28">
+            <div class="glass-neon rounded-[32px] p-6 mb-6">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <p class="text-[10px] opacity-40 uppercase tracking-[0.2em] mb-1">Live Chart</p>
+                        <h2 class="neon-text text-sm">CRASH SYSTEM</h2>
+                    </div>
+                    <div id="crash-mult" class="text-5xl font-black italic tracking-tighter">1.00x</div>
+                </div>
+                <canvas id="crash-canvas"></canvas>
+                <div class="grid grid-cols-2 gap-3 mt-6">
+                    <div class="relative">
+                        <input id="crash-bet" type="number" value="100" class="w-full bg-black/50 border border-white/10 rounded-2xl p-4 text-white font-bold focus:border-[#39FF14] outline-none">
+                        <span class="absolute right-4 top-4 opacity-30">⭐</span>
+                    </div>
+                    <button id="crash-btn" onclick="crashAction()" class="bg-[#39FF14] text-black font-black rounded-2xl uppercase text-xs tracking-widest shadow-lg shadow-green-500/20">Place Bet</button>
+                </div>
+            </div>
+            
+            <div class="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+                <div class="glass min-w-[120px] p-4 rounded-2xl flex flex-col gap-1">
+                    <span class="text-[9px] opacity-40">LAST CRASH</span>
+                    <span class="font-bold text-red-500">1.45x</span>
+                </div>
+                <div class="glass min-w-[120px] p-4 rounded-2xl flex flex-col gap-1">
+                    <span class="text-[9px] opacity-40">LAST CRASH</span>
+                    <span class="font-bold text-[#39FF14]">14.2x</span>
+                </div>
+            </div>
         </div>
 
-        <div class="glass neon-border rounded-3xl p-5 mb-6">
-            <div class="flex justify-between mb-2">
-                <span class="text-[10px] font-bold opacity-50 uppercase">Crash Game</span>
-                <span id="mult" class="text-2xl font-black">1.00x</span>
-            </div>
-            <canvas id="crash-canvas"></canvas>
-            <div class="flex gap-2 mt-4">
-                <input id="bet-input" type="number" value="10" class="w-1/2 bg-white/10 rounded-xl px-4 text-white outline-none">
-                <button id="btn-bet" onclick="startBet()" class="w-1/2 bg-[#39FF14] text-black font-bold py-3 rounded-xl uppercase">Ставка</button>
-                <button id="btn-cash" onclick="takeWin()" class="hidden w-1/2 bg-white text-black font-bold py-3 rounded-xl uppercase tracking-tighter">Забрать</button>
+        <div id="page-cases" class="page pt-28">
+            <h2 class="neon-text mb-6">LOOTBOXES</h2>
+            <div class="grid grid-cols-1 gap-4">
+                <div id="case-box-1" class="glass-neon p-6 rounded-[32px] flex items-center justify-between border-l-4 border-[#39FF14]">
+                    <div class="flex items-center gap-6">
+                        <div id="case-anim-1" class="text-5xl">📦</div>
+                        <div>
+                            <h3 class="font-black text-lg">NEON BOX</h3>
+                            <p class="text-[10px] opacity-50 uppercase tracking-widest">Drop: 0 - 500 ⭐</p>
+                        </div>
+                    </div>
+                    <button onclick="openLootbox(100, 'case-anim-1')" class="bg-[#39FF14] text-black px-6 py-3 rounded-2xl font-black text-xs">100 ⭐</button>
+                </div>
+                <div id="case-box-2" class="glass p-6 rounded-[32px] flex items-center justify-between border-l-4 border-purple-500">
+                    <div class="flex items-center gap-6">
+                        <div id="case-anim-2" class="text-5xl">💎</div>
+                        <div>
+                            <h3 class="font-black text-lg">ELITE BOX</h3>
+                            <p class="text-[10px] opacity-50 uppercase tracking-widest">Drop: 0 - 2500 ⭐</p>
+                        </div>
+                    </div>
+                    <button onclick="openLootbox(500, 'case-anim-2')" class="bg-white text-black px-6 py-3 rounded-2xl font-black text-xs">500 ⭐</button>
+                </div>
             </div>
         </div>
 
-        <h3 class="text-xs font-bold mb-3 opacity-50 uppercase">Кейсы</h3>
-        <div class="grid grid-cols-2 gap-4 mb-8">
-            <div class="glass p-4 rounded-2xl text-center border border-white/10">
-                <div id="case-1-icon" class="text-4xl mb-2 text-white">📦</div>
-                <div class="text-[10px] font-bold mb-2">NEON BOX</div>
-                <button onclick="openCase(50, 'case-1')" class="w-full bg-[#39FF14] text-black text-[10px] font-bold py-2 rounded-lg">50 ⭐</button>
-            </div>
-            <div class="glass p-4 rounded-2xl text-center border border-white/10">
-                <div id="case-2-icon" class="text-4xl mb-2 text-white">💎</div>
-                <div class="text-[10px] font-bold mb-2">ELITE BOX</div>
-                <button onclick="openCase(200, 'case-2')" class="w-full bg-[#39FF14] text-black text-[10px] font-bold py-2 rounded-lg">200 ⭐</button>
+        <div id="page-gifts" class="page pt-28">
+            <h2 class="neon-text mb-6 uppercase">NFT Gifts Market</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-neon p-4 rounded-3xl relative overflow-hidden">
+                    <div class="absolute -top-4 -right-4 w-12 h-12 bg-[#39FF14] blur-2xl opacity-20"></div>
+                    <div class="aspect-square bg-black/40 rounded-2xl mb-4 flex items-center justify-center text-5xl">⚡</div>
+                    <p class="font-black text-xs mb-1">STORM BOTTLE</p>
+                    <p class="text-[10px] text-[#39FF14] font-bold mb-4">5.5 TON</p>
+                    <button onclick="buyAction('Storm Bottle', 5.5)" class="w-full bg-white/5 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest">Buy Only TON</button>
+                </div>
+                <div class="glass p-4 rounded-3xl">
+                    <div class="aspect-square bg-black/40 rounded-2xl mb-4 flex items-center justify-center text-5xl">🛡️</div>
+                    <p class="font-black text-xs mb-1">NEON SHIELD</p>
+                    <p class="text-[10px] text-[#39FF14] font-bold mb-4">12.0 TON</p>
+                    <button onclick="buyAction('Neon Shield', 12)" class="w-full bg-white/5 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest">Buy Only TON</button>
+                </div>
             </div>
         </div>
+
+        <div id="page-trade" class="page pt-28">
+            <h2 class="neon-text mb-6">P2P TRADE</h2>
+            <div class="glass-neon p-8 rounded-[40px] text-center">
+                <div class="flex justify-between items-center mb-10">
+                    <div class="w-20 h-20 rounded-3xl border border-dashed border-white/20 flex items-center justify-center flex-col">
+                        <span class="text-[8px] opacity-40 mb-2 uppercase">You</span>
+                        <span class="text-2xl">➕</span>
+                    </div>
+                    <div class="text-[#39FF14] animate-pulse">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16l-4-4 4-4M17 8l4 4-4 4M3 12h18"/></svg>
+                    </div>
+                    <div class="w-20 h-20 rounded-3xl border border-dashed border-white/20 flex items-center justify-center flex-col">
+                        <span class="text-[8px] opacity-40 mb-2 uppercase">Partner</span>
+                        <span class="text-2xl">👤</span>
+                    </div>
+                </div>
+                <p class="text-xs text-zinc-500 mb-6">Select NFT from your inventory to start trade with another player</p>
+                <button class="w-full btn-primary bg-[#39FF14] text-black py-4 rounded-2xl font-black text-xs uppercase tracking-widest">Find Partner</button>
+            </div>
+        </div>
+
+        <div id="page-profile" class="page pt-28">
+            <div class="flex items-center gap-6 mb-10">
+                <div class="w-20 h-20 rounded-[30px] bg-gradient-to-tr from-[#39FF14] to-black p-[2px]">
+                    <div class="w-full h-full bg-black rounded-[28px] flex items-center justify-center text-3xl">👤</div>
+                </div>
+                <div>
+                    <h2 id="profile-name" class="font-black text-2xl uppercase">USERNAME</h2>
+                    <p class="text-[10px] text-[#39FF14] tracking-[0.3em]">ID: 98234112</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div onclick="openTab('wallet')" class="glass-neon p-6 rounded-3xl">
+                    <p class="text-[10px] opacity-40 mb-2 uppercase">Stars</p>
+                    <p class="font-black text-xl">1,250</p>
+                </div>
+                <div class="glass p-6 rounded-3xl">
+                    <p class="text-[10px] opacity-40 mb-2 uppercase">NFT Count</p>
+                    <p class="font-black text-xl">0</p>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <button onclick="openTab('wallet')" class="w-full glass p-5 rounded-2xl flex justify-between items-center">
+                    <span class="text-sm font-bold uppercase tracking-widest">Financial Panel</span>
+                    <span>→</span>
+                </button>
+                <button class="w-full glass p-5 rounded-2xl flex justify-between items-center opacity-50">
+                    <span class="text-sm font-bold uppercase tracking-widest">History</span>
+                    <span>→</span>
+                </button>
+                <button class="w-full glass p-5 rounded-2xl flex justify-between items-center text-red-500 border-red-500/20">
+                    <span class="text-sm font-bold uppercase tracking-widest">Security Logout</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="page-wallet" class="page pt-28">
+            <button onclick="openTab('profile')" class="mb-6 text-[#39FF14] text-xs font-black uppercase tracking-widest">← Back to profile</button>
+            <h2 class="neon-text mb-6">WALLET PANEL</h2>
+            
+            <div class="glass-neon p-8 rounded-[40px] mb-6">
+                <p class="text-xs opacity-40 mb-2 uppercase tracking-widest text-center">Available Balance</p>
+                <h3 class="text-5xl font-black text-center mb-8 italic">⭐ 1,250</h3>
+                <div class="grid grid-cols-1 gap-3">
+                    <button onclick="tg.showPopup({message: 'Select: Card or Telegram Stars'})" class="w-full bg-[#39FF14] text-black py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em]">Deposit (Card/Stars)</button>
+                    <button onclick="tg.showPopup({message: 'Manual withdrawal request sent to admin'})" class="w-full bg-white/5 py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] border border-white/10">Withdrawal Request</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        let balance = 1000;
-        let multiplier = 1.0;
-        let bet = 0;
-        let isMoving = false;
-        let points = [];
+        tg.expand();
+        tg.enableClosingConfirmation();
+        
+        let balance = 1250;
+        let crashRunning = false;
+        let crashMult = 1.0;
+        let crashPoints = [];
+        let currentBet = 0;
 
-        // Инициализация
+        // 1. WELCOME SEQUENCE
         setTimeout(() => {
-            document.getElementById('splash').remove();
-            document.getElementById('lang-page').classList.add('active');
-        }, 3000);
-
-        function init(l) {
-            document.getElementById('lang-page').remove();
-            document.getElementById('main-app').classList.add('active');
-            if(tg.initDataUnsafe?.user) document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name.toUpperCase();
-            startEngine();
-        }
-
-        // Функции баланса
-        function updateBal() { document.getElementById('balance').innerText = Math.floor(balance); }
-
-        // Логика КЕЙСОВ
-        function openCase(cost, id) {
-            if (balance < cost) return alert("Недостаточно ⭐");
-            balance -= cost;
-            updateBal();
-            
-            const icon = document.getElementById(id + '-icon');
-            icon.classList.add('anim-spin');
-            
+            document.getElementById('screen-welcome').style.opacity = '0';
             setTimeout(() => {
-                icon.classList.remove('anim-spin');
-                const win = Math.floor(Math.random() * (cost * 2.5));
-                balance += win;
-                updateBal();
-                tg.showPopup({ message: `Вы выбили: ${win} ⭐` });
-                tg.HapticFeedback.notificationOccurred('success');
-            }, 1500);
-        }
+                document.getElementById('screen-welcome').remove();
+                document.getElementById('screen-lang').style.opacity = '1';
+                document.getElementById('screen-lang').style.pointerEvents = 'auto';
+            }, 700);
+        }, 5000); // 5 секунд
 
-        // Логика КРАША
-        function startBet() {
-            const val = parseInt(document.getElementById('bet-input').value);
-            if(val > balance || val <= 0) return;
-            balance -= val;
-            bet = val;
-            updateBal();
-            document.getElementById('btn-bet').classList.add('hidden');
-            document.getElementById('btn-cash').classList.remove('hidden');
+        function pickLang(l) {
             tg.HapticFeedback.impactOccurred('medium');
+            document.getElementById('lang-next').classList.remove('hidden');
         }
 
-        function takeWin() {
-            if(bet <= 0) return;
-            const prize = bet * multiplier;
-            balance += prize;
-            updateBal();
-            bet = 0;
-            document.getElementById('btn-bet').classList.remove('hidden');
-            document.getElementById('btn-cash').classList.add('hidden');
-            tg.HapticFeedback.notificationOccurred('success');
+        function enterApp() {
+            document.getElementById('screen-lang').remove();
+            document.getElementById('app-shell').classList.remove('hidden');
+            if(tg.initDataUnsafe?.user) {
+                document.getElementById('header-user').innerText = tg.initDataUnsafe.user.first_name;
+                document.getElementById('profile-name').innerText = tg.initDataUnsafe.user.first_name;
+            }
+            startCrashEngine();
         }
 
-        function startEngine() {
+        // 2. TAB NAVIGATION
+        function openTab(tabId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.style.opacity = '0.4');
+            
+            const target = document.getElementById('page-' + tabId);
+            target.classList.add('active');
+            
+            const nav = document.getElementById('nav-' + tabId);
+            if(nav) nav.style.opacity = '1';
+            
+            tg.HapticFeedback.selectionChanged();
+        }
+
+        // 3. CRASH ENGINE
+        function startCrashEngine() {
             const canvas = document.getElementById('crash-canvas');
             const ctx = canvas.getContext('2d');
             
             setInterval(() => {
                 ctx.clearRect(0,0, canvas.width, canvas.height);
-                multiplier += 0.01;
+                crashMult += 0.008;
                 
-                if(Math.random() < 0.005) { // Шанс краша
-                    if(bet > 0) {
-                        bet = 0;
-                        document.getElementById('btn-bet').classList.remove('hidden');
-                        document.getElementById('btn-cash').classList.add('hidden');
+                if(Math.random() < 0.004) { // Crash chance
+                    if(currentBet > 0) {
                         tg.HapticFeedback.notificationOccurred('error');
+                        currentBet = 0;
+                        toggleCrashBtn(true);
                     }
-                    multiplier = 1.0;
-                    points = [];
+                    crashMult = 1.0;
+                    crashPoints = [];
                 }
 
-                points.push(multiplier);
-                if(points.length > 50) points.shift();
+                crashPoints.push(crashMult);
+                if(crashPoints.length > 70) crashPoints.shift();
 
                 ctx.strokeStyle = '#39FF14';
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 4;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#39FF14';
                 ctx.beginPath();
-                points.forEach((p, i) => {
-                    ctx.lineTo((i/50)*canvas.width, canvas.height - (p*15));
+                crashPoints.forEach((p, i) => {
+                    const x = (i/70)*canvas.width;
+                    const y = canvas.height - (p*25);
+                    if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
                 });
                 ctx.stroke();
-                document.getElementById('mult').innerText = multiplier.toFixed(2) + 'x';
+                document.getElementById('crash-mult').innerText = crashMult.toFixed(2) + 'x';
             }, 50);
+        }
+
+        function crashAction() {
+            const btn = document.getElementById('crash-btn');
+            if(currentBet === 0) {
+                const amt = parseInt(document.getElementById('crash-bet').value);
+                if(amt > balance || amt <= 0) return;
+                balance -= amt;
+                currentBet = amt;
+                updateUI();
+                toggleCrashBtn(false);
+            } else {
+                const win = currentBet * crashMult;
+                balance += win;
+                currentBet = 0;
+                updateUI();
+                toggleCrashBtn(true);
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        }
+
+        function toggleCrashBtn(isBet) {
+            const btn = document.getElementById('crash-btn');
+            if(isBet) {
+                btn.innerText = "Place Bet";
+                btn.style.background = "#39FF14";
+            } else {
+                btn.innerText = "Cash Out";
+                btn.style.background = "#FFFFFF";
+            }
+        }
+
+        // 4. LOOTBOXES
+        function openLootbox(cost, animId) {
+            if(balance < cost) return tg.showAlert("Insufficient Stars!");
+            balance -= cost; updateUI();
+            
+            const el = document.getElementById(animId);
+            el.classList.add('case-shake');
+            
+            setTimeout(() => {
+                el.classList.remove('case-shake');
+                const win = Math.floor(Math.random() * (cost * 2.8));
+                balance += win; updateUI();
+                tg.HapticFeedback.notificationOccurred('success');
+                tg.showPopup({ title: 'LOOTBOX RESULT', message: `You received: ${win} ⭐` });
+            }, 1800);
+        }
+
+        function updateUI() {
+            document.getElementById('header-balance').innerText = Math.floor(balance).toLocaleString();
+            document.getElementById('header-balance').style.transform = "scale(1.2)";
+            setTimeout(() => document.getElementById('header-balance').style.transform = "scale(1)", 200);
+        }
+
+        function buyAction(name, price) {
+            tg.showConfirm(`Purchase ${name} for ${price} TON?`, (ok) => {
+                if(ok) tg.showAlert("Order sent to admin. Check your DM.");
+            });
         }
     </script>
 </body>
