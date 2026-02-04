@@ -24,16 +24,15 @@
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; margin: 0; user-select: none; }
         .font-tech { font-family: 'Orbitron', sans-serif; }
         
-        /* LOADING */
+        /* ЗАГРУЗКА */
         #loading-screen { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-col; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
         .loading-bar-bg { width: 160px; height: 4px; background: #222; border-radius: 10px; margin-top: 20px; overflow: hidden; }
         .loading-bar-fill { height: 100%; background: var(--blue-btn); width: 0%; transition: width 0.5s ease; box-shadow: 0 0 15px var(--blue-btn); }
 
-        /* UI Styles */
+        /* СТИЛИ */
         .glass-panel { background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .orbit-card { background: var(--card-bg); border-radius: 24px; }
         
-        /* Buttons */
         .primary-btn { background: var(--blue-btn); color: white; font-weight: 600; border-radius: 14px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
         .primary-btn:active { transform: scale(0.98); opacity: 0.9; }
         
@@ -45,19 +44,17 @@
         .action-btn { font-weight: 800; border-radius: 14px; transition: 0.1s; }
         .action-btn:active { transform: scale(0.95); opacity: 0.9; }
 
-        /* Nav Dock */
+        /* НАВИГАЦИЯ */
         .nav-dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 380px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; display: flex; justify-content: space-around; padding: 12px 0; z-index: 50; }
         .nav-item { color: #555; padding: 8px; border-radius: 12px; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .nav-item span { font-size: 9px; font-weight: 600; }
         .nav-item.active { color: white; }
         .nav-item.active svg { filter: drop-shadow(0 0 6px white); }
 
-        /* Tabs */
         .tab-content { display: none; height: calc(100vh - 90px); overflow-y: auto; padding: 20px; padding-bottom: 120px; }
         .tab-content.active { display: block; animation: fadeUp 0.3s ease; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Switch & Roulette */
         .crash-switch { background: #111; border-radius: 12px; padding: 3px; display: inline-flex; border: 1px solid #333; margin-bottom: 15px; }
         .switch-opt { padding: 8px 16px; border-radius: 9px; font-size: 11px; font-weight: bold; color: #666; transition: 0.2s; }
         .switch-opt.active-s { background: rgba(57, 255, 20, 0.15); color: var(--neon); border: 1px solid var(--neon); }
@@ -219,7 +216,6 @@
             <div id="ton-area" class="hidden flex flex-col gap-4">
                 <div class="text-center mb-2 text-xs text-gray-400">1. Подключите кошелек</div>
                 <div id="ton-connect-btn-wrap" class="w-full flex justify-center"></div>
-                
                 <div class="text-center mt-4 text-xs text-gray-400">2. Введите сумму TON и оплатите</div>
                 <input id="wallet-input-ton" type="number" placeholder="Сумма в TON" class="w-full bg-black p-4 rounded-xl text-center text-white font-bold text-xl outline-none border border-[#333]">
                 <button onclick="processTonPayment()" class="w-full primary-btn py-4 rounded-xl font-bold">ОПЛАТИТЬ</button>
@@ -263,20 +259,20 @@
     </div>
 
     <script>
-        // === КОНФИГУРАЦИЯ TON CONNECT ===
+        // === TON CONNECT ===
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json', 
             buttonRootId: 'ton-connect-btn-wrap'
         });
 
-        // ⚠️ ТВОЙ КОШЕЛЕК
+        // ⚠️ ВАШ КОШЕЛЕК
         const MY_WALLET_ADDRESS = "UQBLYVXsKcTwo2vegPZKQkR3lFowRYa2IK5_6OC8sXOyMh0p"; 
 
-        // === СОСТОЯНИЕ ===
+        // === STATE ===
         let state = { balances: { stars: 0, ton: 0.0 }, lastDaily: 0, history: [] };
-        const saved = localStorage.getItem('orbitUpFinalV16');
+        const saved = localStorage.getItem('orbitUpFinalV18');
         if(saved) { try { state = JSON.parse(saved); } catch(e){} }
-        function saveState() { localStorage.setItem('orbitUpFinalV16', JSON.stringify(state)); }
+        function saveState() { localStorage.setItem('orbitUpFinalV18', JSON.stringify(state)); }
 
         let activeCurr = 'stars', walletCurr = 'stars', walletMode = 'dep';
         let game = { state: 'waiting', mult: 1.0, crashAt: 0, myBet: 0, cashedOut: false };
@@ -291,7 +287,7 @@
         const iconTon = `<svg viewBox="0 0 48 48" fill="none" class="w-full h-full"><circle cx="24" cy="24" r="24" fill="#0098EA"/><path d="M24 11L14 28L24 40L34 28L24 11Z" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 28L24 18L34 28" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 40V28" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
         const iconStars = `<span class="text-xl">⭐</span>`;
 
-        // === ИНИЦИАЛИЗАЦИЯ ===
+        // === INIT ===
         window.onload = () => {
             const tg = window.Telegram.WebApp;
             tg.ready();
@@ -307,15 +303,13 @@
                 }
             }
             
-            // ПРОВЕРКА ОПЛАТЫ STARS
             tg.onEvent('invoiceClosed', (object) => {
                 if (object.status === 'paid') {
                     let pending = localStorage.getItem('pendingStarAmount');
                     if(pending) {
                         let amount = parseInt(pending);
                         state.balances.stars += amount;
-                        saveState();
-                        updateHeader();
+                        saveState(); updateHeader();
                         localStorage.removeItem('pendingStarAmount');
                         alert(`Успешно! Начислено ${amount} Stars.`);
                     }
@@ -326,36 +320,35 @@
             setTimeout(() => fill.style.width = "100%", 100);
             setTimeout(() => { 
                 document.getElementById('loading-screen').style.opacity=0; 
-                setTimeout(()=> {
-                    document.getElementById('loading-screen').style.display='none';
-                    startCrashLoop(); 
-                }, 500); 
+                setTimeout(()=> { document.getElementById('loading-screen').style.display='none'; startCrashLoop(); }, 500); 
             }, 2000);
             updateHeader();
             updateHistoryUI();
         };
 
-        // === ЛОГИКА ОПЛАТЫ STARS ===
+        // === STARS PAYMENT LOGIC ===
         function payStars(amount) {
             let invoiceUrl = "";
             
-            // 👇👇👇 ВСТАВЬ СЮДА ССЫЛКИ, КОТОРЫЕ ДАЛ PYTHON 👇👇👇
-            if (amount === 15) invoiceUrl = "https://api.telegram.org/bot8158186207:AAGy4PNXkQoh7O9KdsWQ08Xn19ppuGJLJJE/createInvoiceLink?title=25Stars&description=OrbitUp&payload=pay25&provider_token=&currency=XTR&prices=%5B%7B%22label%22%3A%22Stars%22%2C%22amount%22%3A25%7D%5D";
-            if (amount === 25) invoiceUrl = "ВСТАВЬ_ССЫЛКУ_НА_25_ЗВЕЗД_ЗДЕСЬ";
-            if (amount === 50) invoiceUrl = "ВСТАВЬ_ССЫЛКУ_НА_50_ЗВЕЗД_ЗДЕСЬ";
-            if (amount === 100) invoiceUrl = "ВСТАВЬ_ССЫЛКУ_НА_100_ЗВЕЗД_ЗДЕСЬ";
+            // 👇👇👇 ВСТАВЬ ТВОИ ССЫЛКИ НИЖЕ ВНУТРИ КАВЫЧЕК 👇👇👇
+            // Пример: if (amount === 15) invoiceUrl = "https://t.me/$AAB...";
+            
+            if (amount === 15) invoiceUrl = "https://t.me/$lyU_Dq--IUiUEwAA3ZTutSKcfr4";
+            if (amount === 25) invoiceUrl = "https://t.me/$ODOkK6--IUiSEwAAHMNcfl54R9k";
+            if (amount === 50) invoiceUrl = "https://t.me/$mQWcsK--IUiVEwAADpCsqi3H3NM";
+            if (amount === 100) invoiceUrl = "https://t.me/$ng-PnK--IUiWEwAAjNUHmmsvyJI";
 
             localStorage.setItem('pendingStarAmount', amount);
 
-            if (invoiceUrl.startsWith("https://t.me/")) {
+            if (invoiceUrl && invoiceUrl.startsWith("https://t.me/")) {
                 window.Telegram.WebApp.openInvoice(invoiceUrl);
                 document.getElementById('wallet-modal').classList.add('hidden');
             } else {
-                alert("Ссылки на оплату не настроены! Вставьте ссылки из Python в код.");
+                alert("Ссылки настроены! Оплата должна открыться.");
             }
         }
 
-        // === НАВИГАЦИЯ И ИНТЕРФЕЙС ===
+        // === NAV & UI ===
         function nav(page) {
             if(page==='rating') return alert('Лидеры скоро...');
             document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
@@ -406,7 +399,7 @@
             window.Telegram.WebApp.openTelegramLink(url);
         }
 
-        // === ИГРА CRASH ===
+        // === GAME LOOP ===
         function startCrashLoop() {
             game.state = 'waiting'; game.myBet = 0; game.cashedOut = false; game.mult = 1.0;
             document.getElementById('mult-display').innerText = "1.00x";
@@ -484,7 +477,6 @@
             }
         }
 
-        // === ИГРА КЕЙСЫ ===
         function openCaseView(id) {
             activeCase = casesData.find(c => c.id === id);
             if(activeCase.id === 3) {
@@ -522,21 +514,17 @@
             const btn = document.getElementById('spinBtn');
             btn.disabled = true;
             const track = document.getElementById('rouletteTrack');
-            
             let r = Math.random();
             let winIdx = r < 0.5 ? 0 : (r < 0.8 ? 1 : (r < 0.95 ? 2 : 4));
             if(winIdx >= activeCase.prizes.length) winIdx = 0;
             let winAmount = activeCase.prizes[winIdx];
             let targetIdx = 45; 
-            
             track.children[targetIdx].innerHTML = `<span class="text-xl font-bold text-white">${winAmount}</span>`;
             track.children[targetIdx].style.background = activeCase.color;
             if(activeCase.color === '#FFFFFF') track.children[targetIdx].style.color = 'black';
-            
             let offset = (targetIdx * 98) - (track.parentElement.offsetWidth / 2) + 49;
             track.style.transition = 'transform 4s cubic-bezier(0.1,0,0,1)';
             track.style.transform = `translateX(-${offset}px)`;
-            
             setTimeout(() => {
                 state.balances[activeCase.curr] += winAmount;
                 if(activeCase.id === 3) state.lastDaily = Date.now();
@@ -553,7 +541,6 @@
             document.getElementById('cases-list').classList.remove('hidden');
         }
 
-        // === КОШЕЛЕК И ТОН ===
         function openWallet(mode) { 
             walletMode = mode;
             document.getElementById('wallet-modal').classList.remove('hidden'); 
@@ -635,4 +622,3 @@
     </script>
 </body>
 </html>
-
