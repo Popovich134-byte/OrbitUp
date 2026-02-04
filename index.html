@@ -3,42 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Neon Gaming TMA</title>
+    <title>Neon Gaming Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;600&display=swap');
         :root { --neon: #39FF14; --gold: #FFD700; --dark: #050505; }
         body { background: var(--dark); color: white; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; margin: 0; }
         .neon-text { font-family: 'Orbitron', sans-serif; color: var(--neon); text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
-        .neon-btn { background: var(--neon); color: black; font-weight: bold; border-radius: 12px; transition: all 0.2s; }
-        .neon-btn:disabled { background: #1a1a1a; color: #444; box-shadow: none; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .neon-border { border: 2px solid var(--neon); box-shadow: 0 0 15px rgba(57, 255, 20, 0.2); }
+        .neon-btn { background: var(--neon); color: black; font-weight: bold; border-radius: 12px; transition: 0.2s; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .tab-content { display: none; height: calc(100vh - 170px); overflow-y: auto; padding: 20px; }
         .tab-content.active { display: block; }
+        
+        /* Кошелек */
+        #wallet-overlay { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform: translateY(100%); }
+        #wallet-overlay.open { transform: translateY(0); }
 
         /* Рулетка */
-        .roulette-container { position: relative; width: 100%; height: 130px; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #222; }
-        .roulette-track { display: flex; position: absolute; left: 0; align-items: center; height: 100%; will-change: transform; }
-        .roulette-item { min-width: 90px; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111; margin: 0 5px; border-radius: 15px; border: 1px solid #222; }
-        .gold-border { border: 2px solid var(--gold) !important; box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.3); }
+        .roulette-container { position: relative; width: 100%; height: 120px; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #222; }
+        .roulette-track { display: flex; position: absolute; left: 0; align-items: center; height: 100%; transition: transform 4s cubic-bezier(0.15, 0, 0.05, 1); }
+        .roulette-item { min-width: 90px; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111; margin: 0 5px; border-radius: 15px; border: 1px solid #222; }
+        .gold-border { border: 2px solid var(--gold) !important; box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
         .roulette-marker { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: var(--neon); z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px var(--neon); }
         
-        /* Ракета */
-        #rocket { position: absolute; font-size: 2.5rem; z-index: 5; pointer-events: none; filter: drop-shadow(0 0 10px var(--neon)); transition: opacity 0.3s; }
+        #rocket { position: absolute; font-size: 2.5rem; transition: opacity 0.3s; z-index: 5; }
     </style>
 </head>
 <body>
 
-    <header class="p-4 flex justify-between items-center border-b border-gray-900 bg-black/50">
-        <div>
-            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Баланс</p>
+    <header class="p-4 flex justify-between items-center bg-black/80">
+        <div onclick="openWallet()" class="neon-border rounded-2xl px-4 py-2 bg-black cursor-pointer active:scale-95 transition">
+            <p class="text-[9px] text-gray-500 uppercase font-black mb-1">Кошелек 💳</p>
             <div class="flex items-center gap-2">
-                <span class="text-2xl font-black neon-text" id="balanceDisplay">10.00</span>
-                <span class="text-sm">⭐</span>
+                <span class="text-xl font-black neon-text" id="balanceDisplay">10.00</span>
+                <span class="text-sm text-yellow-400">⭐</span>
             </div>
         </div>
-        <div class="flex items-center gap-2 glass px-3 py-1 rounded-full text-[10px] font-bold">
-            <span class="text-[#39FF14] animate-pulse">●</span> LIVE
+        <div class="text-right">
+            <p class="text-[9px] text-gray-500 uppercase font-bold">Уровень 1</p>
+            <div class="w-20 h-1.5 bg-gray-800 rounded-full mt-1 overflow-hidden">
+                <div id="xpBar" class="h-full bg-[#39FF14]" style="width: 30%;"></div>
+            </div>
         </div>
     </header>
 
@@ -52,107 +58,150 @@
             </div>
 
             <div class="glass rounded-3xl p-6">
-                <p class="text-[10px] text-gray-500 mb-2 uppercase font-bold">Ваша ставка</p>
                 <div class="flex gap-3">
                     <input id="betInput" type="number" value="1.0" class="bg-black border border-gray-800 rounded-xl flex-grow p-4 text-center font-bold outline-none focus:border-[#39FF14]">
-                    <button onclick="handleBetClick()" id="crashBtn" class="w-1/2 neon-btn uppercase text-sm shadow-lg shadow-green-900/20">Ставка</button>
+                    <button onclick="handleBetClick()" id="crashBtn" class="w-1/2 neon-btn uppercase text-sm">Ставка</button>
                 </div>
             </div>
         </section>
 
-        <section id="page-cases" class="tab-content">
-            <h2 class="text-xl font-black mb-4 uppercase text-center neon-text">Mystery Box</h2>
+        <section id="page-cases" class="tab-content text-center">
+            <h2 class="text-lg font-black mb-4 uppercase neon-text tracking-widest">Секретный Кейс</h2>
             <div class="roulette-container mb-6">
                 <div class="roulette-marker"></div>
-                <div id="rouletteTrack" class="roulette-track" style="transition: transform 4s cubic-bezier(0.15, 0, 0.05, 1);"></div>
+                <div id="rouletteTrack" class="roulette-track"></div>
             </div>
-
-            <div class="bg-gradient-to-b from-gray-900 to-black p-6 rounded-[2rem] border border-gray-800 text-center">
-                <p class="text-gray-400 text-xs mb-1">Стоимость открытия</p>
-                <p class="text-xl font-bold mb-4">5.00 ⭐</p>
-                <button onclick="openCase()" id="caseBtn" class="w-full py-4 neon-btn uppercase tracking-widest">Открыть кейс</button>
+            <div class="glass p-8 rounded-[2.5rem]">
+                <p class="text-sm text-gray-400 mb-4">Цена: <span class="text-white font-bold">5.00 ⭐</span></p>
+                <button onclick="openCase()" id="caseBtn" class="w-full py-4 neon-btn uppercase shadow-xl">Открыть</button>
             </div>
         </section>
 
-        <section id="page-profile" class="tab-content text-center">
-            <div class="w-24 h-24 bg-gray-900 rounded-full mx-auto mb-4 border-2 border-[#39FF14] flex items-center justify-center text-4xl">🤴</div>
-            <h2 class="text-xl font-bold uppercase tracking-widest">Player One</h2>
-            <p class="text-[#39FF14] text-xs">VIP Статус</p>
-            <div class="mt-10 grid grid-cols-2 gap-4">
-                <div class="glass p-5 rounded-2xl border-b-2 border-green-500"><p class="text-xs text-gray-500 uppercase">Игр</p><p class="text-xl font-bold">48</p></div>
-                <div class="glass p-5 rounded-2xl border-b-2 border-yellow-500"><p class="text-xs text-gray-500 uppercase">Рекорд</p><p class="text-xl font-bold">12.5x</p></div>
+        <section id="page-profile" class="tab-content">
+            <div class="glass p-6 rounded-[2rem] text-center border-t border-white/10">
+                <div class="w-20 h-20 bg-gray-900 rounded-full mx-auto mb-4 border-2 border-[#39FF14] flex items-center justify-center text-3xl">🤴</div>
+                <h3 class="font-bold">ИГРОК #1209</h3>
+                <div class="mt-6 space-y-3">
+                    <button class="w-full py-3 glass rounded-xl text-xs uppercase font-bold tracking-widest">История игр</button>
+                    <button class="w-full py-3 glass rounded-xl text-xs uppercase font-bold tracking-widest text-red-500">Выйти</button>
+                </div>
             </div>
         </section>
     </main>
 
-    <nav class="fixed bottom-6 left-6 right-6 h-18 glass rounded-[2rem] flex justify-around items-center border border-white/10 z-50 p-2">
-        <button onclick="nav('crash')" class="p-3">📈</button>
-        <button onclick="nav('cases')" class="p-3">🎁</button>
-        <button onclick="nav('profile')" class="p-3">👤</button>
+    <nav class="fixed bottom-6 left-8 right-8 h-16 glass rounded-full flex justify-around items-center border border-white/10 z-40 p-1">
+        <button onclick="nav('crash')" class="text-xl opacity-50 focus:opacity-100">📈</button>
+        <button onclick="nav('cases')" class="text-xl opacity-50 focus:opacity-100">🎁</button>
+        <button onclick="nav('profile')" class="text-xl opacity-50 focus:opacity-100">👤</button>
     </nav>
 
+    <div id="wallet-overlay" class="fixed inset-0 z-[100] bg-black/90 hidden flex flex-col justify-end">
+        <div class="glass rounded-t-[3rem] p-8 border-t border-[#39FF14]/30">
+            <div class="w-12 h-1.5 bg-gray-800 mx-auto mb-8 rounded-full" onclick="closeWallet()"></div>
+            
+            <div id="wallet-main">
+                <div class="flex gap-4 mb-6">
+                    <button onclick="showWalletForm('dep')" class="flex-grow py-4 neon-btn rounded-2xl uppercase text-xs">Пополнить</button>
+                    <button onclick="showWalletForm('with')" class="flex-grow py-4 glass border border-gray-700 rounded-2xl uppercase text-xs">Вывести</button>
+                </div>
+                <p class="text-[10px] text-gray-500 text-center uppercase tracking-widest">Минимальный вывод: 50 ⭐</p>
+            </div>
+
+            <div id="wallet-form" class="hidden animate-fade-in">
+                <h4 id="form-title" class="text-center font-bold mb-4 uppercase text-[#39FF14]"></h4>
+                <input id="wallet-amount" type="number" placeholder="Введите сумму" class="w-full bg-black border border-gray-800 p-4 rounded-xl mb-4 text-center font-bold outline-none focus:border-[#39FF14]">
+                <button onclick="processWalletAction()" class="w-full py-4 neon-btn uppercase text-xs mb-4">Подтвердить</button>
+                <button onclick="resetWalletUI()" class="w-full text-gray-500 text-[10px] uppercase font-bold">Назад</button>
+            </div>
+            
+            <button onclick="closeWallet()" class="mt-6 w-full text-gray-600 font-bold text-xs uppercase py-2">Закрыть</button>
+        </div>
+    </div>
+
     <script>
-        // --- ДАННЫЕ ---
         let balance = 10.0;
         let game = { state: 'waiting', mult: 1.0, crashAt: 0, myBet: 0, cashedOut: false };
-        const casePrizes = [
-            { s: '⭐', n: '2 звезды', v: 2.0, w: 0.85, gold: false },
-            { s: '🧸', n: '15 звезд', v: 15.0, w: 0.08, gold: false },
-            { s: '💖', n: '15 звезд', v: 15.0, w: 0.05, gold: true },
-            { s: '🌹', n: '25 звезд', v: 25.0, w: 0.02, gold: false }
-        ];
+        let walletMode = '';
 
-        // --- КРАШ ЛОГИКА ---
+        // --- КОШЕЛЕК ---
+        function openWallet() {
+            const ov = document.getElementById('wallet-overlay');
+            ov.classList.remove('hidden');
+            setTimeout(() => ov.classList.add('open'), 10);
+        }
+        function closeWallet() {
+            const ov = document.getElementById('wallet-overlay');
+            ov.classList.remove('open');
+            setTimeout(() => ov.classList.add('hidden'), 400);
+            resetWalletUI();
+        }
+        function showWalletForm(mode) {
+            walletMode = mode;
+            document.getElementById('wallet-main').classList.add('hidden');
+            document.getElementById('wallet-form').classList.remove('hidden');
+            document.getElementById('form-title').innerText = mode === 'dep' ? 'Пополнение Stars' : 'Вывод Средств';
+        }
+        function resetWalletUI() {
+            document.getElementById('wallet-main').classList.remove('hidden');
+            document.getElementById('wallet-form').classList.add('hidden');
+            document.getElementById('wallet-amount').value = '';
+        }
+        function processWalletAction() {
+            const amt = parseFloat(document.getElementById('wallet-amount').value);
+            if (!amt || amt <= 0) return alert('Введите корректную сумму');
+            
+            if (walletMode === 'dep') {
+                balance += amt;
+                alert(`Успешно пополнено на ${amt} ⭐`);
+            } else {
+                if (amt > balance) return alert('Недостаточно баланса!');
+                balance -= amt;
+                alert(`Заявка на вывод ${amt} ⭐ создана!`);
+            }
+            updateUI();
+            closeWallet();
+        }
+
+        // --- КРАШ ---
         function runCrashCycle() {
             game.state = 'waiting';
             game.cashedOut = false;
             game.mult = 1.0;
-            
-            let timer = 5000;
             const bar = document.getElementById('timer-bar');
             bar.style.width = '100%';
             bar.style.transition = 'width 5s linear';
-            document.getElementById('game-status').innerText = 'Старт через 5.0с';
+            document.getElementById('game-status').innerText = 'Ожидание...';
             document.getElementById('rocket').style.opacity = '0';
-            document.getElementById('mult-display').classList.remove('text-red-600', 'text-[#39FF14]');
 
             setTimeout(() => {
-                bar.style.transition = 'none';
-                bar.style.width = '0%';
+                bar.style.transition = 'none'; bar.style.width = '0%';
                 launchRocket();
             }, 5000);
         }
 
         function launchRocket() {
             game.state = 'flying';
-            // Алгоритм выгоды (RTP)
             let r = Math.random();
-            game.crashAt = r < 0.35 ? 1.0 + Math.random()*0.2 : (r < 0.9 ? 1.2 + Math.random()*0.8 : 2.0 + Math.random()*4);
+            game.crashAt = r < 0.4 ? 1.1 + r : (r < 0.9 ? 1.3 + Math.random() : 2.5 + Math.random()*5);
+            document.getElementById('rocket').style.opacity = '1';
             
-            document.getElementById('game-status').innerText = 'В ПОЛЕТЕ';
-            const rocket = document.getElementById('rocket');
-            rocket.style.opacity = '1';
-
-            const interval = setInterval(() => {
-                if (game.state !== 'flying') { clearInterval(interval); return; }
-                
+            const intrvl = setInterval(() => {
+                if (game.state !== 'flying') { clearInterval(intrvl); return; }
                 game.mult += 0.02;
                 document.getElementById('mult-display').innerText = game.mult.toFixed(2) + 'x';
                 
-                // Движение ракеты
-                let pos = Math.min(75, game.mult * 8);
-                rocket.style.bottom = (10 + pos/2) + '%';
-                rocket.style.left = (10 + pos) + '%';
+                let p = Math.min(70, game.mult * 8);
+                document.getElementById('rocket').style.bottom = (10 + p/2) + '%';
+                document.getElementById('rocket').style.left = (10 + p) + '%';
 
                 if (game.mult >= game.crashAt) {
                     game.state = 'crashed';
-                    document.getElementById('mult-display').innerText = 'CRASH';
+                    document.getElementById('mult-display').innerText = 'BOOM!';
                     document.getElementById('mult-display').classList.add('text-red-600');
-                    rocket.style.opacity = '0';
-                    game.myBet = 0;
-                    updateUI();
+                    document.getElementById('rocket').style.opacity = '0';
+                    game.myBet = 0; updateUI();
                     setTimeout(runCrashCycle, 3000);
-                    clearInterval(interval);
+                    clearInterval(intrvl);
                 }
             }, 60);
         }
@@ -160,98 +209,65 @@
         function handleBetClick() {
             const amt = parseFloat(document.getElementById('betInput').value);
             if (game.state === 'waiting' && game.myBet === 0) {
-                if (amt > balance) return alert('Недостаточно звезд!');
-                balance -= amt;
-                game.myBet = amt;
-                updateUI();
+                if (amt > balance) return alert('Мало звезд!');
+                balance -= amt; game.myBet = amt; updateUI();
             } else if (game.state === 'flying' && game.myBet > 0 && !game.cashedOut) {
-                let win = game.myBet * game.mult;
-                balance += win;
+                balance += (game.myBet * game.mult);
                 game.cashedOut = true;
-                document.getElementById('mult-display').classList.add('text-[#39FF14]');
-                alert('Выигрыш: ' + win.toFixed(2) + ' ⭐');
-                updateUI();
+                alert('Победа!'); updateUI();
             }
         }
 
-        // --- КЕЙС ЛОГИКА ---
-        function createItem(itemData) {
-            const div = document.createElement('div');
-            div.className = `roulette-item ${itemData.gold ? 'gold-border' : ''}`;
-            div.innerHTML = `
-                <span class="text-3xl">${itemData.s}</span>
-                <span class="text-[8px] mt-2 font-bold uppercase text-gray-400">${itemData.n}</span>
-            `;
-            return div;
-        }
+        // --- КЕЙСЫ ---
+        const prizes = [
+            { s: '⭐', n: '2 звезды', v: 2.0, w: 0.8, gold: false },
+            { s: '🧸', n: '15 звезд', v: 15.0, w: 0.1, gold: false },
+            { s: '💖', n: '15 звезд', v: 15.0, w: 0.07, gold: true },
+            { s: '🌹', n: '25 звезд', v: 25.0, w: 0.03, gold: false }
+        ];
 
         function initRoulette() {
             const track = document.getElementById('rouletteTrack');
             track.innerHTML = '';
             for(let i=0; i<60; i++) {
-                let r = Math.random();
-                let prize = casePrizes[0];
-                if(r < 0.02) prize = casePrizes[3];
-                else if(r < 0.07) prize = casePrizes[2];
-                else if(r < 0.15) prize = casePrizes[1];
-                track.appendChild(createItem(prize));
+                let p = prizes[Math.random() > 0.1 ? 0 : Math.floor(Math.random()*4)];
+                const d = document.createElement('div');
+                d.className = `roulette-item ${p.gold ? 'gold-border' : ''}`;
+                d.innerHTML = `<span class="text-3xl">${p.s}</span><span class="text-[7px] mt-2 text-gray-500">${p.n}</span>`;
+                track.appendChild(d);
             }
         }
 
         function openCase() {
             if(balance < 5) return alert('Нужно 5.00 ⭐');
-            balance -= 5;
-            updateUI();
-            
-            const btn = document.getElementById('caseBtn');
-            btn.disabled = true;
-            
+            balance -= 5; updateUI();
             const track = document.getElementById('rouletteTrack');
-            let targetIdx = 45 + Math.floor(Math.random() * 5);
+            document.getElementById('caseBtn').disabled = true;
             
-            // Наша выгода: в 90% случаев выигрыш - звезда (2 звезды)
-            let finalWin = Math.random() > 0.1 ? casePrizes[0] : casePrizes[Math.floor(Math.random()*3)];
-            
-            // Заменяем элемент в рулетке
-            track.children[targetIdx].replaceWith(createItem(finalWin));
+            let targetIdx = 48;
+            let finalWin = Math.random() > 0.15 ? prizes[0] : prizes[1];
+            track.children[targetIdx].innerHTML = `<span class="text-3xl">${finalWin.s}</span><span class="text-[7px] mt-2 text-gray-500">${finalWin.n}</span>`;
+            if(finalWin.gold) track.children[targetIdx].classList.add('gold-border');
 
-            const offset = (targetIdx * 100) - (track.parentElement.offsetWidth / 2) + 50;
-            track.style.transition = 'transform 4s cubic-bezier(0.15, 0, 0.05, 1)';
-            track.style.transform = `translateX(-${offset}px)`;
+            const x = (targetIdx * 100) - (track.parentElement.offsetWidth / 2) + 50;
+            track.style.transform = `translateX(-${x}px)`;
 
             setTimeout(() => {
-                balance += finalWin.v;
-                updateUI();
-                alert(`Вам выпало: ${finalWin.s} (${finalWin.n})`);
-                btn.disabled = false;
-                // Сброс рулетки
-                setTimeout(() => {
-                    track.style.transition = 'none';
-                    track.style.transform = 'translateX(0)';
-                    initRoulette();
-                }, 1000);
+                balance += finalWin.v; updateUI();
+                alert('Выпало: ' + finalWin.n);
+                document.getElementById('caseBtn').disabled = false;
+                track.style.transition = 'none'; track.style.transform = 'translateX(0)';
+                initRoulette();
+                setTimeout(()=>track.style.transition='transform 4s cubic-bezier(0.15, 0, 0.05, 1)', 50);
             }, 4500);
         }
 
-        // --- СИСТЕМНОЕ ---
         function updateUI() {
             document.getElementById('balanceDisplay').innerText = balance.toFixed(2);
             const btn = document.getElementById('crashBtn');
-            if (game.state === 'waiting') {
-                btn.innerText = game.myBet > 0 ? 'ЖДЕМ...' : 'СТАВКА';
-                btn.className = game.myBet > 0 ? 'w-1/2 bg-gray-800 rounded-xl uppercase text-sm' : 'w-1/2 neon-btn uppercase text-sm';
-            } else if (game.state === 'flying') {
-                if (game.myBet > 0 && !game.cashedOut) {
-                    btn.innerText = 'ЗАБРАТЬ';
-                    btn.className = 'w-1/2 bg-white text-black font-bold rounded-xl uppercase text-sm';
-                } else {
-                    btn.innerText = 'ПОЛЕТ...';
-                    btn.className = 'w-1/2 bg-gray-800 rounded-xl uppercase text-sm';
-                }
-            } else {
-                btn.innerText = 'КРАШ!';
-                btn.className = 'w-1/2 bg-red-900 rounded-xl uppercase text-sm';
-            }
+            if (game.state === 'waiting') btn.innerText = game.myBet > 0 ? 'ГОТОВО' : 'СТАВКА';
+            else if (game.state === 'flying') btn.innerText = (game.myBet > 0 && !game.cashedOut) ? 'ЗАБРАТЬ' : 'ПОЛЕТ';
+            else btn.innerText = 'КРАШ';
         }
 
         function nav(p) {
@@ -259,10 +275,7 @@
             document.getElementById('page-'+p).classList.add('active');
         }
 
-        window.onload = () => {
-            initRoulette();
-            runCrashCycle();
-        };
+        window.onload = () => { initRoulette(); runCrashCycle(); };
     </script>
 </body>
 </html>
