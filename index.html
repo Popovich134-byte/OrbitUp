@@ -67,8 +67,10 @@
         .p-tab.active { background: #2C2C2E; color: white; }
 
         /* Tasks Styles */
-        .task-card { background: #151517; border-radius: 20px; padding: 16px; margin-bottom: 12px; border: 1px solid #2A2A2C; display: flex; align-items: center; justify-content: space-between; }
-        .task-btn { background: var(--blue-btn); color: white; font-size: 11px; font-weight: 700; padding: 8px 16px; border-radius: 20px; transition: 0.2s; min-width: 80px; text-align: center; }
+        .task-card { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; margin-bottom: 10px; }
+        .task-icon { width: 40px; height: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-right: 12px; }
+        .task-btn { background: var(--blue-btn); color: white; font-size: 10px; font-weight: 700; padding: 8px 16px; border-radius: 100px; }
+        .task-btn:active { transform: scale(0.95); opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -154,38 +156,36 @@
         <section id="page-tasks" class="tab-content">
             <h2 class="text-center font-tech text-xl font-black uppercase text-white mb-6">Задания</h2>
             
-            <div class="glass-panel p-4 rounded-[24px] mb-4 border border-gray-800">
-                <div class="flex items-center gap-3 mb-2">
-                    <span class="text-2xl">📢</span>
-                    <h3 class="font-bold text-sm">Подписка на Канал</h3>
-                </div>
-                <p class="text-[10px] text-gray-400 mb-3">Подпишись на официальный канал, чтобы быть в курсе новостей.</p>
-                <div class="flex justify-between items-center bg-[#111] p-2 rounded-xl">
-                    <div class="flex items-center gap-2">
-                        <span class="text-[#FFD700]">⭐</span>
-                        <span class="text-sm font-bold">+1 Stars</span>
+            <div class="task-card">
+                <div class="flex items-center">
+                    <div class="task-icon">📢</div>
+                    <div>
+                        <h3 class="font-bold text-xs text-white">Подписаться на канал</h3>
+                        <div class="flex items-center gap-1 mt-0.5">
+                            <span class="text-[#FFD700] text-[10px]">⭐</span>
+                            <span class="text-[10px] font-bold text-[#FFD700]">+1 Stars</span>
+                        </div>
                     </div>
-                    <button onclick="handleTask()" class="task-btn">ВЫПОЛНИТЬ</button>
                 </div>
+                <button onclick="alert('Эта функция в разработке')" class="task-btn">ВЫПОЛНИТЬ</button>
             </div>
 
-            <div class="glass-panel p-4 rounded-[24px] mb-4 border border-gray-800">
-                <div class="flex items-center gap-3 mb-2">
-                    <span class="text-2xl">💬</span>
-                    <h3 class="font-bold text-sm">Вступить в Чат</h3>
-                </div>
-                <p class="text-[10px] text-gray-400 mb-3">Вступай в наш чат и общайся с другими игроками.</p>
-                <div class="flex justify-between items-center bg-[#111] p-2 rounded-xl">
-                    <div class="flex items-center gap-2">
-                        <span class="text-[#FFD700]">⭐</span>
-                        <span class="text-sm font-bold">+1 Stars</span>
+            <div class="task-card">
+                <div class="flex items-center">
+                    <div class="task-icon">💬</div>
+                    <div>
+                        <h3 class="font-bold text-xs text-white">Вступить в чат</h3>
+                        <div class="flex items-center gap-1 mt-0.5">
+                            <span class="text-[#FFD700] text-[10px]">⭐</span>
+                            <span class="text-[10px] font-bold text-[#FFD700]">+1 Stars</span>
+                        </div>
                     </div>
-                    <button onclick="handleTask()" class="task-btn">ВЫПОЛНИТЬ</button>
                 </div>
+                <button onclick="alert('Эта функция в разработке')" class="task-btn">ВЫПОЛНИТЬ</button>
             </div>
 
             <div class="text-center mt-8 text-gray-600 text-[10px]">
-                Новые задания появятся скоро...
+                Новые задания скоро...
             </div>
         </section>
 
@@ -246,7 +246,6 @@
         <div class="bg-[#1C1C1E] w-full rounded-t-[32px] p-6 pb-12 border-t border-gray-800">
             <div class="w-12 h-1 bg-gray-600 mx-auto rounded-full mb-6" onclick="document.getElementById('wallet-modal').classList.add('hidden')"></div>
             <h3 class="text-center font-bold text-white mb-6 uppercase tracking-widest text-lg" id="wallet-title">Пополнение</h3>
-            
             <div class="flex gap-2 mb-6">
                 <button onclick="switchWalletCurr('stars')" id="wc-stars" class="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition">STARS</button>
                 <button onclick="switchWalletCurr('ton')" id="wc-ton" class="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition">TON</button>
@@ -292,7 +291,7 @@
                 <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center text-3xl">🤖</div>
             </div>
             <h3 class="text-lg font-bold mb-2">Отправьте подарок боту</h3>
-            <p class="text-xs text-gray-400 mb-6">Перейдите к боту @GiftsToOrbitUp. Количество подарков не ограничено.</p>
+            <p class="text-xs text-gray-400 mb-6">Перейдите к боту @GiftsToOrbitUp.</p>
             <a href="https://t.me/GiftsToOrbitUp" target="_blank" class="w-full primary-btn py-4 rounded-xl font-bold uppercase tracking-wide mb-3">ПЕРЕЙТИ К БОТУ</a>
         </div>
     </div>
@@ -581,7 +580,6 @@
             document.getElementById('cases-list').classList.remove('hidden');
         }
 
-        // === WALLET & REAL TON ===
         function openWallet(mode) { 
             walletMode = mode;
             document.getElementById('wallet-modal').classList.remove('hidden'); 
