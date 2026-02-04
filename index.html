@@ -3,13 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OrbitUp System</title>
+    <title>OrbitUp Final</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600;700&display=swap');
         
-        :root { --neon: #39FF14; --ton: #0098EA; --bg: #000000; --card-bg: #1C1C1E; --blue-btn: #007AFF; }
+        :root { 
+            --neon: #39FF14; 
+            --ton: #0098EA; 
+            --bg: #000000; 
+            --card-bg: #1C1C1E; 
+            --blue-btn: #007AFF; 
+        }
 
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; margin: 0; user-select: none; }
         .font-tech { font-family: 'Orbitron', sans-serif; }
@@ -24,7 +30,11 @@
         .orbit-card { background: var(--card-bg); border-radius: 24px; }
         .action-btn { font-weight: 800; border-radius: 14px; transition: 0.1s; }
         .action-btn:active { transform: scale(0.95); opacity: 0.9; }
-        .primary-btn { background: var(--blue-btn); color: white; }
+        
+        /* Buttons */
+        .primary-btn { background: var(--blue-btn); color: white; font-weight: 600; border-radius: 14px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
+        .primary-btn:active { transform: scale(0.98); opacity: 0.9; }
+        
         .neon-btn { background: var(--neon); color: black; box-shadow: 0 0 15px rgba(57, 255, 20, 0.3); }
         .ton-btn { background: var(--ton); color: white; box-shadow: 0 0 15px rgba(0, 152, 234, 0.3); }
 
@@ -67,7 +77,7 @@
         <div class="glass-panel rounded-xl py-2 px-3 flex items-center gap-3 border-l-2 border-[#39FF14]" id="balance-container">
             <div id="headerIcon" class="w-6 h-6 flex items-center justify-center"></div>
             <div class="flex flex-col leading-none">
-                <span class="text-[8px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Ваш Баланс</span>
+                <span class="text-[8px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Баланс</span>
                 <span class="font-tech font-bold text-lg text-white" id="headerBalance">0</span>
             </div>
         </div>
@@ -151,8 +161,15 @@
                         </div>
                     </div>
                 </div>
-                <button onclick="openWallet('dep')" class="w-full py-3.5 mt-6 bg-[#007AFF] text-white font-bold rounded-xl text-sm shadow-lg shadow-blue-900/40 active:scale-95 transition">Пополнить баланс</button>
-                <button onclick="openWallet('with')" class="w-full py-2 mt-1 text-[10px] text-gray-500 font-bold uppercase">Вывод средств</button>
+                
+                <div class="flex gap-3 mt-6">
+                    <button onclick="openWallet('dep')" class="flex-1 primary-btn py-3 text-xs shadow-lg shadow-blue-900/40">
+                        Пополнить баланс
+                    </button>
+                    <button onclick="openWallet('with')" class="flex-1 primary-btn py-3 text-xs shadow-lg shadow-blue-900/40" style="background: #2C2C2E; border: 1px solid #444;">
+                        Вывод средств
+                    </button>
+                </div>
             </div>
 
             <div class="bg-gradient-to-r from-[#007AFF] to-[#00C6FF] rounded-2xl p-4 mb-4 text-center shadow-lg relative overflow-hidden">
@@ -167,36 +184,56 @@
                 <div class="p-tab" onclick="switchTab('history', this)">История</div>
             </div>
 
-            <div id="tab-gifts" class="mt-8 text-center border border-dashed border-gray-800 rounded-2xl py-8">
-                <div class="text-3xl mb-2 opacity-30">🎁</div><p class="text-xs text-gray-500">Пусто</p>
+            <div id="tab-gifts" class="mt-4">
+                <div class="text-center py-6 border border-dashed border-gray-800 rounded-2xl mb-4">
+                    <div class="text-3xl mb-2 opacity-30">🎁</div><p class="text-xs text-gray-500">У вас нет подарков</p>
+                </div>
+                <button onclick="openGiftModal()" class="w-full primary-btn py-3.5 text-sm font-bold uppercase tracking-wide">ДОБАВИТЬ ПОДАРОК</button>
             </div>
+
             <div id="tab-friends" class="hidden mt-4 text-center"><p class="text-xs text-gray-500">У вас 0 друзей</p></div>
             <div id="tab-history" class="hidden mt-4 space-y-2"></div>
         </section>
     </main>
 
     <nav class="nav-dock">
-        <button onclick="nav('crash')" id="nav-crash" class="nav-item active">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.48-.56.93-1.23 1.35-2h4.65c.96 0 1.88.38 2.59 1.06l.32.32a.75.75 0 0 0 1.06 0l2.12-2.12a.75.75 0 0 0 0-1.06l-.32-.32a3.68 3.68 0 0 0-1.06-2.59V8.15c.77-.42 1.44-.87 2-1.35 1.5-1.26 2-5 2-5s-3.74.5-5 2c-.48.56-.93 1.23-1.35 2H9.85c-.96 0-1.88-.38-2.59-1.06l-.32-.32a.75.75 0 0 0-1.06 0L3.76 6.54a.75.75 0 0 0 0 1.06l.32.32c.68.71 1.06 1.63 1.06 2.59v4.65c-.42.77-.87 1.44-1.35 2z"/></svg>
-        </button>
-        <button onclick="nav('cases')" id="nav-cases" class="nav-item">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-        </button>
-        <button onclick="nav('profile')" id="nav-profile" class="nav-item">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        </button>
+        <div onclick="alert('Скоро')" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><rect x="4" y="14" width="16" height="6" rx="2"/></svg><span>Лидеры</span></div>
+        <div onclick="nav('cases')" id="nav-cases" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg><span>Розыгрыши</span></div>
+        <div onclick="nav('crash')" id="nav-crash" class="nav-item active"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.48-.56.93-1.23 1.35-2h4.65c.96 0 1.88.38 2.59 1.06l.32.32a.75.75 0 0 0 1.06 0l2.12-2.12a.75.75 0 0 0 0-1.06l-.32-.32a3.68 3.68 0 0 0-1.06-2.59V8.15c.77-.42 1.44-.87 2-1.35 1.5-1.26 2-5 2-5s-3.74.5-5 2c-.48.56-.93 1.23-1.35 2H9.85c-.96 0-1.88-.38-2.59-1.06l-.32-.32a.75.75 0 0 0-1.06 0L3.76 6.54a.75.75 0 0 0 0 1.06l.32.32c.68.71 1.06 1.63 1.06 2.59v4.65c-.42.77-.87 1.44-1.35 2z"/></svg><span>Играть</span></div>
+        <div onclick="alert('Скоро')" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Задания</span></div>
+        <div onclick="nav('profile')" id="nav-profile" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Профиль</span></div>
     </nav>
 
     <div id="wallet-modal" class="hidden fixed inset-0 bg-black/90 z-[100] flex items-end">
         <div class="bg-[#1C1C1E] w-full rounded-t-[32px] p-6 pb-12 border-t border-gray-800">
             <div class="w-12 h-1 bg-gray-600 mx-auto rounded-full mb-6" onclick="document.getElementById('wallet-modal').classList.add('hidden')"></div>
-            <h3 class="text-center font-bold text-white mb-6 uppercase tracking-widest text-lg">Пополнение</h3>
+            <h3 class="text-center font-bold text-white mb-6 uppercase tracking-widest text-lg" id="wallet-title">Пополнение</h3>
             <div class="flex gap-2 mb-4">
                 <button onclick="switchWalletCurr('stars')" id="wc-stars" class="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition">STARS</button>
                 <button onclick="switchWalletCurr('ton')" id="wc-ton" class="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition">TON</button>
             </div>
             <input id="wallet-input" type="number" placeholder="Сумма" class="w-full bg-black p-4 rounded-xl text-center text-white font-bold text-xl outline-none mb-4 border border-[#333]">
-            <button onclick="processWallet()" class="w-full bg-[#007AFF] text-white py-4 rounded-xl font-bold">Подтвердить</button>
+            <button onclick="processWallet()" class="w-full primary-btn py-4 rounded-xl font-bold" id="wallet-action-btn">Подтвердить</button>
+        </div>
+    </div>
+
+    <div id="gift-modal" class="hidden fixed inset-0 bg-black/95 z-[100] flex flex-col justify-center px-6">
+        <div class="bg-[#1C1C1E] rounded-3xl p-6 border border-gray-800 text-center relative">
+            <button onclick="document.getElementById('gift-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-500 font-bold">✕</button>
+            
+            <div class="flex justify-center items-center gap-4 mb-6 mt-4">
+                <div class="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center text-3xl">🎁</div>
+                <div class="text-gray-500">➜</div>
+                <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center text-3xl">🤖</div>
+            </div>
+
+            <h3 class="text-lg font-bold mb-2">Отправьте подарок боту</h3>
+            <p class="text-xs text-gray-400 mb-6">Перейдите к боту по кнопке ниже. Количество подарков не ограничено. Если цена не устроит, можно вывести обратно.</p>
+
+            <a href="https://t.me/GiftsToOrbitUp" target="_blank" class="w-full primary-btn py-4 rounded-xl font-bold uppercase tracking-wide mb-3">
+                ПЕРЕЙТИ К БОТУ
+            </a>
+            <p class="text-[10px] text-gray-600">@GiftsToOrbitUp</p>
         </div>
     </div>
 
@@ -204,22 +241,16 @@
         // === STATE & LOCAL STORAGE ===
         let state = {
             balances: { stars: 1000, ton: 5.0 },
-            lastDaily: 0, // Timestamp
+            lastDaily: 0,
             history: []
         };
-
-        // Load Saved State
-        const saved = localStorage.getItem('orbitUpStateV1');
-        if(saved) {
-            try { state = JSON.parse(saved); } catch(e) { console.log('Reset state'); }
-        }
-
-        function saveState() {
-            localStorage.setItem('orbitUpStateV1', JSON.stringify(state));
-        }
+        const saved = localStorage.getItem('orbitUpStateV2');
+        if(saved) { try { state = JSON.parse(saved); } catch(e) {} }
+        function saveState() { localStorage.setItem('orbitUpStateV2', JSON.stringify(state)); }
 
         let activeCurr = 'stars'; 
         let walletCurr = 'stars';
+        let walletMode = 'dep';
         let game = { state: 'waiting', mult: 1.0, crashAt: 0, myBet: 0, cashedOut: false };
         let activeCase = null;
 
@@ -234,7 +265,6 @@
 
         // === INIT ===
         window.onload = () => {
-            // Telegram Init
             const tg = window.Telegram.WebApp;
             tg.ready();
             const user = tg.initDataUnsafe.user;
@@ -247,8 +277,6 @@
                     document.getElementById('user-avatar-placeholder').classList.add('hidden');
                 }
             }
-
-            // Loader
             let fill = document.getElementById('loader-fill');
             setTimeout(() => fill.style.width = "100%", 100);
             setTimeout(() => { 
@@ -262,18 +290,67 @@
             updateHistoryUI();
         };
 
-        // === CRASH GAME (ENDLESS) ===
+        // === NAVIGATION ===
+        function nav(page) {
+            if(page==='rating') return alert('Лидеры скоро...');
+            document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
+            document.getElementById('page-'+page).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
+            if(page === 'crash') document.getElementById('nav-crash').classList.add('active');
+            if(page === 'cases') document.getElementById('nav-cases').classList.add('active');
+            if(page === 'profile') document.getElementById('nav-profile').classList.add('active');
+        }
+
+        // === UI UPDATES ===
+        function updateHeader() {
+            const iconContainer = document.getElementById('headerIcon');
+            const balanceText = document.getElementById('headerBalance');
+            const container = document.getElementById('balance-container');
+            
+            if(activeCurr === 'stars') {
+                iconContainer.innerHTML = iconStars;
+                balanceText.innerText = state.balances.stars.toFixed(0);
+                balanceText.style.color = 'white';
+                container.style.borderLeftColor = '#39FF14';
+            } else {
+                iconContainer.innerHTML = iconTon;
+                balanceText.innerText = state.balances.ton.toFixed(2);
+                balanceText.style.color = '#0098EA';
+                container.style.borderLeftColor = '#0098EA';
+            }
+        }
+
+        function setCurrency(c) {
+            activeCurr = c;
+            if(c==='stars') {
+                document.getElementById('sw-stars').className="switch-opt active-s";
+                document.getElementById('sw-ton').className="switch-opt";
+                document.getElementById('min-bet-label').innerText = "Min: 25 Stars";
+                document.getElementById('betInput').value = 25;
+            } else {
+                document.getElementById('sw-ton').className="switch-opt active-t";
+                document.getElementById('sw-stars').className="switch-opt";
+                document.getElementById('min-bet-label').innerText = "Min: 0.1 TON";
+                document.getElementById('betInput').value = 0.1;
+            }
+            updateHeader();
+            updateBtn();
+        }
+
+        function shareLink() {
+            const url = "https://t.me/share/url?url=https://t.me/orbitupbot&text=Получай Звезды Бесплатно! в боте @OrbitUpBot";
+            window.Telegram.WebApp.openTelegramLink(url);
+        }
+
+        // === CRASH GAME ===
         function startCrashLoop() {
             game.state = 'waiting'; game.myBet = 0; game.cashedOut = false; game.mult = 1.0;
-            
             document.getElementById('mult-display').innerText = "1.00x";
             document.getElementById('mult-display').className = "relative z-10 text-6xl font-black font-tech text-white transition-transform";
             document.getElementById('game-status').innerText = "ОЖИДАНИЕ...";
             document.getElementById('rocket').style.opacity = '0';
-            
             const bar = document.getElementById('timer-bar');
             bar.style.transition = 'none'; bar.style.width = '100%';
-            
             setTimeout(() => { bar.style.transition = 'width 5s linear'; bar.style.width = '0%'; }, 100);
             updateBtn();
             setTimeout(launchRocket, 5000);
@@ -283,29 +360,20 @@
             game.state = 'flying';
             document.getElementById('game-status').innerText = "ПОЛЕТ";
             document.getElementById('rocket').style.opacity = '1';
-
-            // House Edge Algorithm (Crash Logic)
             let r = Math.random();
-            if (r < 0.30) game.crashAt = 1.00 + Math.random() * 0.20; // 30% instant crash
-            else if (r < 0.70) game.crashAt = 1.20 + Math.random() * 0.40; // 40% low
-            else if (r < 0.90) game.crashAt = 1.60 + Math.random() * 0.90; // 20% mid
-            else game.crashAt = 2.50 + Math.random() * 4.0; // 10% high
-
+            if (r < 0.30) game.crashAt = 1.00 + Math.random() * 0.20; 
+            else if (r < 0.70) game.crashAt = 1.20 + Math.random() * 0.40;
+            else if (r < 0.90) game.crashAt = 1.60 + Math.random() * 0.90;
+            else game.crashAt = 2.50 + Math.random() * 4.0;
             updateBtn();
-
             let loop = setInterval(() => {
                 if(game.state !== 'flying') { clearInterval(loop); return; }
                 game.mult += 0.01;
                 document.getElementById('mult-display').innerText = game.mult.toFixed(2) + 'x';
-                
                 let p = Math.min(80, (game.mult - 1) * 30);
                 document.getElementById('rocket').style.bottom = (10 + p/2) + '%';
                 document.getElementById('rocket').style.left = (10 + p) + '%';
-
-                if(game.mult >= game.crashAt) {
-                    clearInterval(loop);
-                    doCrash();
-                }
+                if(game.mult >= game.crashAt) { clearInterval(loop); doCrash(); }
             }, 50);
         }
 
@@ -355,20 +423,14 @@
         // === CASES ===
         function openCaseView(id) {
             activeCase = casesData.find(c => c.id === id);
-            
-            // Daily check
             if(activeCase.id === 3) {
                 const now = Date.now();
-                if(now - state.lastDaily < 86400000) {
-                    return alert('Ежедневный бонус доступен раз в 24 часа! Ждите.');
-                }
+                if(now - state.lastDaily < 86400000) return alert('Бонус доступен раз в 24 часа!');
             }
-
             document.getElementById('cases-list').classList.add('hidden');
             document.getElementById('case-roulette-view').classList.remove('hidden');
             document.getElementById('active-case-name').innerText = activeCase.name;
             document.getElementById('active-case-name').style.color = activeCase.color;
-            
             const btn = document.getElementById('spinBtn');
             btn.innerText = activeCase.price === 0 ? "КРУТИТЬ БЕСПЛАТНО" : `КРУТИТЬ ЗА ${activeCase.price} ${activeCase.curr.toUpperCase()}`;
             btn.style.backgroundColor = activeCase.color;
@@ -391,19 +453,16 @@
 
         function spinRoulette() {
             if(activeCase.price > 0 && state.balances[activeCase.curr] < activeCase.price) return alert('Недостаточно средств');
-            
             if(activeCase.price > 0) state.balances[activeCase.curr] -= activeCase.price;
             saveState(); updateHeader();
-            
             const btn = document.getElementById('spinBtn');
             btn.disabled = true;
             const track = document.getElementById('rouletteTrack');
             
-            // House Edge for Cases (Mostly 0 and 1 index)
+            // House Edge
             let r = Math.random();
             let winIdx = r < 0.5 ? 0 : (r < 0.8 ? 1 : (r < 0.95 ? 2 : 4));
             if(winIdx >= activeCase.prizes.length) winIdx = 0;
-            
             let winAmount = activeCase.prizes[winIdx];
             let targetIdx = 45; 
             
@@ -431,57 +490,15 @@
             document.getElementById('cases-list').classList.remove('hidden');
         }
 
-        // === CORE & UI ===
-        function updateHeader() {
-            const iconContainer = document.getElementById('headerIcon');
-            const balanceText = document.getElementById('headerBalance');
-            const container = document.getElementById('balance-container');
-            
-            if(activeCurr === 'stars') {
-                iconContainer.innerHTML = iconStars;
-                balanceText.innerText = state.balances.stars.toFixed(0);
-                balanceText.style.color = 'white';
-                container.style.borderLeftColor = '#39FF14';
-            } else {
-                iconContainer.innerHTML = iconTon;
-                balanceText.innerText = state.balances.ton.toFixed(2);
-                balanceText.style.color = '#0098EA';
-                container.style.borderLeftColor = '#0098EA';
-            }
+        // === WALLET & TABS ===
+        function openWallet(mode) { 
+            walletMode = mode;
+            document.getElementById('wallet-modal').classList.remove('hidden'); 
+            document.getElementById('wallet-title').innerText = mode === 'dep' ? "Пополнение" : "Вывод средств";
+            document.getElementById('wallet-action-btn').innerText = mode === 'dep' ? "Пополнить" : "Вывести";
         }
-
-        function setCurrency(c) {
-            activeCurr = c;
-            if(c==='stars') {
-                document.getElementById('sw-stars').className="switch-opt active-s";
-                document.getElementById('sw-ton').className="switch-opt";
-                document.getElementById('min-bet-label').innerText = "Min: 25 Stars";
-                document.getElementById('betInput').value = 25;
-            } else {
-                document.getElementById('sw-ton').className="switch-opt active-t";
-                document.getElementById('sw-stars').className="switch-opt";
-                document.getElementById('min-bet-label').innerText = "Min: 0.1 TON";
-                document.getElementById('betInput').value = 0.1;
-            }
-            updateHeader();
-        }
-
-        function shareLink() {
-            const url = "https://t.me/share/url?url=https://t.me/orbitupbot&text=Получай Звезды Бесплатно! в боте @OrbitUpBot";
-            window.Telegram.WebApp.openTelegramLink(url);
-        }
-
-        function nav(page) {
-            if(page==='rating') return alert('Лидеры скоро...');
-            document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
-            document.getElementById('page-'+page).classList.add('active');
-            document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
-            if(page === 'crash') document.getElementById('nav-crash').classList.add('active');
-            if(page === 'cases') document.getElementById('nav-cases').classList.add('active');
-            if(page === 'profile') document.getElementById('nav-profile').classList.add('active');
-        }
-
-        function openWallet() { document.getElementById('wallet-modal').classList.remove('hidden'); }
+        function openGiftModal() { document.getElementById('gift-modal').classList.remove('hidden'); }
+        
         function switchWalletCurr(c) {
             walletCurr = c;
             if(c==='stars') {
@@ -495,10 +512,16 @@
         function processWallet() {
             let val = parseFloat(document.getElementById('wallet-input').value);
             if(val > 0) {
-                state.balances[walletCurr] += val;
+                if(walletMode === 'dep') {
+                    state.balances[walletCurr] += val;
+                    alert('Баланс пополнен!');
+                } else {
+                    if(state.balances[walletCurr] < val) return alert('Недостаточно средств');
+                    state.balances[walletCurr] -= val;
+                    alert('Заявка на вывод создана');
+                }
                 saveState(); updateHeader();
                 document.getElementById('wallet-modal').classList.add('hidden');
-                alert('Успешно!');
             }
         }
         function switchTab(t, btn) {
@@ -507,8 +530,6 @@
             document.querySelectorAll('.p-tab').forEach(e=>e.classList.remove('active'));
             btn.classList.add('active');
         }
-
-        // History Logic
         function addHistory(gameName, amount, type) {
             state.history.unshift({ game: gameName, amount: amount, type: type, time: new Date().toLocaleTimeString().slice(0,5) });
             if(state.history.length > 5) state.history.pop();
