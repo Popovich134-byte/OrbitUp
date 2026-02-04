@@ -265,14 +265,14 @@
             buttonRootId: 'ton-connect-btn-wrap'
         });
 
-        // ⚠️ ВАШ КОШЕЛЕК
+        // ⚠️ ТВОЙ КОШЕЛЕК
         const MY_WALLET_ADDRESS = "UQBLYVXsKcTwo2vegPZKQkR3lFowRYa2IK5_6OC8sXOyMh0p"; 
 
         // === STATE ===
         let state = { balances: { stars: 0, ton: 0.0 }, lastDaily: 0, history: [] };
-        const saved = localStorage.getItem('orbitUpFinalV18');
+        const saved = localStorage.getItem('orbitUpFinalV19');
         if(saved) { try { state = JSON.parse(saved); } catch(e){} }
-        function saveState() { localStorage.setItem('orbitUpFinalV18', JSON.stringify(state)); }
+        function saveState() { localStorage.setItem('orbitUpFinalV19', JSON.stringify(state)); }
 
         let activeCurr = 'stars', walletCurr = 'stars', walletMode = 'dep';
         let game = { state: 'waiting', mult: 1.0, crashAt: 0, myBet: 0, cashedOut: false };
@@ -326,13 +326,11 @@
             updateHistoryUI();
         };
 
-        // === STARS PAYMENT LOGIC ===
+        // === STARS PAYMENT LOGIC (FIXED) ===
         function payStars(amount) {
             let invoiceUrl = "";
             
-            // 👇👇👇 ВСТАВЬ ТВОИ ССЫЛКИ НИЖЕ ВНУТРИ КАВЫЧЕК 👇👇👇
-            // Пример: if (amount === 15) invoiceUrl = "https://t.me/$AAB...";
-            
+            // ВСТАВЛЕННЫЕ ССЫЛКИ
             if (amount === 15) invoiceUrl = "https://t.me/$lyU_Dq--IUiUEwAA3ZTutSKcfr4";
             if (amount === 25) invoiceUrl = "https://t.me/$ODOkK6--IUiSEwAAHMNcfl54R9k";
             if (amount === 50) invoiceUrl = "https://t.me/$mQWcsK--IUiVEwAADpCsqi3H3NM";
@@ -341,10 +339,17 @@
             localStorage.setItem('pendingStarAmount', amount);
 
             if (invoiceUrl && invoiceUrl.startsWith("https://t.me/")) {
-                window.Telegram.WebApp.openInvoice(invoiceUrl);
-                document.getElementById('wallet-modal').classList.add('hidden');
+                // ИСПРАВЛЕНИЕ ЗАГРУЗКИ: Берем только "хвост" ссылки
+                let slug = invoiceUrl.split("https://t.me/")[1];
+                window.Telegram.WebApp.openInvoice(slug, (status) => {
+                    if (status == 'paid') {
+                        document.getElementById('wallet-modal').classList.add('hidden');
+                    } else if (status == 'failed') {
+                        alert("Ошибка оплаты");
+                    }
+                });
             } else {
-                alert("Ссылки настроены! Оплата должна открыться.");
+                alert("Ошибка: Ссылка на оплату не найдена!");
             }
         }
 
