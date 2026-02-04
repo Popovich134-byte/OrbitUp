@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OrbitUp Ultimate</title>
+    <title>OrbitUp Final</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
@@ -12,16 +12,27 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600;700&display=swap');
         
-        :root { --neon: #39FF14; --ton: #0098EA; --bg: #000000; --card-bg: #1C1C1E; --blue-btn: #007AFF; --stars: #FFD700; }
+        :root { 
+            --neon: #39FF14; 
+            --ton: #0098EA; 
+            --bg: #000000; 
+            --card-bg: #1C1C1E; 
+            --blue-btn: #007AFF; 
+            --stars: #FFD700;
+        }
+
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; margin: 0; user-select: none; }
         .font-tech { font-family: 'Orbitron', sans-serif; }
         
+        /* Loading */
         #loading-screen { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-col; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
         .loading-bar-bg { width: 160px; height: 4px; background: #222; border-radius: 10px; margin-top: 20px; overflow: hidden; }
         .loading-bar-fill { height: 100%; background: var(--blue-btn); width: 0%; transition: width 0.5s ease; box-shadow: 0 0 15px var(--blue-btn); }
 
+        /* UI */
         .glass-panel { background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .orbit-card { background: var(--card-bg); border-radius: 24px; }
+        
         .primary-btn { background: var(--blue-btn); color: white; font-weight: 600; border-radius: 14px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
         .primary-btn:active { transform: scale(0.98); opacity: 0.9; }
         .secondary-btn { background: #2C2C2E; color: white; font-weight: 600; border-radius: 14px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
@@ -31,19 +42,22 @@
         .action-btn { font-weight: 800; border-radius: 14px; transition: 0.1s; }
         .action-btn:active { transform: scale(0.95); opacity: 0.9; }
 
+        /* Nav */
         .nav-dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 380px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; display: flex; justify-content: space-around; padding: 12px 0; z-index: 50; }
         .nav-item { color: #555; padding: 8px; border-radius: 12px; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-item span { font-size: 9px; font-weight: 600; }
         .nav-item.active { color: white; }
-        
+        .nav-item.active svg { filter: drop-shadow(0 0 6px white); }
+
         .tab-content { display: none; height: calc(100vh - 90px); overflow-y: auto; padding: 20px; padding-bottom: 120px; }
         .tab-content.active { display: block; animation: fadeUp 0.3s ease; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Crash/Cases */
         .crash-switch { background: #111; border-radius: 12px; padding: 3px; display: inline-flex; border: 1px solid #333; margin-bottom: 15px; }
         .switch-opt { padding: 8px 16px; border-radius: 9px; font-size: 11px; font-weight: bold; color: #666; transition: 0.2s; }
         .switch-opt.active-s { background: rgba(57, 255, 20, 0.15); color: var(--neon); border: 1px solid var(--neon); }
         .switch-opt.active-t { background: rgba(0, 152, 234, 0.15); color: var(--ton); border: 1px solid var(--ton); }
-        
         .roulette-wrapper { position: relative; width: 100%; height: 110px; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid #333; margin-bottom: 20px; }
         .roulette-track { display: flex; position: absolute; height: 100%; align-items: center; left: 0; will-change: transform; }
         .roulette-item { min-width: 90px; height: 90px; margin: 0 4px; background: #151515; border-radius: 12px; border: 1px solid #222; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -52,10 +66,9 @@
         .p-tab { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 600; color: #666; border-radius: 8px; transition: 0.2s; }
         .p-tab.active { background: #2C2C2E; color: white; }
 
+        /* Tasks Styles */
         .task-card { background: #151517; border-radius: 20px; padding: 16px; margin-bottom: 12px; border: 1px solid #2A2A2C; display: flex; align-items: center; justify-content: space-between; }
         .task-btn { background: var(--blue-btn); color: white; font-size: 11px; font-weight: 700; padding: 8px 16px; border-radius: 20px; transition: 0.2s; min-width: 80px; text-align: center; }
-        .task-btn.completed { background: #22c55e; color: black; pointer-events: none; }
-        .task-btn.check { background: #eab308; color: black; }
     </style>
 </head>
 <body>
@@ -152,7 +165,7 @@
                         <span class="text-[#FFD700]">⭐</span>
                         <span class="text-sm font-bold">+1 Stars</span>
                     </div>
-                    <button id="task-btn-channel" onclick="handleTask('channel', 'https://t.me/orbitinstats')" class="task-btn">ВЫПОЛНИТЬ</button>
+                    <button onclick="handleTask()" class="task-btn">ВЫПОЛНИТЬ</button>
                 </div>
             </div>
 
@@ -167,8 +180,12 @@
                         <span class="text-[#FFD700]">⭐</span>
                         <span class="text-sm font-bold">+1 Stars</span>
                     </div>
-                    <button id="task-btn-chat" onclick="handleTask('chat', 'https://t.me/orbitinchat')" class="task-btn">ВЫПОЛНИТЬ</button>
+                    <button onclick="handleTask()" class="task-btn">ВЫПОЛНИТЬ</button>
                 </div>
+            </div>
+
+            <div class="text-center mt-8 text-gray-600 text-[10px]">
+                Новые задания появятся скоро...
             </div>
         </section>
 
@@ -229,6 +246,7 @@
         <div class="bg-[#1C1C1E] w-full rounded-t-[32px] p-6 pb-12 border-t border-gray-800">
             <div class="w-12 h-1 bg-gray-600 mx-auto rounded-full mb-6" onclick="document.getElementById('wallet-modal').classList.add('hidden')"></div>
             <h3 class="text-center font-bold text-white mb-6 uppercase tracking-widest text-lg" id="wallet-title">Пополнение</h3>
+            
             <div class="flex gap-2 mb-6">
                 <button onclick="switchWalletCurr('stars')" id="wc-stars" class="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition">STARS</button>
                 <button onclick="switchWalletCurr('ton')" id="wc-ton" class="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition">TON</button>
@@ -246,33 +264,22 @@
                 <div class="text-center mb-4">
                     <p class="text-xs text-gray-400 mb-2">Выберите пакет Звезд</p>
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="showPaymentInfo(15)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center">
+                        <button onclick="payStars(15)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center">
                             <span>15 ⭐</span><span class="text-[9px] text-gray-500 font-normal">Новичок</span>
                         </button>
-                        <button onclick="showPaymentInfo(25)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center">
+                        <button onclick="payStars(25)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center">
                             <span>25 ⭐</span><span class="text-[9px] text-gray-500 font-normal">Любитель</span>
                         </button>
-                        <button onclick="showPaymentInfo(50)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center">
+                        <button onclick="payStars(50)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center">
                             <span>50 ⭐</span><span class="text-[9px] text-gray-500 font-normal">Профи</span>
                         </button>
-                        <button onclick="showPaymentInfo(100)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center">
+                        <button onclick="payStars(100)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center">
                             <span>100 ⭐</span><span class="text-[9px] text-gray-500 font-normal">Магнат</span>
                         </button>
                     </div>
                 </div>
                 <p class="text-[10px] text-gray-500 text-center">Оплата через Telegram Stars</p>
             </div>
-        </div>
-    </div>
-
-    <div id="payment-info-modal" class="hidden fixed inset-0 bg-black/95 z-[100] flex items-center justify-center px-6">
-        <div class="bg-[#1C1C1E] rounded-3xl p-6 border border-yellow-500/30 text-center relative w-full max-w-sm">
-            <button onclick="document.getElementById('payment-info-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-500 font-bold">✕</button>
-            <div class="text-4xl mb-4">🌟</div>
-            <h3 class="text-xl font-bold mb-2 text-white">Покупка Звезд</h3>
-            <p class="text-sm text-gray-400 mb-6">Чтобы пополнить баланс на <span id="pay-amount-display" class="text-white font-bold">0</span> Stars, свяжитесь с поддержкой.</p>
-            <a href="https://t.me/OrbitUpSupport" target="_blank" class="w-full bg-[#007AFF] text-white font-bold py-3.5 rounded-xl uppercase tracking-wide mb-3 block">СВЯЗАТЬСЯ С АДМИНОМ</a>
-            <p class="text-[10px] text-gray-600">После оплаты вам отправят ссылку на зачисление.</p>
         </div>
     </div>
 
@@ -298,19 +305,10 @@
 
         const MY_WALLET_ADDRESS = "UQBLYVXsKcTwo2vegPZKQkR3lFowRYa2IK5_6OC8sXOyMh0p"; 
 
-        let state = { balances: { stars: 0, ton: 0.0 }, lastDaily: 0, history: [], tasks: { channel: false, chat: false }, usedLinks: [] };
-        
-        // Initial Load
-        const saved = localStorage.getItem('orbitUpFinalV28');
-        if(saved) { 
-            try { state = JSON.parse(saved); } catch(e){} 
-        }
-        
-        // Fix for old saves
-        if(!state.tasks) state.tasks = { channel: false, chat: false };
-        if(!state.usedLinks) state.usedLinks = [];
-
-        function saveState() { localStorage.setItem('orbitUpFinalV28', JSON.stringify(state)); }
+        let state = { balances: { stars: 0, ton: 0.0 }, lastDaily: 0, history: [] };
+        const saved = localStorage.getItem('orbitUpFinalV26');
+        if(saved) { try { state = JSON.parse(saved); } catch(e){} }
+        function saveState() { localStorage.setItem('orbitUpFinalV26', JSON.stringify(state)); }
 
         let activeCurr = 'stars', walletCurr = 'stars', walletMode = 'dep';
         let game = { state: 'waiting', mult: 1.0, crashAt: 0, myBet: 0, cashedOut: false };
@@ -328,7 +326,6 @@
         window.onload = () => {
             const tg = window.Telegram.WebApp;
             tg.ready(); tg.expand();
-            
             const user = tg.initDataUnsafe.user;
             if(user) {
                 document.getElementById('user-name').innerText = user.first_name;
@@ -339,22 +336,19 @@
                     document.getElementById('user-avatar-placeholder').classList.add('hidden');
                 }
             }
-
-            // === GIFT LINK CHECKER ===
-            const startParam = tg.initDataUnsafe.start_param;
-            if(startParam && !state.usedLinks.includes(startParam)) {
-                let bonus = 0;
-                if(startParam.startsWith('bonus_')) {
-                    bonus = parseInt(startParam.split('_')[1]);
+            
+            tg.onEvent('invoiceClosed', (object) => {
+                if (object.status === 'paid') {
+                    let pending = localStorage.getItem('pendingStarAmount');
+                    if(pending) {
+                        let amount = parseInt(pending);
+                        state.balances.stars += amount;
+                        saveState(); updateHeader();
+                        localStorage.removeItem('pendingStarAmount');
+                        alert(`Успешно! Начислено ${amount} Stars.`);
+                    }
                 }
-                
-                if(bonus > 0) {
-                    state.balances.stars += bonus;
-                    state.usedLinks.push(startParam);
-                    saveState();
-                    alert(`🎁 Зачислено: ${bonus} Stars!`);
-                }
-            }
+            });
 
             let fill = document.getElementById('loader-fill');
             setTimeout(() => fill.style.width = "100%", 100);
@@ -365,50 +359,31 @@
             
             updateHeader();
             updateHistoryUI();
-            checkTasksUI();
         };
 
-        // === TASKS LOGIC ===
-        function handleTask(taskId, link) {
-            if(state.tasks[taskId]) return;
-            let btn = document.getElementById(`task-btn-${taskId}`);
-            
-            if (btn.innerText === "ВЫПОЛНИТЬ") {
-                window.Telegram.WebApp.openTelegramLink(link);
-                btn.innerText = "ПРОВЕРИТЬ";
-                btn.classList.add("check");
-            } 
-            else if (btn.innerText === "ПРОВЕРИТЬ") {
-                btn.innerText = "⏳";
-                setTimeout(() => {
-                    state.tasks[taskId] = true;
-                    state.balances.stars += 1;
-                    saveState();
-                    updateHeader();
-                    checkTasksUI();
-                    alert("Задание выполнено! Начислена 1 звезда.");
-                }, 1500);
-            }
+        // === TASKS (SAFE MODE) ===
+        function handleTask() {
+            alert("Эта функция в разработке");
         }
 
-        function checkTasksUI() {
-            if(state.tasks.channel) {
-                const btn = document.getElementById('task-btn-channel');
-                btn.innerText = "ГОТОВО";
-                btn.className = "task-btn completed";
-            }
-            if(state.tasks.chat) {
-                const btn = document.getElementById('task-btn-chat');
-                btn.innerText = "ГОТОВО";
-                btn.className = "task-btn completed";
-            }
-        }
+        // === PAYMENT (SAFE MODE) ===
+        function payStars(amount) {
+            let invoiceUrl = "";
+            // Вставлять ссылки сюда (когда будут)
+            if (amount === 15) invoiceUrl = ""; 
+            if (amount === 25) invoiceUrl = ""; 
+            if (amount === 50) invoiceUrl = ""; 
+            if (amount === 100) invoiceUrl = ""; 
 
-        // === PAYMENT LOGIC ===
-        function showPaymentInfo(amount) {
-            document.getElementById('pay-amount-display').innerText = amount;
-            document.getElementById('wallet-modal').classList.add('hidden');
-            document.getElementById('payment-info-modal').classList.remove('hidden');
+            localStorage.setItem('pendingStarAmount', amount);
+
+            if (invoiceUrl && invoiceUrl.startsWith("https://t.me/")) {
+                window.Telegram.WebApp.openInvoice(invoiceUrl);
+                document.getElementById('wallet-modal').classList.add('hidden');
+            } else {
+                // БЕЗОПАСНЫЙ РЕЖИМ: Просто ошибка, без демо-денег
+                alert("Пополнение временно недоступно (Технические работы)");
+            }
         }
 
         // === NAV ===
@@ -606,6 +581,7 @@
             document.getElementById('cases-list').classList.remove('hidden');
         }
 
+        // === WALLET & REAL TON ===
         function openWallet(mode) { 
             walletMode = mode;
             document.getElementById('wallet-modal').classList.remove('hidden'); 
