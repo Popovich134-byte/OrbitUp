@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OrbitUp Final</title>
+    <title>OrbitUp Ultimate</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
@@ -24,24 +24,25 @@
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; margin: 0; user-select: none; }
         .font-tech { font-family: 'Orbitron', sans-serif; }
         
+        /* Loading */
         #loading-screen { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-col; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
         .loading-bar-bg { width: 160px; height: 4px; background: #222; border-radius: 10px; margin-top: 20px; overflow: hidden; }
         .loading-bar-fill { height: 100%; background: var(--blue-btn); width: 0%; transition: width 0.5s ease; box-shadow: 0 0 15px var(--blue-btn); }
 
+        /* UI */
         .glass-panel { background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .orbit-card { background: var(--card-bg); border-radius: 24px; }
         
         .primary-btn { background: var(--blue-btn); color: white; font-weight: 600; border-radius: 14px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
         .primary-btn:active { transform: scale(0.98); opacity: 0.9; }
-        
         .secondary-btn { background: #2C2C2E; color: white; font-weight: 600; border-radius: 14px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
         .secondary-btn:active { transform: scale(0.98); opacity: 0.8; }
-
         .neon-btn { background: var(--neon); color: black; box-shadow: 0 0 15px rgba(57, 255, 20, 0.3); }
         .ton-btn { background: var(--ton); color: white; box-shadow: 0 0 15px rgba(0, 152, 234, 0.3); }
         .action-btn { font-weight: 800; border-radius: 14px; transition: 0.1s; }
         .action-btn:active { transform: scale(0.95); opacity: 0.9; }
 
+        /* Nav */
         .nav-dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 380px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; display: flex; justify-content: space-around; padding: 12px 0; z-index: 50; }
         .nav-item { color: #555; padding: 8px; border-radius: 12px; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .nav-item span { font-size: 9px; font-weight: 600; }
@@ -52,19 +53,25 @@
         .tab-content.active { display: block; animation: fadeUp 0.3s ease; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Crash/Cases */
         .crash-switch { background: #111; border-radius: 12px; padding: 3px; display: inline-flex; border: 1px solid #333; margin-bottom: 15px; }
         .switch-opt { padding: 8px 16px; border-radius: 9px; font-size: 11px; font-weight: bold; color: #666; transition: 0.2s; }
         .switch-opt.active-s { background: rgba(57, 255, 20, 0.15); color: var(--neon); border: 1px solid var(--neon); }
         .switch-opt.active-t { background: rgba(0, 152, 234, 0.15); color: var(--ton); border: 1px solid var(--ton); }
-        
         .roulette-wrapper { position: relative; width: 100%; height: 110px; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid #333; margin-bottom: 20px; }
         .roulette-track { display: flex; position: absolute; height: 100%; align-items: center; left: 0; will-change: transform; }
         .roulette-item { min-width: 90px; height: 90px; margin: 0 4px; background: #151515; border-radius: 12px; border: 1px solid #222; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .roulette-marker { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: white; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 10px white; }
-
         .p-tabs { background: #111; padding: 4px; border-radius: 12px; display: flex; margin-bottom: 15px; border: 1px solid #222; }
         .p-tab { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 600; color: #666; border-radius: 8px; transition: 0.2s; }
         .p-tab.active { background: #2C2C2E; color: white; }
+
+        /* Tasks Styles */
+        .task-card { background: #151517; border-radius: 20px; padding: 16px; margin-bottom: 12px; border: 1px solid #2A2A2C; display: flex; align-items: center; justify-content: space-between; }
+        .task-icon { width: 42px; height: 42px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-right: 12px; }
+        .task-btn { background: var(--blue-btn); color: white; font-size: 11px; font-weight: 700; padding: 8px 16px; border-radius: 20px; transition: 0.2s; min-width: 80px; text-align: center; }
+        .task-btn.completed { background: #22c55e; color: black; pointer-events: none; }
+        .task-btn.check { background: #eab308; color: black; }
     </style>
 </head>
 <body>
@@ -147,6 +154,44 @@
             </div>
         </section>
 
+        <section id="page-tasks" class="tab-content">
+            <h2 class="text-center font-tech text-xl font-black uppercase text-white mb-6">Задания</h2>
+            
+            <div class="glass-panel p-4 rounded-[24px] mb-4 border border-gray-800">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="text-2xl">📢</span>
+                    <h3 class="font-bold text-sm">Подписка на Канал</h3>
+                </div>
+                <p class="text-[10px] text-gray-400 mb-3">Подпишись на официальный канал, чтобы быть в курсе новостей.</p>
+                <div class="flex justify-between items-center bg-[#111] p-2 rounded-xl">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[#FFD700]">⭐</span>
+                        <span class="text-sm font-bold">+1 Stars</span>
+                    </div>
+                    <button id="task-btn-channel" onclick="handleTask('channel', 'https://t.me/orbitinstats')" class="task-btn">ВЫПОЛНИТЬ</button>
+                </div>
+            </div>
+
+            <div class="glass-panel p-4 rounded-[24px] mb-4 border border-gray-800">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="text-2xl">💬</span>
+                    <h3 class="font-bold text-sm">Вступить в Чат</h3>
+                </div>
+                <p class="text-[10px] text-gray-400 mb-3">Вступай в наш чат и общайся с другими игроками.</p>
+                <div class="flex justify-between items-center bg-[#111] p-2 rounded-xl">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[#FFD700]">⭐</span>
+                        <span class="text-sm font-bold">+1 Stars</span>
+                    </div>
+                    <button id="task-btn-chat" onclick="handleTask('chat', 'https://t.me/orbitinchat')" class="task-btn">ВЫПОЛНИТЬ</button>
+                </div>
+            </div>
+
+            <div class="text-center mt-8 text-gray-600 text-[10px]">
+                Новые задания появятся скоро...
+            </div>
+        </section>
+
         <section id="page-profile" class="tab-content">
             <div class="glass-panel p-5 rounded-[24px] mb-4 relative overflow-hidden">
                 <div class="flex items-center gap-4 relative z-10">
@@ -196,7 +241,7 @@
         <div onclick="alert('Скоро')" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><rect x="4" y="14" width="16" height="6" rx="2"/></svg><span>Лидеры</span></div>
         <div onclick="nav('cases')" id="nav-cases" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg><span>Розыгрыши</span></div>
         <div onclick="nav('crash')" id="nav-crash" class="nav-item active"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.48-.56.93-1.23 1.35-2h4.65c.96 0 1.88.38 2.59 1.06l.32.32a.75.75 0 0 0 1.06 0l2.12-2.12a.75.75 0 0 0 0-1.06l-.32-.32a3.68 3.68 0 0 0-1.06-2.59V8.15c.77-.42 1.44-.87 2-1.35 1.5-1.26 2-5 2-5s-3.74.5-5 2c-.48.56-.93 1.23-1.35 2H9.85c-.96 0-1.88-.38-2.59-1.06l-.32-.32a.75.75 0 0 0-1.06 0L3.76 6.54a.75.75 0 0 0 0 1.06l.32.32c.68.71 1.06 1.63 1.06 2.59v4.65c-.42.77-.87 1.44-1.35 2z"/></svg><span>Играть</span></div>
-        <div onclick="alert('Скоро')" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Задания</span></div>
+        <div onclick="nav('tasks')" id="nav-tasks" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Задания</span></div>
         <div onclick="nav('profile')" id="nav-profile" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Профиль</span></div>
     </nav>
 
@@ -256,20 +301,21 @@
     </div>
 
     <script>
-        // === TON CONNECT ===
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
             manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json', 
             buttonRootId: 'ton-connect-btn-wrap'
         });
 
-        // ⚠️ ТВОЙ КОШЕЛЕК
         const MY_WALLET_ADDRESS = "UQBLYVXsKcTwo2vegPZKQkR3lFowRYa2IK5_6OC8sXOyMh0p"; 
 
-        // === STATE ===
-        let state = { balances: { stars: 0, ton: 0.0 }, lastDaily: 0, history: [] };
-        const saved = localStorage.getItem('orbitUpFinalV17');
+        let state = { balances: { stars: 0, ton: 0.0 }, lastDaily: 0, history: [], tasks: { channel: false, chat: false } };
+        const saved = localStorage.getItem('orbitUpFinalV25');
         if(saved) { try { state = JSON.parse(saved); } catch(e){} }
-        function saveState() { localStorage.setItem('orbitUpFinalV17', JSON.stringify(state)); }
+        
+        // Ensure tasks object exists in old saves
+        if(!state.tasks) state.tasks = { channel: false, chat: false };
+
+        function saveState() { localStorage.setItem('orbitUpFinalV25', JSON.stringify(state)); }
 
         let activeCurr = 'stars', walletCurr = 'stars', walletMode = 'dep';
         let game = { state: 'waiting', mult: 1.0, crashAt: 0, myBet: 0, cashedOut: false };
@@ -284,11 +330,9 @@
         const iconTon = `<svg viewBox="0 0 48 48" fill="none" class="w-full h-full"><circle cx="24" cy="24" r="24" fill="#0098EA"/><path d="M24 11L14 28L24 40L34 28L24 11Z" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 28L24 18L34 28" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 40V28" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
         const iconStars = `<span class="text-xl">⭐</span>`;
 
-        // === INIT ===
         window.onload = () => {
             const tg = window.Telegram.WebApp;
-            tg.ready();
-            tg.expand();
+            tg.ready(); tg.expand();
             const user = tg.initDataUnsafe.user;
             if(user) {
                 document.getElementById('user-name').innerText = user.first_name;
@@ -319,19 +363,58 @@
                 document.getElementById('loading-screen').style.opacity=0; 
                 setTimeout(()=> { document.getElementById('loading-screen').style.display='none'; startCrashLoop(); }, 500); 
             }, 2000);
+            
             updateHeader();
             updateHistoryUI();
+            checkTasksUI();
         };
+
+        // === TASKS LOGIC ===
+        function handleTask(taskId, link) {
+            if(state.tasks[taskId]) return; // Already done
+
+            let btn = document.getElementById(`task-btn-${taskId}`);
+            
+            // Step 1: Open Link
+            if (btn.innerText === "ВЫПОЛНИТЬ") {
+                window.Telegram.WebApp.openTelegramLink(link);
+                btn.innerText = "ПРОВЕРИТЬ";
+                btn.classList.add("check");
+            } 
+            // Step 2: Check (Simulation)
+            else if (btn.innerText === "ПРОВЕРИТЬ") {
+                btn.innerText = "⏳";
+                setTimeout(() => {
+                    state.tasks[taskId] = true;
+                    state.balances.stars += 1;
+                    saveState();
+                    updateHeader();
+                    checkTasksUI();
+                    alert("Задание выполнено! Начислена 1 звезда.");
+                }, 1500);
+            }
+        }
+
+        function checkTasksUI() {
+            if(state.tasks.channel) {
+                const btn = document.getElementById('task-btn-channel');
+                btn.innerText = "ГОТОВО";
+                btn.className = "task-btn completed";
+            }
+            if(state.tasks.chat) {
+                const btn = document.getElementById('task-btn-chat');
+                btn.innerText = "ГОТОВО";
+                btn.className = "task-btn completed";
+            }
+        }
 
         // === PAYMENT LOGIC ===
         function payStars(amount) {
             let invoiceUrl = "";
-            
-            // 👇👇👇 ВСТАВЛЯЙ ССЫЛКИ СЮДА 👇👇👇
-            if (amount === 15) invoiceUrl = ""; // Вставь ссылку в кавычки
-            if (amount === 25) invoiceUrl = ""; // Вставь ссылку в кавычки
-            if (amount === 50) invoiceUrl = ""; // Вставь ссылку в кавычки
-            if (amount === 100) invoiceUrl = ""; // Вставь ссылку в кавычки
+            if (amount === 15) invoiceUrl = ""; 
+            if (amount === 25) invoiceUrl = ""; 
+            if (amount === 50) invoiceUrl = ""; 
+            if (amount === 100) invoiceUrl = ""; 
 
             localStorage.setItem('pendingStarAmount', amount);
 
@@ -339,7 +422,6 @@
                 window.Telegram.WebApp.openInvoice(invoiceUrl);
                 document.getElementById('wallet-modal').classList.add('hidden');
             } else {
-                // FALLBACK DEMO MODE (Если ссылок нет)
                 if(confirm("Ссылка не настроена. Включить Демо-пополнение?")) {
                     state.balances.stars += amount;
                     saveState(); updateHeader();
@@ -356,6 +438,7 @@
             document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active'));
             if(page === 'crash') document.getElementById('nav-crash').classList.add('active');
             if(page === 'cases') document.getElementById('nav-cases').classList.add('active');
+            if(page === 'tasks') document.getElementById('nav-tasks').classList.add('active');
             if(page === 'profile') document.getElementById('nav-profile').classList.add('active');
         }
 
@@ -477,6 +560,7 @@
             }
         }
 
+        // === CASES ===
         function openCaseView(id) {
             activeCase = casesData.find(c => c.id === id);
             if(activeCase.id === 3) {
@@ -514,21 +598,17 @@
             const btn = document.getElementById('spinBtn');
             btn.disabled = true;
             const track = document.getElementById('rouletteTrack');
-            
             let r = Math.random();
             let winIdx = r < 0.5 ? 0 : (r < 0.8 ? 1 : (r < 0.95 ? 2 : 4));
             if(winIdx >= activeCase.prizes.length) winIdx = 0;
             let winAmount = activeCase.prizes[winIdx];
             let targetIdx = 45; 
-            
             track.children[targetIdx].innerHTML = `<span class="text-xl font-bold text-white">${winAmount}</span>`;
             track.children[targetIdx].style.background = activeCase.color;
             if(activeCase.color === '#FFFFFF') track.children[targetIdx].style.color = 'black';
-            
             let offset = (targetIdx * 98) - (track.parentElement.offsetWidth / 2) + 49;
             track.style.transition = 'transform 4s cubic-bezier(0.1,0,0,1)';
             track.style.transform = `translateX(-${offset}px)`;
-            
             setTimeout(() => {
                 state.balances[activeCase.curr] += winAmount;
                 if(activeCase.id === 3) state.lastDaily = Date.now();
@@ -545,6 +625,7 @@
             document.getElementById('cases-list').classList.remove('hidden');
         }
 
+        // === WALLET & REAL TON ===
         function openWallet(mode) { 
             walletMode = mode;
             document.getElementById('wallet-modal').classList.remove('hidden'); 
