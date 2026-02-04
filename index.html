@@ -2,175 +2,190 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>OrbitUp | Original Premium</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Gaming Ecosystem</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #000; color: #39FF14; font-family: sans-serif; margin: 0; overflow-x: hidden; }
-        .neon-border { border: 1px solid #39FF14; box-shadow: 0 0 10px rgba(57, 255, 20, 0.3); }
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
-        .page { display: none; }
-        .page.active { display: block; }
-        #crash-canvas { width: 100%; height: 180px; background: #050505; border-radius: 15px; }
-        .tab-btn.active { background: #39FF14; color: #000; }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; }
+        .neon-text { text-shadow: 0 0 10px #39FF14; color: #39FF14; font-family: 'Orbitron', sans-serif; }
+        .neon-btn { box-shadow: 0 0 15px rgba(57, 255, 20, 0.3); transition: 0.3s; }
+        .neon-btn:disabled { opacity: 0.5; box-shadow: none; filter: grayscale(1); }
+        #crashCanvas { width: 100%; height: 180px; background: #000; border-radius: 12px; border: 1px solid #1a1a1a; }
+        .history-item { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { transform: translateX(-10px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
-<body class="p-4">
+<body class="p-4 pb-24">
 
-    <div id="welcome" class="fixed inset-0 z-50 bg-black flex flex-col items-center justify-center text-center">
-        <h1 class="text-4xl font-black italic tracking-tighter mb-2" style="text-shadow: 0 0 15px #39FF14;">ORBIT UP</h1>
-        <p class="text-[10px] uppercase tracking-[0.5em] opacity-50">Welcome to project</p>
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-[10px] text-gray-500 uppercase tracking-widest">My Assets</h1>
+            <div class="flex items-center gap-2">
+                <span class="text-2xl font-bold neon-text" id="balanceDisplay">2.00</span>
+                <span class="text-xs text-gray-400">STARS</span>
+            </div>
+        </div>
+        <div class="bg-[#111] p-2 rounded-lg border border-gray-800 text-[10px] text-center">
+            <p class="text-gray-500">BONUS ACTIVE</p>
+            <p class="text-[#39FF14]">+10% Daily</p>
+        </div>
     </div>
 
-    <div id="lang" class="page fixed inset-0 bg-black flex flex-col items-center justify-center p-6 text-center">
-        <h2 class="text-xl font-bold mb-10 uppercase">Выберите язык</h2>
-        <div class="w-full space-y-4 mb-10">
-            <button onclick="selectL('ru')" id="l-ru" class="w-full glass p-5 rounded-2xl font-bold border border-white/10">РУССКИЙ</button>
-            <button onclick="selectL('en')" id="l-en" class="w-full glass p-5 rounded-2xl font-bold border border-white/10">ENGLISH</button>
+    <div class="bg-[#0f0f0f] rounded-2xl p-4 border border-gray-800 mb-6">
+        <div class="relative mb-4">
+            <canvas id="crashCanvas"></canvas>
+            <div id="multiplier" class="absolute inset-0 flex flex-col items-center justify-center">
+                <span class="text-4xl font-black neon-text" id="multText">1.00x</span>
+                <span id="statusText" class="text-[10px] uppercase tracking-widest text-gray-500">Waiting for bet...</span>
+            </div>
         </div>
-        <button id="go" onclick="start()" class="hidden w-full bg-[#39FF14] text-black font-black py-4 rounded-2xl uppercase">Продолжить</button>
+
+        <div class="grid grid-cols-2 gap-3 mb-4">
+            <div class="bg-black p-2 rounded-xl border border-gray-800">
+                <p class="text-[10px] text-gray-500 mb-1 ml-1">BET AMOUNT</p>
+                <input id="betInput" type="number" value="0.5" step="0.1" min="0.1" 
+                    class="bg-transparent w-full text-lg font-bold outline-none text-white px-1">
+            </div>
+            <button onclick="handleAction()" id="actionBtn" 
+                class="bg-[#39FF14] text-black font-bold rounded-xl uppercase neon-btn">
+                Place Bet
+            </button>
+        </div>
     </div>
 
-    <div id="app" class="page">
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <p id="u-name" class="font-bold text-white uppercase text-sm tracking-widest">User</p>
-                <p class="text-[8px] opacity-50">PREMIUM ACCOUNT</p>
+    <div>
+        <h3 class="text-xs font-bold text-gray-500 uppercase mb-3">Live History</h3>
+        <div id="historyList" class="flex gap-2 overflow-x-auto pb-2">
             </div>
-            <div class="glass neon-border px-4 py-1 rounded-full text-sm font-black tracking-tighter">
-                ⭐ <span id="bal-val">1000</span>
-            </div>
-        </div>
-
-        <div id="sec-crash" class="sec active">
-            <div class="glass neon-border rounded-3xl p-5 mb-6">
-                <div class="flex justify-between mb-2 items-center">
-                    <span class="text-[10px] font-bold opacity-50">CRASH GAME</span>
-                    <span id="mult" class="text-3xl font-black italic">1.00x</span>
-                </div>
-                <canvas id="crash-canvas"></canvas>
-                <div class="flex gap-2 mt-4">
-                    <input id="bet-input" type="number" value="50" class="w-1/2 bg-white/10 rounded-xl px-4 text-white outline-none">
-                    <button id="b-bet" onclick="doBet()" class="w-1/2 bg-[#39FF14] text-black font-bold py-3 rounded-xl uppercase text-xs">Ставка</button>
-                    <button id="b-cash" onclick="doCash()" class="hidden w-1/2 bg-white text-black font-bold py-3 rounded-xl uppercase text-xs">Забрать</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="sec-cases" class="sec hidden">
-            <h3 class="text-[10px] font-bold mb-4 opacity-50 uppercase tracking-widest">Кейсы</h3>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="glass p-5 rounded-3xl text-center border border-white/5">
-                    <div id="box-1" class="text-5xl mb-4">📦</div>
-                    <p class="text-[10px] font-bold mb-3">NEON BOX</p>
-                    <button onclick="openBox(100, 'box-1')" class="w-full bg-[#39FF14] text-black py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter">100 ⭐</button>
-                </div>
-                <div class="glass p-5 rounded-3xl text-center border border-white/5">
-                    <div id="box-2" class="text-5xl mb-4">💎</div>
-                    <p class="text-[10px] font-bold mb-3">ELITE BOX</p>
-                    <button onclick="openBox(500, 'box-2')" class="w-full bg-[#39FF14] text-black py-2 rounded-xl text-[10px] font-black uppercase tracking-tighter">500 ⭐</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="fixed bottom-6 left-6 right-6 h-16 glass rounded-full flex justify-around items-center border border-white/10">
-            <button onclick="tab('crash')" class="tab-btn w-10 h-10 rounded-full flex items-center justify-center">📈</button>
-            <button onclick="tab('cases')" class="tab-btn w-10 h-10 rounded-full flex items-center justify-center">📦</button>
-            <button onclick="tab('gifts')" class="tab-btn w-10 h-10 rounded-full flex items-center justify-center">🎁</button>
-            <button onclick="tab('profile')" class="tab-btn w-10 h-10 rounded-full flex items-center justify-center">👤</button>
-        </div>
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        let balance = 1000;
-        let mult = 1.0;
-        let bet = 0;
-        let points = [];
+        // --- State ---
+        let balance = 2.00;
+        let currentBet = 0;
+        let isGaming = false;
+        let gameInterval = null;
+        let currentMultiplier = 1.00;
+        let hasCashedOut = false;
 
-        // 1. Порядок входа
-        setTimeout(() => {
-            document.getElementById('welcome').remove();
-            document.getElementById('lang').classList.add('active');
-        }, 5000); // 5 сек приветствие
+        const balanceDisplay = document.getElementById('balanceDisplay');
+        const multText = document.getElementById('multText');
+        const statusText = document.getElementById('statusText');
+        const actionBtn = document.getElementById('actionBtn');
+        const betInput = document.getElementById('betInput');
+        const historyList = document.getElementById('historyList');
 
-        function selectL(l) {
-            document.getElementById('l-ru').style.borderColor = (l==='ru') ? '#39FF14' : 'rgba(255,255,255,0.1)';
-            document.getElementById('l-en').style.borderColor = (l==='en') ? '#39FF14' : 'rgba(255,255,255,0.1)';
-            document.getElementById('go').classList.remove('hidden');
+        // --- Logic ---
+
+        function updateBalance(amount) {
+            balance = parseFloat((balance + amount).toFixed(2));
+            balanceDisplay.innerText = balance.toFixed(2);
         }
 
-        function start() {
-            document.getElementById('lang').remove();
-            document.getElementById('app').classList.add('active');
-            if(tg.initDataUnsafe?.user) document.getElementById('u-name').innerText = tg.initDataUnsafe.user.first_name;
-            runCrash();
+        function handleAction() {
+            if (!isGaming) {
+                startNewGame();
+            } else if (!hasCashedOut) {
+                cashOut();
+            }
         }
 
-        // 2. Кейсы (Работающие)
-        function openBox(cost, id) {
-            if(balance < cost) return tg.showAlert("Мало звезд!");
-            balance -= cost; upUI();
-            const el = document.getElementById(id);
-            el.style.transition = "0.5s"; el.style.transform = "scale(1.3) rotate(10deg)";
-            setTimeout(() => {
-                el.style.transform = "scale(1) rotate(0deg)";
-                const win = Math.floor(Math.random() * (cost * 2.5));
-                balance += win; upUI();
-                tg.showPopup({ title: "Дроп!", message: `Вы получили ${win} ⭐` });
-            }, 600);
-        }
+        function startNewGame() {
+            const betValue = parseFloat(betInput.value);
+            
+            if (betValue > balance) {
+                alert("Not enough Stars!");
+                return;
+            }
+            if (betValue <= 0) return;
 
-        // 3. Краш (Рабочий)
-        function doBet() {
-            const v = parseInt(document.getElementById('bet-input').value);
-            if(v > balance || v <= 0) return;
-            balance -= v; bet = v; upUI();
-            document.getElementById('b-bet').classList.add('hidden');
-            document.getElementById('b-cash').classList.remove('hidden');
-        }
+            // Занимаем ставку
+            currentBet = betValue;
+            updateBalance(-currentBet);
+            
+            // Сброс состояния
+            isGaming = true;
+            hasCashedOut = false;
+            currentMultiplier = 1.00;
+            const crashPoint = (Math.random() * 3.5 + 1.01); // Рандом для демо
 
-        function doCash() {
-            if(bet <= 0) return;
-            balance += (bet * mult); bet = 0; upUI();
-            document.getElementById('b-bet').classList.remove('hidden');
-            document.getElementById('b-cash').classList.add('hidden');
-            tg.HapticFeedback.notificationOccurred('success');
-        }
-
-        function upUI() { document.getElementById('bal-val').innerText = Math.floor(balance); }
-
-        function runCrash() {
-            const canvas = document.getElementById('crash-canvas');
-            const ctx = canvas.getContext('2d');
-            setInterval(() => {
-                ctx.clearRect(0,0, canvas.width, canvas.height);
-                mult += 0.01;
-                if(Math.random() < 0.005) { // Краш
-                    if(bet > 0) {
-                        bet = 0;
-                        document.getElementById('b-bet').classList.remove('hidden');
-                        document.getElementById('b-cash').classList.add('hidden');
-                        tg.HapticFeedback.notificationOccurred('error');
-                    }
-                    mult = 1.0; points = [];
+            actionBtn.innerText = "Cash Out";
+            actionBtn.classList.replace('bg-[#39FF14]', 'bg-white');
+            statusText.innerText = "Game in progress...";
+            
+            gameInterval = setInterval(() => {
+                currentMultiplier += 0.01;
+                multText.innerText = currentMultiplier.toFixed(2) + 'x';
+                
+                if (currentMultiplier >= crashPoint) {
+                    endGame(false);
                 }
-                points.push(mult); if(points.length > 50) points.shift();
-                ctx.strokeStyle = '#39FF14'; ctx.lineWidth = 4;
-                ctx.beginPath();
-                points.forEach((p, i) => ctx.lineTo((i/50)*canvas.width, canvas.height - (p*15)));
-                ctx.stroke();
-                document.getElementById('mult').innerText = mult.toFixed(2) + 'x';
             }, 60);
         }
 
-        function tab(t) {
-            document.querySelectorAll('.sec').forEach(s => s.classList.add('hidden'));
-            const target = document.getElementById('sec-' + t);
-            if(target) target.classList.remove('hidden');
-            tg.HapticFeedback.selectionChanged();
+        function cashOut() {
+            if (hasCashedOut) return;
+            
+            const winAmount = currentBet * currentMultiplier;
+            updateBalance(winAmount);
+            hasCashedOut = true;
+            
+            actionBtn.disabled = true;
+            actionBtn.innerText = "WIN: +" + winAmount.toFixed(2);
+            statusText.innerText = "Profit Secured!";
+            addToHistory(currentMultiplier.toFixed(2), true);
         }
+
+        function endGame(wasCashedOut) {
+            clearInterval(gameInterval);
+            isGaming = false;
+            
+            if (!hasCashedOut) {
+                multText.classList.add('text-red-600');
+                statusText.innerText = "Crashed!";
+                addToHistory(currentMultiplier.toFixed(2), false);
+                actionBtn.innerText = "Busted!";
+                actionBtn.classList.replace('bg-white', 'bg-red-600');
+            }
+
+            setTimeout(() => {
+                resetUI();
+            }, 2000);
+        }
+
+        function resetUI() {
+            multText.innerText = "1.00x";
+            multText.classList.remove('text-red-600');
+            statusText.innerText = "Waiting for bet...";
+            actionBtn.disabled = false;
+            actionBtn.innerText = "Place Bet";
+            actionBtn.className = "bg-[#39FF14] text-black font-bold rounded-xl uppercase neon-btn";
+        }
+
+        function addToHistory(val, win) {
+            const item = document.createElement('div');
+            item.className = `history-item px-3 py-1 rounded-full text-[10px] font-bold border ${win ? 'border-[#39FF14] text-[#39FF14]' : 'border-red-600 text-red-600'} bg-black`;
+            item.innerText = val + 'x';
+            historyList.prepend(item);
+        }
+
+        // --- Canvas Visual (Simplified) ---
+        const canvas = document.getElementById('crashCanvas');
+        const ctx = canvas.getContext('2d');
+        function draw() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            if(isGaming) {
+                ctx.strokeStyle = '#39FF14';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, 180);
+                ctx.quadraticCurveTo(canvas.width/2, 180, canvas.width, 180 - (currentMultiplier * 20));
+                ctx.stroke();
+            }
+            requestAnimationFrame(draw);
+        }
+        draw();
     </script>
 </body>
 </html>
