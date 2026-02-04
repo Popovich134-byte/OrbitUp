@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>OrbitUp Final</title>
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600;700&display=swap');
         
@@ -35,6 +38,9 @@
         .primary-btn { background: var(--blue-btn); color: white; font-weight: 600; border-radius: 14px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
         .primary-btn:active { transform: scale(0.98); opacity: 0.9; }
         
+        .secondary-btn { background: #2C2C2E; color: white; font-weight: 600; border-radius: 14px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
+        .secondary-btn:active { transform: scale(0.98); opacity: 0.8; }
+
         .neon-btn { background: var(--neon); color: black; box-shadow: 0 0 15px rgba(57, 255, 20, 0.3); }
         .ton-btn { background: var(--ton); color: white; box-shadow: 0 0 15px rgba(0, 152, 234, 0.3); }
 
@@ -77,7 +83,7 @@
         <div class="glass-panel rounded-xl py-2 px-3 flex items-center gap-3 border-l-2 border-[#39FF14]" id="balance-container">
             <div id="headerIcon" class="w-6 h-6 flex items-center justify-center"></div>
             <div class="flex flex-col leading-none">
-                <span class="text-[8px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Баланс</span>
+                <span class="text-[8px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Ваш Баланс</span>
                 <span class="font-tech font-bold text-lg text-white" id="headerBalance">0</span>
             </div>
         </div>
@@ -163,12 +169,8 @@
                 </div>
                 
                 <div class="flex gap-3 mt-6">
-                    <button onclick="openWallet('dep')" class="flex-1 primary-btn py-3 text-xs shadow-lg shadow-blue-900/40">
-                        Пополнить баланс
-                    </button>
-                    <button onclick="openWallet('with')" class="flex-1 primary-btn py-3 text-xs shadow-lg shadow-blue-900/40" style="background: #2C2C2E; border: 1px solid #444;">
-                        Вывод средств
-                    </button>
+                    <button onclick="openWallet('dep')" class="flex-1 primary-btn py-3 text-xs shadow-lg shadow-blue-900/40">Пополнить баланс</button>
+                    <button onclick="openWallet('with')" class="flex-1 secondary-btn py-3 text-xs shadow-lg border border-white/5 text-gray-400">Вывод средств</button>
                 </div>
             </div>
 
@@ -190,7 +192,6 @@
                 </div>
                 <button onclick="openGiftModal()" class="w-full primary-btn py-3.5 text-sm font-bold uppercase tracking-wide">ДОБАВИТЬ ПОДАРОК</button>
             </div>
-
             <div id="tab-friends" class="hidden mt-4 text-center"><p class="text-xs text-gray-500">У вас 0 друзей</p></div>
             <div id="tab-history" class="hidden mt-4 space-y-2"></div>
         </section>
@@ -208,45 +209,50 @@
         <div class="bg-[#1C1C1E] w-full rounded-t-[32px] p-6 pb-12 border-t border-gray-800">
             <div class="w-12 h-1 bg-gray-600 mx-auto rounded-full mb-6" onclick="document.getElementById('wallet-modal').classList.add('hidden')"></div>
             <h3 class="text-center font-bold text-white mb-6 uppercase tracking-widest text-lg" id="wallet-title">Пополнение</h3>
+            
             <div class="flex gap-2 mb-4">
                 <button onclick="switchWalletCurr('stars')" id="wc-stars" class="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition">STARS</button>
                 <button onclick="switchWalletCurr('ton')" id="wc-ton" class="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition">TON</button>
             </div>
-            <input id="wallet-input" type="number" placeholder="Сумма" class="w-full bg-black p-4 rounded-xl text-center text-white font-bold text-xl outline-none mb-4 border border-[#333]">
-            <button onclick="processWallet()" class="w-full primary-btn py-4 rounded-xl font-bold" id="wallet-action-btn">Подтвердить</button>
+
+            <div id="ton-connect-container" class="hidden text-center mb-6">
+                <p class="text-xs text-gray-400 mb-2">Подключите кошелек для оплаты</p>
+                <div id="ton-connect-button-root" class="flex justify-center"></div>
+            </div>
+
+            <div id="manual-input-container">
+                <input id="wallet-input" type="number" placeholder="Сумма" class="w-full bg-black p-4 rounded-xl text-center text-white font-bold text-xl outline-none mb-4 border border-[#333]">
+                <button onclick="processWallet()" class="w-full primary-btn py-4 rounded-xl font-bold" id="wallet-action-btn">Подтвердить</button>
+            </div>
         </div>
     </div>
 
     <div id="gift-modal" class="hidden fixed inset-0 bg-black/95 z-[100] flex flex-col justify-center px-6">
         <div class="bg-[#1C1C1E] rounded-3xl p-6 border border-gray-800 text-center relative">
             <button onclick="document.getElementById('gift-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-500 font-bold">✕</button>
-            
             <div class="flex justify-center items-center gap-4 mb-6 mt-4">
                 <div class="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center text-3xl">🎁</div>
                 <div class="text-gray-500">➜</div>
                 <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center text-3xl">🤖</div>
             </div>
-
             <h3 class="text-lg font-bold mb-2">Отправьте подарок боту</h3>
-            <p class="text-xs text-gray-400 mb-6">Перейдите к боту по кнопке ниже. Количество подарков не ограничено. Если цена не устроит, можно вывести обратно.</p>
-
-            <a href="https://t.me/GiftsToOrbitUp" target="_blank" class="w-full primary-btn py-4 rounded-xl font-bold uppercase tracking-wide mb-3">
-                ПЕРЕЙТИ К БОТУ
-            </a>
-            <p class="text-[10px] text-gray-600">@GiftsToOrbitUp</p>
+            <p class="text-xs text-gray-400 mb-6">Перейдите к боту @GiftsToOrbitUp. Количество подарков не ограничено.</p>
+            <a href="https://t.me/GiftsToOrbitUp" target="_blank" class="w-full primary-btn py-4 rounded-xl font-bold uppercase tracking-wide mb-3">ПЕРЕЙТИ К БОТУ</a>
         </div>
     </div>
 
     <script>
-        // === STATE & LOCAL STORAGE ===
-        let state = {
-            balances: { stars: 1000, ton: 5.0 },
-            lastDaily: 0,
-            history: []
-        };
-        const saved = localStorage.getItem('orbitUpStateV2');
-        if(saved) { try { state = JSON.parse(saved); } catch(e) {} }
-        function saveState() { localStorage.setItem('orbitUpStateV2', JSON.stringify(state)); }
+        // === TON CONNECT INIT ===
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json', 
+            buttonRootId: 'ton-connect-button-root'
+        });
+
+        // === STATE ===
+        let state = { balances: { stars: 1000, ton: 5.0 }, lastDaily: 0, history: [] };
+        const saved = localStorage.getItem('orbitUpV3');
+        if(saved) { try { state = JSON.parse(saved); } catch(e){} }
+        function saveState() { localStorage.setItem('orbitUpV3', JSON.stringify(state)); }
 
         let activeCurr = 'stars'; 
         let walletCurr = 'stars';
@@ -345,12 +351,15 @@
         // === CRASH GAME ===
         function startCrashLoop() {
             game.state = 'waiting'; game.myBet = 0; game.cashedOut = false; game.mult = 1.0;
+            
             document.getElementById('mult-display').innerText = "1.00x";
             document.getElementById('mult-display').className = "relative z-10 text-6xl font-black font-tech text-white transition-transform";
             document.getElementById('game-status').innerText = "ОЖИДАНИЕ...";
             document.getElementById('rocket').style.opacity = '0';
+            
             const bar = document.getElementById('timer-bar');
             bar.style.transition = 'none'; bar.style.width = '100%';
+            
             setTimeout(() => { bar.style.transition = 'width 5s linear'; bar.style.width = '0%'; }, 100);
             updateBtn();
             setTimeout(launchRocket, 5000);
@@ -496,6 +505,7 @@
             document.getElementById('wallet-modal').classList.remove('hidden'); 
             document.getElementById('wallet-title').innerText = mode === 'dep' ? "Пополнение" : "Вывод средств";
             document.getElementById('wallet-action-btn').innerText = mode === 'dep' ? "Пополнить" : "Вывести";
+            switchWalletCurr('stars'); // default
         }
         function openGiftModal() { document.getElementById('gift-modal').classList.remove('hidden'); }
         
@@ -504,9 +514,22 @@
             if(c==='stars') {
                 document.getElementById('wc-stars').className="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition";
                 document.getElementById('wc-ton').className="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition";
+                
+                // Show Input
+                document.getElementById('manual-input-container').classList.remove('hidden');
+                document.getElementById('ton-connect-container').classList.add('hidden');
             } else {
                 document.getElementById('wc-ton').className="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition";
                 document.getElementById('wc-stars').className="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition";
+                
+                // Show Connect Button if Deposit, else show Input for Withdraw
+                if(walletMode === 'dep') {
+                    document.getElementById('manual-input-container').classList.add('hidden');
+                    document.getElementById('ton-connect-container').classList.remove('hidden');
+                } else {
+                    document.getElementById('manual-input-container').classList.remove('hidden');
+                    document.getElementById('ton-connect-container').classList.add('hidden');
+                }
             }
         }
         function processWallet() {
