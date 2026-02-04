@@ -53,11 +53,26 @@
         .tab-content.active { display: block; animation: fadeUp 0.3s ease; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Crash New Design */
+        .crash-container { position: relative; width: 100%; height: 220px; background: #000; border-radius: 24px; overflow: hidden; margin-bottom: 16px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .crash-bg { position: absolute; inset: 0; background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 30px 30px; opacity: 0.2; animation: starsMove 20s linear infinite; }
+        @keyframes starsMove { from { background-position: 0 0; } to { background-position: -100px 0; } }
+        #rocket-new { position: absolute; left: 20px; bottom: 20px; font-size: 40px; transition: all 0.1s ease-out; }
+        .mult-badge { position: absolute; top: 16px; right: 16px; background: rgba(0, 122, 255, 0.2); border: 1px solid var(--blue-btn); padding: 6px 12px; border-radius: 12px; display: flex; align-items: center; gap: 6px; }
+        .history-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; }
+        .history-item { padding: 6px 12px; background: #2C2C2E; border-radius: 10px; font-size: 11px; font-weight: 700; color: #888; white-space: nowrap; }
+        .history-item.current { background: var(--blue-btn); color: white; }
+        .crash-btn-big { width: 100%; padding: 16px; border-radius: 16px; font-weight: 800; font-size: 14px; text-transform: uppercase; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .crash-btn-big.start { background: var(--blue-btn); color: white; }
+        .crash-btn-big.cashout { background: #22c55e; color: black; }
+        .crash-btn-big.crashed { background: #ef4444; color: white; }
+        .crash-btn-big:active:not(:disabled) { transform: scale(0.98); opacity: 0.9; }
+        .players-list { margin-top: 24px; }
+        .player-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .player-info { display: flex; align-items: center; gap: 10px; }
+        .player-avatar { width: 32px; height: 32px; background: #333; rounded-full; flex-shrink: 0; overflow: hidden; }
+
         /* Crash/Cases */
-        .crash-switch { background: #111; border-radius: 12px; padding: 3px; display: inline-flex; border: 1px solid #333; margin-bottom: 15px; }
-        .switch-opt { padding: 8px 16px; border-radius: 9px; font-size: 11px; font-weight: bold; color: #666; transition: 0.2s; }
-        .switch-opt.active-s { background: rgba(57, 255, 20, 0.15); color: var(--neon); border: 1px solid var(--neon); }
-        .switch-opt.active-t { background: rgba(0, 152, 234, 0.15); color: var(--ton); border: 1px solid var(--ton); }
         .roulette-wrapper { position: relative; width: 100%; height: 110px; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid #333; margin-bottom: 20px; }
         .roulette-track { display: flex; position: absolute; height: 100%; align-items: center; left: 0; will-change: transform; }
         .roulette-item { min-width: 90px; height: 90px; margin: 0 4px; background: #151515; border-radius: 12px; border: 1px solid #222; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -96,26 +111,33 @@
 
     <main>
         <section id="page-crash" class="tab-content active">
-            <div class="flex justify-center mb-4">
-                <div class="crash-switch">
-                    <button onclick="setCurrency('stars')" id="sw-stars" class="switch-opt active-s">STARS</button>
-                    <button onclick="setCurrency('ton')" id="sw-ton" class="switch-opt">TON</button>
+            <div class="crash-container">
+                <div class="crash-bg"></div>
+                <div id="rocket-new">🚀</div>
+                <div class="mult-badge">
+                    <span id="crash-curr-icon"></span>
+                    <span id="mult-display-new" class="font-tech font-bold text-lg">1.00x</span>
                 </div>
             </div>
-            <div class="relative w-full h-72 bg-[#080808] rounded-[30px] border border-gray-800 mb-5 overflow-hidden flex flex-col items-center justify-center shadow-2xl">
-                <div class="absolute inset-0" style="background-image: radial-gradient(#222 1px, transparent 1px); background-size: 24px 24px; opacity: 0.4;"></div>
-                <div id="rocket" class="absolute text-5xl transition-all duration-75 ease-linear" style="bottom: 10%; left: 10%; opacity: 0;">🚀</div>
-                <div id="mult-display" class="relative z-10 text-6xl font-black font-tech text-white transition-transform">1.00x</div>
-                <div id="game-status" class="relative z-10 text-[9px] text-gray-500 font-bold uppercase tracking-[0.2em] mt-2">Ожидание...</div>
-                <div id="timer-bar" class="absolute bottom-0 left-0 h-1.5 bg-[#39FF14] w-0 shadow-[0_0_10px_#39FF14]"></div>
-            </div>
-            <div class="glass-panel rounded-[24px] p-5">
-                <div class="flex justify-between text-[9px] text-gray-500 font-bold uppercase mb-2">
-                    <span>Сумма ставки</span><span id="min-bet-label" class="text-white">Min: 25</span>
+
+            <div class="history-bar" id="crash-history-bar">
                 </div>
-                <div class="flex gap-3">
-                    <input id="betInput" type="number" class="w-full bg-[#050505] border border-gray-700 rounded-2xl p-4 text-center text-xl font-bold text-white outline-none focus:border-white transition" value="25">
-                    <button onclick="handleBetClick()" id="crashBtn" class="w-1/2 action-btn neon-btn uppercase text-sm tracking-wider shadow-lg">ЖДИТЕ</button>
+
+            <button id="crashBtnBig" onclick="handleCrashBtnClick()" class="crash-btn-big start">СДЕЛАТЬ СТАВКУ</button>
+
+            <div class="players-list">
+                <h3 class="text-xs font-bold text-gray-500 mb-3 uppercase tracking-wider">Игроки в раунде</h3>
+                <div class="player-row">
+                    <div class="player-info"><div class="player-avatar bg-blue-500/20">👤</div><div><p class="text-sm font-bold">Alex</p><p class="text-[10px] text-gray-500">Ставка: 100 ⭐</p></div></div>
+                    <div class="text-right"><span class="text-green-500 font-bold text-sm">1.54x</span></div>
+                </div>
+                <div class="player-row">
+                    <div class="player-info"><div class="player-avatar bg-purple-500/20">👤</div><div><p class="text-sm font-bold">Dima_Top</p><p class="text-[10px] text-gray-500">Ставка: 250 ⭐</p></div></div>
+                    <div class="text-right"><span class="text-gray-500 font-bold text-sm">В игре...</span></div>
+                </div>
+                <div class="player-row">
+                    <div class="player-info"><div class="player-avatar bg-red-500/20">👤</div><div><p class="text-sm font-bold">Winner777</p><p class="text-[10px] text-gray-500">Ставка: 50 ⭐</p></div></div>
+                    <div class="text-right"><span class="text-red-500 font-bold text-sm">CRASH</span></div>
                 </div>
             </div>
         </section>
@@ -282,6 +304,19 @@
         </div>
     </div>
 
+    <div id="bet-modal" class="hidden fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-6">
+        <div class="bg-[#1C1C1E] rounded-3xl p-6 border border-blue-500/30 text-center relative w-full max-w-sm">
+            <button onclick="document.getElementById('bet-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-500 font-bold">✕</button>
+            <h3 class="text-xl font-bold mb-6 text-white uppercase">Сделать ставку</h3>
+            <div class="flex gap-2 mb-4">
+                <button onclick="setCurrency('stars')" id="bm-stars" class="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition">STARS</button>
+                <button onclick="setCurrency('ton')" id="bm-ton" class="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition">TON</button>
+            </div>
+            <input id="betInputNew" type="number" placeholder="Сумма ставки" class="w-full bg-black p-4 rounded-xl text-center text-white font-bold text-xl outline-none border border-[#333] mb-4">
+            <button onclick="confirmBet()" class="w-full bg-[#007AFF] text-white font-bold py-4 rounded-xl uppercase tracking-wide">ПОСТАВИТЬ</button>
+        </div>
+    </div>
+
     <div id="gift-modal" class="hidden fixed inset-0 bg-black/95 z-[100] flex flex-col justify-center px-6">
         <div class="bg-[#1C1C1E] rounded-3xl p-6 border border-gray-800 text-center relative">
             <button onclick="document.getElementById('gift-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-500 font-bold">✕</button>
@@ -291,7 +326,7 @@
                 <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center text-3xl">🤖</div>
             </div>
             <h3 class="text-lg font-bold mb-2">Отправьте подарок боту</h3>
-            <p class="text-xs text-gray-400 mb-6">Перейдите к боту @GiftsToOrbitUp.</p>
+            <p class="text-xs text-gray-400 mb-6">Перейдите к боту @GiftsToOrbitUp. Количество подарков не ограничено.</p>
             <a href="https://t.me/GiftsToOrbitUp" target="_blank" class="w-full primary-btn py-4 rounded-xl font-bold uppercase tracking-wide mb-3">ПЕРЕЙТИ К БОТУ</a>
         </div>
     </div>
@@ -304,10 +339,11 @@
 
         const MY_WALLET_ADDRESS = "UQBLYVXsKcTwo2vegPZKQkR3lFowRYa2IK5_6OC8sXOyMh0p"; 
 
-        let state = { balances: { stars: 0, ton: 0.0 }, lastDaily: 0, history: [] };
-        const saved = localStorage.getItem('orbitUpFinalV26');
+        let state = { balances: { stars: 1000, ton: 5.0 }, lastDaily: 0, history: [], crashHistory: [1.23, 2.55, 1.01, 5.43, 1.88] };
+        const saved = localStorage.getItem('orbitUpFinalV27');
         if(saved) { try { state = JSON.parse(saved); } catch(e){} }
-        function saveState() { localStorage.setItem('orbitUpFinalV26', JSON.stringify(state)); }
+        if(!state.crashHistory) state.crashHistory = [1.23, 2.55, 1.01, 5.43, 1.88];
+        function saveState() { localStorage.setItem('orbitUpFinalV27', JSON.stringify(state)); }
 
         let activeCurr = 'stars', walletCurr = 'stars', walletMode = 'dep';
         let game = { state: 'waiting', mult: 1.0, crashAt: 0, myBet: 0, cashedOut: false };
@@ -358,6 +394,8 @@
             
             updateHeader();
             updateHistoryUI();
+            updateCrashHistoryUI();
+            setCurrency('stars'); // Init currency icon in crash
         };
 
         // === TASKS (SAFE MODE) ===
@@ -417,19 +455,17 @@
 
         function setCurrency(c) {
             activeCurr = c;
+            const crashIcon = document.getElementById('crash-curr-icon');
             if(c==='stars') {
-                document.getElementById('sw-stars').className="switch-opt active-s";
-                document.getElementById('sw-ton').className="switch-opt";
-                document.getElementById('min-bet-label').innerText = "Min: 25 Stars";
-                document.getElementById('betInput').value = 25;
+                crashIcon.innerHTML = '<span class="text-sm">⭐</span>';
+                document.getElementById('bm-stars').className="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition";
+                document.getElementById('bm-ton').className="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition";
             } else {
-                document.getElementById('sw-ton').className="switch-opt active-t";
-                document.getElementById('sw-stars').className="switch-opt";
-                document.getElementById('min-bet-label').innerText = "Min: 0.1 TON";
-                document.getElementById('betInput').value = 0.1;
+                crashIcon.innerHTML = '<svg width="16" height="16" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="#0098EA"/><path d="M24 11L14 28L24 40L34 28L24 11Z" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 28L24 18L34 28" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 40V28" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+                document.getElementById('bm-ton').className="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition";
+                document.getElementById('bm-stars').className="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition";
             }
             updateHeader();
-            updateBtn();
         }
 
         function shareLink() {
@@ -437,82 +473,89 @@
             window.Telegram.WebApp.openTelegramLink(url);
         }
 
-        // === CRASH ===
+        // === CRASH NEW LOGIC ===
         function startCrashLoop() {
             game.state = 'waiting'; game.myBet = 0; game.cashedOut = false; game.mult = 1.0;
-            document.getElementById('mult-display').innerText = "1.00x";
-            document.getElementById('mult-display').className = "relative z-10 text-6xl font-black font-tech text-white transition-transform";
-            document.getElementById('game-status').innerText = "ОЖИДАНИЕ...";
-            document.getElementById('rocket').style.opacity = '0';
-            const bar = document.getElementById('timer-bar');
-            bar.style.transition = 'none'; bar.style.width = '100%';
-            setTimeout(() => { bar.style.transition = 'width 5s linear'; bar.style.width = '0%'; }, 100);
-            updateBtn();
-            setTimeout(launchRocket, 5000);
+            document.getElementById('mult-display-new').innerText = "1.00x";
+            document.getElementById('mult-display-new').style.color = 'white';
+            document.getElementById('rocket-new').style.left = '20px';
+            document.getElementById('rocket-new').style.bottom = '20px';
+            updateBtnNew();
+            setTimeout(launchRocket, 3000);
         }
 
         function launchRocket() {
             game.state = 'flying';
-            document.getElementById('game-status').innerText = "ПОЛЕТ";
-            document.getElementById('rocket').style.opacity = '1';
             let r = Math.random();
             if (r < 0.30) game.crashAt = 1.00 + Math.random() * 0.20; 
             else if (r < 0.70) game.crashAt = 1.20 + Math.random() * 0.40;
             else if (r < 0.90) game.crashAt = 1.60 + Math.random() * 0.90;
             else game.crashAt = 2.50 + Math.random() * 4.0;
-            updateBtn();
+            updateBtnNew();
             let loop = setInterval(() => {
                 if(game.state !== 'flying') { clearInterval(loop); return; }
                 game.mult += 0.01;
-                document.getElementById('mult-display').innerText = game.mult.toFixed(2) + 'x';
-                let p = Math.min(80, (game.mult - 1) * 30);
-                document.getElementById('rocket').style.bottom = (10 + p/2) + '%';
-                document.getElementById('rocket').style.left = (10 + p) + '%';
+                document.getElementById('mult-display-new').innerText = game.mult.toFixed(2) + 'x';
+                let p = Math.min(100, (game.mult - 1) * 25);
+                document.getElementById('rocket-new').style.left = (20 + p*2) + 'px';
+                document.getElementById('rocket-new').style.bottom = (20 + p) + 'px';
                 if(game.mult >= game.crashAt) { clearInterval(loop); doCrash(); }
             }, 50);
         }
 
         function doCrash() {
             game.state = 'crashed';
-            document.getElementById('mult-display').classList.add('text-red-600');
-            document.getElementById('mult-display').innerText = "CRASHED";
-            document.getElementById('rocket').style.opacity = '0';
-            updateBtn();
-            setTimeout(startCrashLoop, 2000);
+            document.getElementById('mult-display-new').style.color = '#ef4444';
+            state.crashHistory.unshift(game.mult);
+            if(state.crashHistory.length > 8) state.crashHistory.pop();
+            saveState(); updateCrashHistoryUI();
+            updateBtnNew();
+            setTimeout(startCrashLoop, 3000);
         }
 
-        function handleBetClick() {
+        function handleCrashBtnClick() {
             if(game.state === 'waiting') {
-                if(game.myBet > 0) return;
-                let val = parseFloat(document.getElementById('betInput').value);
-                let min = activeCurr === 'stars' ? 25 : 0.1;
-                if(val < min) return alert("Мин: " + min);
-                if(val > state.balances[activeCurr]) return alert("Мало средств");
-                state.balances[activeCurr] -= val;
-                game.myBet = val;
-                saveState(); updateHeader(); updateBtn();
+                document.getElementById('bet-modal').classList.remove('hidden');
             } else if(game.state === 'flying' && game.myBet > 0 && !game.cashedOut) {
                 let win = game.myBet * game.mult;
                 state.balances[activeCurr] += win;
                 game.cashedOut = true;
                 addHistory('Crash', win, 'win');
-                document.getElementById('mult-display').classList.add('text-[#39FF14]');
-                saveState(); updateHeader(); updateBtn();
+                document.getElementById('mult-display-new').style.color = '#22c55e';
+                saveState(); updateHeader(); updateBtnNew();
             }
         }
 
-        function updateBtn() {
-            const btn = document.getElementById('crashBtn');
+        function confirmBet() {
+            let val = parseFloat(document.getElementById('betInputNew').value);
+            if(!val || val <= 0) return alert("Введите сумму");
+            if(val > state.balances[activeCurr]) return alert("Мало средств");
+            state.balances[activeCurr] -= val;
+            game.myBet = val;
+            document.getElementById('bet-modal').classList.add('hidden');
+            saveState(); updateHeader(); updateBtnNew();
+        }
+
+        function updateBtnNew() {
+            const btn = document.getElementById('crashBtnBig');
             if(game.state === 'waiting') {
-                if(game.myBet > 0) { btn.innerText = "СТАВКА ПРИНЯТА"; btn.className = "w-1/2 action-btn bg-gray-800 text-gray-500 text-xs"; btn.disabled = true; }
-                else { btn.innerText = "СТАРТ"; btn.className = activeCurr === 'stars' ? 'w-1/2 action-btn neon-btn uppercase text-sm tracking-wider shadow-lg' : 'w-1/2 action-btn ton-btn uppercase text-sm tracking-wider shadow-lg'; btn.disabled = false; }
+                if(game.myBet > 0) { btn.innerText = "СТАВКА ПРИНЯТА"; btn.className = "crash-btn-big bg-gray-800 text-gray-500"; btn.disabled = true; }
+                else { btn.innerText = "СДЕЛАТЬ СТАВКУ"; btn.className = "crash-btn-big start"; btn.disabled = false; }
             } else if (game.state === 'flying') {
-                if(game.myBet > 0 && !game.cashedOut) { btn.innerText = "ЗАБРАТЬ"; btn.className = "w-1/2 action-btn bg-white text-black text-sm font-black shadow-[0_0_20px_white]"; btn.disabled = false; }
-                else if (game.cashedOut) { btn.innerText = "ВЫИГРЫШ"; btn.className = "w-1/2 action-btn bg-[#39FF14] text-black text-xs font-bold"; btn.disabled = true; }
-                else { btn.innerText = "ИДЕТ ИГРА"; btn.className = "w-1/2 action-btn bg-gray-800 text-gray-500 text-xs"; btn.disabled = true; }
+                if(game.myBet > 0 && !game.cashedOut) { btn.innerText = `ЗАБРАТЬ ${(game.myBet * game.mult).toFixed(2)}`; btn.className = "crash-btn-big cashout"; btn.disabled = false; }
+                else if (game.cashedOut) { btn.innerText = "ВЫИГРЫШ"; btn.className = "crash-btn-big cashout"; btn.disabled = true; }
+                else { btn.innerText = "ИДЕТ ИГРА"; btn.className = "crash-btn-big bg-gray-800 text-gray-500"; btn.disabled = true; }
             } else {
-                btn.innerText = "КРУШЕНИЕ"; btn.className = "w-1/2 action-btn bg-red-900 text-white text-xs"; btn.disabled = true;
+                btn.innerText = `CRASHED @ ${game.crashAt.toFixed(2)}x`; btn.className = "crash-btn-big crashed"; btn.disabled = true;
             }
+        }
+
+        function updateCrashHistoryUI() {
+            const bar = document.getElementById('crash-history-bar');
+            bar.innerHTML = '';
+            state.crashHistory.forEach((h, i) => {
+                bar.innerHTML += `<div class="history-item ${i===0 ? 'current' : ''}">${h.toFixed(2)}x</div>`;
+            });
         }
 
         // === CASES ===
