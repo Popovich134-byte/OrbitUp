@@ -3,65 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OrbitUp Ultimate</title>
+    <title>OrbitUp Final</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600;700&display=swap');
         
-        :root { --neon: #39FF14; --ton: #0098EA; --bg: #050505; --blue-btn: #007AFF; }
+        :root { 
+            --neon: #39FF14; 
+            --ton: #0098EA; 
+            --bg: #050505; 
+            --card-bg: #1C1C1E;
+            --blue-btn: #007AFF;
+        }
 
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; margin: 0; user-select: none; }
         
         .font-tech { font-family: 'Orbitron', sans-serif; }
         
-        /* --- EKRAN ZAGRUZKI --- */
+        /* === EKRAN ZAGRUZKI === */
         #loading-screen {
             position: fixed; inset: 0; z-index: 9999;
             background: #000;
             display: flex; flex-col; align-items: center; justify-content: center;
             transition: opacity 0.5s ease;
         }
-        .loader-ring {
-            width: 48px; height: 48px; border: 4px solid #333; border-top-color: var(--neon); border-radius: 50%;
-            animation: spin 1s linear infinite; margin-top: 20px;
+        .loading-bar-container {
+            width: 150px; height: 4px; background: #222; border-radius: 4px; margin-top: 15px; overflow: hidden;
         }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .loading-bar-fill {
+            height: 100%; background: var(--blue-btn); width: 0%;
+            transition: width 0.5s ease; box-shadow: 0 0 10px var(--blue-btn);
+        }
 
-        /* --- STYLES IZ TVOEGO KODA --- */
+        /* Glass Panel */
         .glass-panel { 
-            background: rgba(20, 20, 20, 0.75); 
+            background: rgba(20, 20, 20, 0.85); 
             backdrop-filter: blur(12px); 
             border: 1px solid rgba(255, 255, 255, 0.08); 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
-        .neon-btn { background: var(--neon); color: black; box-shadow: 0 0 15px rgba(57, 255, 20, 0.3); transition: 0.1s; }
-        .neon-btn:active { transform: scale(0.95); opacity: 0.9; }
+        /* Buttons */
+        .orbit-btn { background: var(--blue-btn); color: white; font-weight: 600; border-radius: 14px; transition: 0.2s; }
+        .orbit-btn:active { transform: scale(0.98); opacity: 0.9; }
         
-        .ton-btn { background: var(--ton); color: white; box-shadow: 0 0 15px rgba(0, 152, 234, 0.3); transition: 0.1s; }
-        .ton-btn:active { transform: scale(0.95); opacity: 0.9; }
+        .gray-btn { background: #2C2C2E; color: white; font-weight: 600; border-radius: 14px; transition: 0.2s; }
+        .gray-btn:active { transform: scale(0.98); opacity: 0.8; }
 
-        .action-btn { font-weight: 800; border-radius: 14px; }
+        .neon-btn { background: var(--neon); color: black; box-shadow: 0 0 15px rgba(57, 255, 20, 0.3); }
+        .ton-btn { background: var(--ton); color: white; box-shadow: 0 0 15px rgba(0, 152, 234, 0.3); }
+        .action-btn { font-weight: 800; border-radius: 14px; transition: 0.1s; }
+        .action-btn:active { transform: scale(0.95); }
 
         /* Nav Dock */
         .nav-dock {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: 92%; max-width: 380px;
-            background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(20px);
+            background: rgba(28, 28, 30, 0.95); backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px;
-            display: flex; justify-content: space-around; padding: 10px 0; z-index: 50;
+            display: flex; justify-content: space-around; padding: 12px 0; z-index: 50;
         }
         .nav-item { color: #555; padding: 8px; border-radius: 12px; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
         .nav-item span { font-size: 9px; font-weight: 600; }
         .nav-item.active { color: white; }
         .nav-item.active svg { filter: drop-shadow(0 0 6px white); }
 
-        /* Tabs */
+        /* Tabs Content */
         .tab-content { display: none; height: calc(100vh - 90px); overflow-y: auto; padding: 20px; padding-bottom: 120px; }
         .tab-content.active { display: block; animation: fadeUp 0.3s ease; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Crash Switch */
+        /* Switcher */
         .crash-switch { background: #111; border-radius: 12px; padding: 3px; display: inline-flex; border: 1px solid #333; margin-bottom: 15px; }
         .switch-opt { padding: 8px 16px; border-radius: 9px; font-size: 11px; font-weight: bold; color: #666; transition: 0.2s; }
         .switch-opt.active-s { background: rgba(57, 255, 20, 0.15); color: var(--neon); border: 1px solid var(--neon); }
@@ -76,19 +87,20 @@
         /* Profile Tabs */
         .p-tabs { background: #111; padding: 4px; border-radius: 12px; display: flex; margin-bottom: 15px; border: 1px solid #222; }
         .p-tab { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 600; color: #666; border-radius: 8px; transition: 0.2s; }
-        .p-tab.active { background: #222; color: white; }
+        .p-tab.active { background: #2C2C2E; color: white; }
     </style>
 </head>
 <body>
 
     <div id="loading-screen">
-        <h1 class="font-tech text-3xl font-bold text-white mb-2 tracking-widest">Orbit<span style="color:var(--neon)">Up</span></h1>
-        <p class="text-xs text-gray-500">Добро пожаловать</p>
-        <div class="loader-ring"></div>
+        <h1 class="font-tech text-3xl font-bold text-white tracking-widest">Orbit<span style="color:var(--blue-btn)">Up</span></h1>
+        <div class="loading-bar-container">
+            <div class="loading-bar-fill" id="loader-fill"></div>
+        </div>
     </div>
 
     <header class="pt-3 px-5 flex justify-between items-center z-20 relative">
-        <div class="glass-panel rounded-xl py-2 px-3 flex items-center gap-3 border-l-2 border-[#39FF14]" id="balance-container">
+        <div onclick="nav('profile')" class="glass-panel rounded-xl py-2 px-3 flex items-center gap-3 cursor-pointer active:scale-95 transition border-l-2 border-[#39FF14]" id="balance-container">
             <div id="headerIcon" class="w-6 h-6 flex items-center justify-center"></div>
             <div class="flex flex-col leading-none">
                 <span class="text-[8px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Баланс</span>
@@ -105,8 +117,7 @@
 
     <main>
         <section id="page-crash" class="tab-content active">
-            
-            <div class="flex justify-center">
+            <div class="flex justify-center mb-4">
                 <div class="crash-switch">
                     <button onclick="setCurrency('stars')" id="sw-stars" class="switch-opt active-s">STARS</button>
                     <button onclick="setCurrency('ton')" id="sw-ton" class="switch-opt">TON</button>
@@ -123,13 +134,11 @@
 
             <div class="glass-panel rounded-[24px] p-5">
                 <div class="flex justify-between text-[9px] text-gray-500 font-bold uppercase mb-2">
-                    <span>Сумма ставки</span>
+                    <span>Ставка</span>
                     <span id="min-bet-label" class="text-white">Min: 25</span>
                 </div>
                 <div class="flex gap-3">
-                    <div class="relative flex-grow">
-                        <input id="betInput" type="number" class="w-full bg-[#050505] border border-gray-700 rounded-2xl p-4 text-center text-xl font-bold text-white outline-none focus:border-white transition" value="25">
-                    </div>
+                    <input id="betInput" type="number" class="w-full bg-[#050505] border border-gray-700 rounded-2xl p-4 text-center text-xl font-bold text-white outline-none focus:border-white transition" value="25">
                     <button onclick="handleBetClick()" id="crashBtn" class="w-1/2 action-btn neon-btn uppercase text-sm tracking-wider shadow-lg">СТАРТ</button>
                 </div>
             </div>
@@ -137,43 +146,29 @@
 
         <section id="page-cases" class="tab-content">
             <div id="cases-list">
-                <h2 class="text-center font-tech text-xl font-black uppercase text-white mb-6">Mystery Boxes</h2>
+                <h2 class="text-center font-tech text-xl font-black uppercase text-white mb-6">Mystery Box</h2>
                 <div class="grid gap-3">
-                    <div onclick="openCaseView(0)" class="glass-panel p-4 rounded-[24px] flex items-center gap-4 border border-gray-800 active:scale-95 transition cursor-pointer">
+                    <div onclick="openCaseView(0)" class="glass-panel p-4 rounded-[24px] flex items-center gap-4 border border-gray-800 active:scale-95 transition cursor-pointer hover:border-green-500">
                         <div class="w-16 h-16 rounded-2xl bg-[#39FF14]/10 flex items-center justify-center text-3xl">📦</div>
                         <div class="flex-grow">
                             <h3 class="font-bold text-lg">Новичок</h3>
                             <p class="text-[10px] text-gray-500">Цена: 15 Stars</p>
                         </div>
-                        <div class="text-right">
-                            <span class="text-[9px] font-bold bg-[#39FF14] text-black px-3 py-1 rounded-full uppercase">Открыть</span>
-                        </div>
+                        <span class="text-[9px] font-bold bg-[#333] text-white px-3 py-1.5 rounded-full">Открыть</span>
                     </div>
-                    <div onclick="openCaseView(1)" class="glass-panel p-4 rounded-[24px] flex items-center gap-4 border border-gray-800 active:scale-95 transition cursor-pointer">
+                    <div onclick="openCaseView(1)" class="glass-panel p-4 rounded-[24px] flex items-center gap-4 border border-gray-800 active:scale-95 transition cursor-pointer hover:border-blue-500">
                         <div class="w-16 h-16 rounded-2xl bg-[#0098EA]/10 flex items-center justify-center text-3xl">💎</div>
                         <div class="flex-grow">
                             <h3 class="font-bold text-lg">Трейдер</h3>
                             <p class="text-[10px] text-gray-500">Цена: 0.5 TON</p>
                         </div>
-                        <div class="text-right">
-                            <span class="text-[9px] font-bold bg-[#0098EA] text-white px-3 py-1 rounded-full uppercase">Открыть</span>
-                        </div>
-                    </div>
-                    <div onclick="openCaseView(2)" class="glass-panel p-4 rounded-[24px] flex items-center gap-4 border border-gray-800 active:scale-95 transition cursor-pointer">
-                        <div class="w-16 h-16 rounded-2xl bg-yellow-500/10 flex items-center justify-center text-3xl">👑</div>
-                        <div class="flex-grow">
-                            <h3 class="font-bold text-lg text-yellow-500">Магнат</h3>
-                            <p class="text-[10px] text-gray-500">Цена: 100 Stars</p>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-[9px] font-bold bg-yellow-500 text-black px-3 py-1 rounded-full uppercase">Открыть</span>
-                        </div>
+                        <span class="text-[9px] font-bold bg-[#333] text-white px-3 py-1.5 rounded-full">Открыть</span>
                     </div>
                 </div>
             </div>
 
             <div id="case-roulette-view" class="hidden h-full flex flex-col">
-                <button onclick="closeCaseView()" class="mb-6 text-[10px] font-bold text-gray-500 flex items-center gap-1 hover:text-white uppercase tracking-widest">← Назад к списку</button>
+                <button onclick="closeCaseView()" class="mb-6 text-[10px] font-bold text-gray-500 flex items-center gap-1 hover:text-white uppercase tracking-widest">← Назад</button>
                 <div class="flex-grow flex flex-col justify-center pb-20">
                     <h2 id="active-case-name" class="text-center text-3xl font-black font-tech mb-8 uppercase tracking-wider">Case</h2>
                     <div class="roulette-wrapper">
@@ -203,16 +198,17 @@
                     <div class="ml-auto text-xl opacity-50">⚙️</div>
                 </div>
 
-                <button onclick="openWallet('dep')" class="w-full py-3.5 mt-6 bg-[#007AFF] text-white font-bold rounded-xl text-sm shadow-lg shadow-blue-900/40 active:scale-95 transition">
-                    Пополнить баланс
-                </button>
-                <button onclick="openWallet('with')" class="w-full py-2 mt-1 text-[10px] text-gray-500 font-bold uppercase">
-                    Вывод средств
-                </button>
+                <div class="flex flex-col gap-2 mt-6">
+                    <button onclick="openWallet('dep')" class="orbit-btn w-full py-3.5 text-sm shadow-lg shadow-blue-900/30">
+                        Пополнить баланс
+                    </button>
+                    <button onclick="openWallet('with')" class="gray-btn w-full py-3.5 text-sm shadow-lg border border-white/5">
+                        Вывод средств
+                    </button>
+                </div>
             </div>
 
             <div class="bg-gradient-to-r from-[#007AFF] to-[#00C6FF] rounded-2xl p-4 mb-4 text-center shadow-lg relative overflow-hidden">
-                <div class="absolute -top-10 -left-10 w-20 h-20 bg-white opacity-10 rounded-full"></div>
                 <h3 class="font-bold text-sm text-white mb-1 relative z-10">Приглашай друзей</h3>
                 <p class="text-[10px] text-white/90 mb-3 relative z-10">и зарабатывай 10% от их депозитов</p>
                 <button class="bg-white/20 border border-white/40 text-white text-xs font-bold px-6 py-2 rounded-full w-full backdrop-blur-sm relative z-10">
@@ -274,7 +270,7 @@
     <div id="wallet-modal" class="hidden fixed inset-0 bg-black/90 z-[100] flex items-end">
         <div class="bg-[#1C1C1E] w-full rounded-t-[32px] p-6 pb-12 border-t border-gray-800">
             <div class="w-12 h-1 bg-gray-600 mx-auto rounded-full mb-6" onclick="document.getElementById('wallet-modal').classList.add('hidden')"></div>
-            <h3 class="text-center font-bold text-white mb-6 uppercase tracking-widest text-lg">Пополнение</h3>
+            <h3 class="text-center font-bold text-white mb-6 uppercase tracking-widest text-lg" id="wallet-title">Пополнение</h3>
             
             <div class="flex gap-2 mb-4">
                 <button onclick="switchWalletCurr('stars')" id="wc-stars" class="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition">STARS</button>
@@ -282,7 +278,7 @@
             </div>
 
             <input id="wallet-input" type="number" placeholder="Сумма" class="w-full bg-black p-4 rounded-xl text-center text-white font-bold text-xl outline-none mb-4 border border-[#333]">
-            <button onclick="processWallet()" class="w-full bg-[#007AFF] text-white py-4 rounded-xl font-bold">Подтвердить</button>
+            <button onclick="processWallet()" class="w-full bg-[#007AFF] text-white py-4 rounded-xl font-bold" id="wallet-btn">Подтвердить</button>
         </div>
     </div>
 
@@ -291,22 +287,26 @@
         let balances = { stars: 1000, ton: 5.0 };
         let activeCurr = 'stars'; 
         let walletCurr = 'stars';
+        let walletActionType = 'dep'; // 'dep' or 'with'
         let game = { state: 'waiting', mult: 1.0, crashAt: 0, myBet: 0, cashedOut: false };
         let activeCase = null;
 
         // Кейсы: 15 вход. Призы: 5, 10, 15, 25, 50.
-        // Чтобы казино было в плюсе, чаще выпадают 5 и 10 (индексы 0 и 1).
+        // House Edge: Чаще всего 5 и 10.
         const casesData = [
             { id: 0, name: "Новичок", price: 15, curr: 'stars', color: '#39FF14', prizes: [5, 10, 15, 25, 50] },
-            { id: 1, name: "Трейдер", price: 0.5, curr: 'ton', color: '#0098EA', prizes: [0.1, 0.2, 0.5, 0.8, 1.5] },
-            { id: 2, name: "Магнат", price: 100, curr: 'stars', color: '#FFD700', prizes: [25, 50, 100, 200, 500] }
+            { id: 1, name: "Трейдер", price: 0.5, curr: 'ton', color: '#0098EA', prizes: [0.1, 0.2, 0.5, 0.8, 1.5] }
         ];
 
+        // Icons
         const iconTon = `<svg viewBox="0 0 48 48" fill="none" class="w-full h-full"><circle cx="24" cy="24" r="24" fill="#0098EA"/><path d="M24 11L14 28L24 40L34 28L24 11Z" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 28L24 18L34 28" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 40V28" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
         const iconStars = `<span class="text-xl">⭐</span>`;
 
         // === INIT ===
         window.onload = () => {
+            // Loader Animation
+            let fill = document.getElementById('loader-fill');
+            setTimeout(() => fill.style.width = "100%", 100);
             setTimeout(() => { 
                 document.getElementById('loading-screen').style.opacity=0; 
                 setTimeout(()=>document.getElementById('loading-screen').style.display='none',500); 
@@ -347,14 +347,18 @@
         function setCurrency(c) {
             activeCurr = c;
             if(c==='stars') {
-                document.getElementById('sw-stars').className="switch-opt active-s";
-                document.getElementById('sw-ton').className="switch-opt";
+                document.getElementById('sw-stars').classList.replace('text-gray-500','text-white');
+                document.getElementById('sw-stars').classList.replace('bg-transparent','bg-[#333]');
+                document.getElementById('sw-ton').classList.replace('text-white','text-gray-500');
+                document.getElementById('sw-ton').classList.replace('bg-[#333]','bg-transparent');
                 document.getElementById('min-bet-label').innerText = "Min: 25 Stars";
                 document.getElementById('betInput').value = 25;
                 document.getElementById('crashBtn').className = 'w-1/2 action-btn neon-btn uppercase text-sm tracking-wider shadow-lg';
             } else {
-                document.getElementById('sw-ton').className="switch-opt active-t";
-                document.getElementById('sw-stars').className="switch-opt";
+                document.getElementById('sw-ton').classList.replace('text-gray-500','text-white');
+                document.getElementById('sw-ton').classList.replace('bg-transparent','bg-[#333]');
+                document.getElementById('sw-stars').classList.replace('text-white','text-gray-500');
+                document.getElementById('sw-stars').classList.replace('bg-[#333]','bg-transparent');
                 document.getElementById('min-bet-label').innerText = "Min: 0.1 TON";
                 document.getElementById('betInput').value = 0.1;
                 document.getElementById('crashBtn').className = 'w-1/2 action-btn ton-btn uppercase text-sm tracking-wider shadow-lg';
@@ -362,7 +366,7 @@
             updateHeader();
         }
 
-        // === CRASH LOGIC ===
+        // === CRASH LOGIC (House Edge) ===
         function handleBetClick() {
             if(game.state === 'waiting' && game.myBet === 0) {
                 let val = parseFloat(document.getElementById('betInput').value);
@@ -385,20 +389,21 @@
             game.state = 'flying'; game.mult = 1.0; game.cashedOut = false;
             document.getElementById('rocket').style.opacity = '1';
             
-            // House Edge: 60% chance to crash below 1.40
+            // House Edge: 60% chance to crash below 1.30 (Greedy)
             let r = Math.random();
-            game.crashAt = r < 0.6 ? 1.0 + Math.random()*0.4 : (r < 0.9 ? 1.5 + Math.random() : 2.5 + Math.random()*3);
+            if (r < 0.6) game.crashAt = 1.0 + Math.random() * 0.3; // 1.00 - 1.30
+            else if (r < 0.9) game.crashAt = 1.3 + Math.random() * 1.2; // 1.30 - 2.50
+            else game.crashAt = 2.5 + Math.random() * 3; // 2.50+
             
-            // Slow loop: 60ms
+            // Speed: 50ms (Smoother)
             let loop = setInterval(() => {
                 if(game.state !== 'flying') { clearInterval(loop); return; }
                 game.mult += 0.01;
                 document.getElementById('mult-display').innerText = game.mult.toFixed(2) + 'x';
                 
-                // Button Text = ЗАБРАТЬ + сумма
+                // Button Text -> ONLY "ЗАБРАТЬ"
                 if(!game.cashedOut) {
-                    let potentialWin = (game.myBet * game.mult).toFixed(2);
-                    document.getElementById('crashBtn').innerText = `ЗАБРАТЬ ${potentialWin}`;
+                    document.getElementById('crashBtn').innerText = "ЗАБРАТЬ";
                     document.getElementById('crashBtn').classList.replace(activeCurr==='stars'?'neon-btn':'ton-btn', 'bg-white');
                     document.getElementById('crashBtn').style.color = 'black';
                 } else {
@@ -430,7 +435,7 @@
                     }, 3000);
                     clearInterval(loop);
                 }
-            }, 60);
+            }, 50);
         }
 
         // === CASES LOGIC ===
@@ -466,33 +471,38 @@
             
             const track = document.getElementById('rouletteTrack');
             
-            // Logic: 0,1 index = loss (5, 10). 2 = breakeven (15).
+            // House Edge: 0,1 index = loss (5, 10). 2 = breakeven (15).
             let r = Math.random();
             let winIdx;
-            if(r < 0.4) winIdx = 0; // 5 stars
-            else if(r < 0.7) winIdx = 1; // 10 stars
-            else if(r < 0.9) winIdx = 2; // 15 stars
+            if(r < 0.45) winIdx = 0; // 5 stars
+            else if(r < 0.75) winIdx = 1; // 10 stars
+            else if(r < 0.95) winIdx = 2; // 15 stars
             else winIdx = 3; // 25 stars
             
             let winAmount = activeCase.prizes[winIdx];
+            let targetIdx = 45; // Fixed target
             
-            track.children[45].innerHTML = `<span class="text-xl font-bold text-white">${winAmount}</span>`;
-            track.children[45].style.background = activeCase.color;
+            track.children[targetIdx].innerHTML = `<span class="text-xl font-bold text-white">${winAmount}</span>`;
+            track.children[targetIdx].style.background = activeCase.color;
             
-            let offset = (45 * 98) - (track.parentElement.offsetWidth / 2) + 49;
+            let cardWidth = 98; // 90 width + 8 margin
+            let offset = (targetIdx * cardWidth) - (track.parentElement.offsetWidth / 2) + (cardWidth / 2);
             track.style.transition = 'transform 4s cubic-bezier(0.1,0,0,1)';
             track.style.transform = `translateX(-${offset}px)`;
             
             setTimeout(() => {
                 balances[activeCase.curr] += winAmount;
                 updateHeader();
-                alert(`Выигрыш: ${winAmount}`);
+                alert(`Выигрыш: ${winAmount} ${activeCase.curr.toUpperCase()}`);
             }, 4200);
         }
 
         // === WALLET & TABS ===
         function openWallet(mode) {
+            walletActionType = mode;
             document.getElementById('wallet-modal').classList.remove('hidden');
+            document.getElementById('wallet-title').innerText = mode === 'dep' ? "Пополнение" : "Вывод средств";
+            document.getElementById('wallet-btn').innerText = mode === 'dep' ? "Пополнить" : "Вывести";
         }
         function switchWalletCurr(c) {
             walletCurr = c;
@@ -507,10 +517,16 @@
         function processWallet() {
             let val = parseFloat(document.getElementById('wallet-input').value);
             if(val > 0) {
-                balances[walletCurr] += val;
+                if(walletActionType === 'dep') {
+                    balances[walletCurr] += val;
+                    alert('Баланс пополнен!');
+                } else {
+                    if(balances[walletCurr] < val) return alert('Недостаточно средств');
+                    balances[walletCurr] -= val;
+                    alert('Заявка на вывод создана');
+                }
                 updateHeader();
                 document.getElementById('wallet-modal').classList.add('hidden');
-                alert('Успешно!');
             }
         }
         function switchTab(t, btn) {
