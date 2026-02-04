@@ -1,191 +1,265 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Neon Gaming Ecosystem</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-        body { background: #050505; color: #fff; font-family: 'Inter', sans-serif; }
-        .neon-text { text-shadow: 0 0 10px #39FF14; color: #39FF14; font-family: 'Orbitron', sans-serif; }
-        .neon-btn { box-shadow: 0 0 15px rgba(57, 255, 20, 0.3); transition: 0.3s; }
-        .neon-btn:disabled { opacity: 0.5; box-shadow: none; filter: grayscale(1); }
-        #crashCanvas { width: 100%; height: 180px; background: #000; border-radius: 12px; border: 1px solid #1a1a1a; }
-        .history-item { animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { transform: translateX(-10px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap');
+        
+        :root { --neon: #39FF14; --dark: #050505; }
+        body { background: var(--dark); color: white; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+        .neon-text { font-family: 'Orbitron', sans-serif; color: var(--neon); text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
+        .neon-btn { background: var(--neon); color: black; font-weight: bold; box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .tab-content { display: none; height: calc(100vh - 160px); overflow-y: auto; }
+        .tab-content.active { display: block; }
+        
+        /* Анимация кейса */
+        .case-spin { display: flex; transition: transform 4s cubic-bezier(0.15, 0, 0.05, 1); }
+        
+        /* Скрытие скроллбара */
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="p-4 pb-24">
+<body>
 
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-[10px] text-gray-500 uppercase tracking-widest">My Assets</h1>
-            <div class="flex items-center gap-2">
-                <span class="text-2xl font-bold neon-text" id="balanceDisplay">2.00</span>
-                <span class="text-xs text-gray-400">STARS</span>
-            </div>
+    <div id="setup-layer" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-6 text-center">
+        <div id="loader" class="flex flex-col items-center">
+            <div class="w-16 h-16 border-4 border-t-[#39FF14] border-gray-900 rounded-full animate-spin mb-4"></div>
+            <h2 class="neon-text tracking-widest uppercase">Initializing...</h2>
         </div>
-        <div class="bg-[#111] p-2 rounded-lg border border-gray-800 text-[10px] text-center">
-            <p class="text-gray-500">BONUS ACTIVE</p>
-            <p class="text-[#39FF14]">+10% Daily</p>
+        
+        <div id="lang-select" class="hidden animate-fade-in">
+            <h2 class="text-2xl font-bold mb-8 neon-text">CHOOSE LANGUAGE</h2>
+            <div class="grid gap-4 w-64">
+                <button onclick="setLanguage('ru')" class="p-4 glass rounded-xl hover:border-[#39FF14] transition">🇷🇺 РУССКИЙ</button>
+                <button onclick="setLanguage('en')" class="p-4 glass rounded-xl hover:border-[#39FF14] transition">🇺🇸 ENGLISH</button>
+            </div>
         </div>
     </div>
 
-    <div class="bg-[#0f0f0f] rounded-2xl p-4 border border-gray-800 mb-6">
-        <div class="relative mb-4">
-            <canvas id="crashCanvas"></canvas>
-            <div id="multiplier" class="absolute inset-0 flex flex-col items-center justify-center">
-                <span class="text-4xl font-black neon-text" id="multText">1.00x</span>
-                <span id="statusText" class="text-[10px] uppercase tracking-widest text-gray-500">Waiting for bet...</span>
+    <div id="wallet-modal" class="fixed inset-0 z-[90] bg-black/90 hidden flex items-end">
+        <div class="w-full glass rounded-t-3xl p-6 border-t border-[#39FF14]/30 animate-slide-up">
+            <div class="w-12 h-1 bg-gray-700 mx-auto mb-6 rounded-full"></div>
+            <h3 class="text-xl font-bold mb-4 neon-text" id="modal-title">Wallet</h3>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <button class="p-4 bg-gray-900 rounded-2xl border border-gray-800 text-center">
+                    <span class="block text-2xl mb-1">➕</span> <span id="btn-deposit">Deposit</span>
+                </button>
+                <button class="p-4 bg-gray-900 rounded-2xl border border-gray-800 text-center">
+                    <span class="block text-2xl mb-1">💸</span> <span id="btn-withdraw">Withdraw</span>
+                </button>
             </div>
+            <button onclick="toggleWallet()" class="w-full p-4 text-gray-400">Close</button>
         </div>
+    </div>
 
-        <div class="grid grid-cols-2 gap-3 mb-4">
-            <div class="bg-black p-2 rounded-xl border border-gray-800">
-                <p class="text-[10px] text-gray-500 mb-1 ml-1">BET AMOUNT</p>
-                <input id="betInput" type="number" value="0.5" step="0.1" min="0.1" 
-                    class="bg-transparent w-full text-lg font-bold outline-none text-white px-1">
+    <div class="p-4 h-full flex flex-col">
+        <header class="flex justify-between items-center mb-4">
+            <div onclick="toggleWallet()" class="cursor-pointer">
+                <p class="text-[10px] text-gray-500 uppercase font-bold" id="label-balance">Your Balance</p>
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl font-black neon-text" id="balance">2.00</span>
+                    <span class="text-xs text-yellow-500">⭐</span>
+                </div>
             </div>
-            <button onclick="handleAction()" id="actionBtn" 
-                class="bg-[#39FF14] text-black font-bold rounded-xl uppercase neon-btn">
-                Place Bet
+            <div class="w-10 h-10 rounded-full glass border border-gray-700 flex items-center justify-center">👤</div>
+        </header>
+
+        <main class="flex-grow">
+            <section id="page-crash" class="tab-content active">
+                <div class="relative bg-black rounded-3xl p-4 border border-gray-900 mb-4 overflow-hidden h-64 flex flex-col items-center justify-center">
+                    <canvas id="crashCanvas" class="absolute inset-0 w-full h-full opacity-40"></canvas>
+                    <div id="mult-display" class="text-5xl font-black neon-text z-10">1.00x</div>
+                    <div id="game-status" class="text-[10px] text-gray-500 uppercase mt-2 z-10">Ready to play</div>
+                </div>
+                
+                <div class="glass rounded-2xl p-4">
+                    <div class="flex gap-2 mb-4">
+                        <div class="flex-grow bg-black/50 rounded-xl p-2 border border-gray-800">
+                            <input id="bet-amount" type="number" value="0.1" step="0.1" class="bg-transparent w-full text-center font-bold outline-none">
+                        </div>
+                        <button onclick="handleCrashAction()" id="crash-btn" class="w-1/2 p-4 rounded-xl neon-btn uppercase tracking-tighter">Place Bet</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-cases" class="tab-content">
+                <h2 class="text-xl font-bold mb-4 neon-text">Mystery Boxes</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="glass p-4 rounded-2xl text-center border-b-2 border-yellow-500">
+                        <div class="text-4xl mb-2">🎁</div>
+                        <p class="font-bold text-sm">Starter Box</p>
+                        <button onclick="openCase(0.5)" class="mt-2 w-full py-2 bg-yellow-500/20 text-yellow-500 rounded-lg text-xs font-bold">0.5 ⭐</button>
+                    </div>
+                    <div class="glass p-4 rounded-2xl text-center border-b-2 border-blue-500">
+                        <div class="text-4xl mb-2">💎</div>
+                        <p class="font-bold text-sm">Elite Case</p>
+                        <button onclick="openCase(5)" class="mt-2 w-full py-2 bg-blue-500/20 text-blue-500 rounded-lg text-xs font-bold">5.0 ⭐</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-profile" class="tab-content text-center">
+                <div class="w-20 h-20 bg-gray-800 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl">🦊</div>
+                <h2 class="text-xl font-bold">Player #721</h2>
+                <p class="text-gray-500 text-sm mb-6">Status: <span class="text-[#39FF14]">Diamond VIP</span></p>
+                <div class="grid grid-cols-2 gap-2 text-left">
+                    <div class="glass p-3 rounded-xl"><p class="text-[10px] text-gray-500">Total Wins</p><p class="font-bold">142 ⭐</p></div>
+                    <div class="glass p-3 rounded-xl"><p class="text-[10px] text-gray-500">Games</p><p class="font-bold">1,024</p></div>
+                </div>
+            </section>
+        </main>
+
+        <nav class="fixed bottom-6 left-4 right-4 h-16 glass rounded-2xl flex justify-around items-center border border-white/10">
+            <button onclick="nav('crash')" class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#39FF14]">
+                <span class="text-xl">📈</span><span class="text-[10px] font-bold uppercase">Crash</span>
             </button>
-        </div>
-    </div>
-
-    <div>
-        <h3 class="text-xs font-bold text-gray-500 uppercase mb-3">Live History</h3>
-        <div id="historyList" class="flex gap-2 overflow-x-auto pb-2">
-            </div>
+            <button onclick="nav('cases')" class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#39FF14]">
+                <span class="text-xl">📦</span><span class="text-[10px] font-bold uppercase">Cases</span>
+            </button>
+            <button onclick="nav('profile')" class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#39FF14]">
+                <span class="text-xl">👤</span><span class="text-[10px] font-bold uppercase">Profile</span>
+            </button>
+        </nav>
     </div>
 
     <script>
-        // --- State ---
-        let balance = 2.00;
-        let currentBet = 0;
-        let isGaming = false;
-        let gameInterval = null;
-        let currentMultiplier = 1.00;
-        let hasCashedOut = false;
+        // --- DATA & CONFIG ---
+        let state = {
+            balance: 2.0,
+            lang: localStorage.getItem('lang') || null,
+            isGaming: false,
+            multiplier: 1.0,
+            winProbability: 0.65 // 65% шанс на "небольшой выигрыш", остальное - слив
+        };
 
-        const balanceDisplay = document.getElementById('balanceDisplay');
-        const multText = document.getElementById('multText');
-        const statusText = document.getElementById('statusText');
-        const actionBtn = document.getElementById('actionBtn');
-        const betInput = document.getElementById('betInput');
-        const historyList = document.getElementById('historyList');
+        const texts = {
+            ru: { balance: "Ваш баланс", deposit: "Пополнить", withdraw: "Вывод", bet: "Ставка", cashout: "Забрать", wait: "Ждем ставку..." },
+            en: { balance: "Your Balance", deposit: "Deposit", withdraw: "Withdraw", bet: "Place Bet", cashout: "Cash Out", wait: "Waiting..." }
+        };
 
-        // --- Logic ---
+        // --- INITIALIZATION ---
+        window.onload = () => {
+            if (state.lang) {
+                document.getElementById('setup-layer').style.display = 'none';
+                applyLang();
+            } else {
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('lang-select').classList.remove('hidden');
+            }
+            updateBalanceUI();
+        };
 
-        function updateBalance(amount) {
-            balance = parseFloat((balance + amount).toFixed(2));
-            balanceDisplay.innerText = balance.toFixed(2);
+        function setLanguage(l) {
+            state.lang = l;
+            localStorage.setItem('lang', l);
+            document.getElementById('setup-layer').classList.add('opacity-0');
+            setTimeout(() => document.getElementById('setup-layer').remove(), 500);
+            applyLang();
         }
 
-        function handleAction() {
-            if (!isGaming) {
-                startNewGame();
-            } else if (!hasCashedOut) {
-                cashOut();
-            }
+        function applyLang() {
+            const t = texts[state.lang];
+            document.getElementById('label-balance').innerText = t.balance;
+            document.getElementById('btn-deposit').innerText = t.deposit;
+            document.getElementById('btn-withdraw').innerText = t.withdraw;
+            document.getElementById('crash-btn').innerText = t.bet;
         }
 
-        function startNewGame() {
-            const betValue = parseFloat(betInput.value);
-            
-            if (betValue > balance) {
-                alert("Not enough Stars!");
-                return;
-            }
-            if (betValue <= 0) return;
+        // --- UI NAVIGATION ---
+        function nav(page) {
+            document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+        }
 
-            // Занимаем ставку
-            currentBet = betValue;
-            updateBalance(-currentBet);
-            
-            // Сброс состояния
-            isGaming = true;
-            hasCashedOut = false;
-            currentMultiplier = 1.00;
-            const crashPoint = (Math.random() * 3.5 + 1.01); // Рандом для демо
+        function toggleWallet() {
+            const m = document.getElementById('wallet-modal');
+            m.classList.toggle('hidden');
+        }
 
-            actionBtn.innerText = "Cash Out";
-            actionBtn.classList.replace('bg-[#39FF14]', 'bg-white');
-            statusText.innerText = "Game in progress...";
-            
-            gameInterval = setInterval(() => {
-                currentMultiplier += 0.01;
-                multText.innerText = currentMultiplier.toFixed(2) + 'x';
+        function updateBalanceUI() {
+            document.getElementById('balance').innerText = state.balance.toFixed(2);
+        }
+
+        // --- CRASH LOGIC WITH "HOUSE EDGE" (Алгоритм выгоды) ---
+        let crashInterval;
+        function handleCrashAction() {
+            if (!state.isGaming) {
+                let bet = parseFloat(document.getElementById('bet-amount').value);
+                if (bet > state.balance || bet <= 0) return alert("Low balance!");
                 
-                if (currentMultiplier >= crashPoint) {
-                    endGame(false);
-                }
-            }, 60);
-        }
+                state.balance -= bet;
+                state.currentBet = bet;
+                state.isGaming = true;
+                state.multiplier = 1.0;
+                updateBalanceUI();
 
-        function cashOut() {
-            if (hasCashedOut) return;
-            
-            const winAmount = currentBet * currentMultiplier;
-            updateBalance(winAmount);
-            hasCashedOut = true;
-            
-            actionBtn.disabled = true;
-            actionBtn.innerText = "WIN: +" + winAmount.toFixed(2);
-            statusText.innerText = "Profit Secured!";
-            addToHistory(currentMultiplier.toFixed(2), true);
-        }
+                // АЛГОРИТМ ВЫГОДЫ:
+                // 1. С шансом 35% игра "крашнется" почти сразу (до 1.2x)
+                // 2. С шансом 60% даст чуть-чуть вырасти (до 1.5x)
+                // 3. Только с шансом 5% даст большой икс.
+                let rnd = Math.random();
+                let crashPoint;
+                if (rnd < 0.35) crashPoint = 1.0 + Math.random() * 0.2;
+                else if (rnd < 0.95) crashPoint = 1.2 + Math.random() * 0.4;
+                else crashPoint = 2.0 + Math.random() * 5;
 
-        function endGame(wasCashedOut) {
-            clearInterval(gameInterval);
-            isGaming = false;
-            
-            if (!hasCashedOut) {
-                multText.classList.add('text-red-600');
-                statusText.innerText = "Crashed!";
-                addToHistory(currentMultiplier.toFixed(2), false);
-                actionBtn.innerText = "Busted!";
-                actionBtn.classList.replace('bg-white', 'bg-red-600');
+                document.getElementById('crash-btn').innerText = texts[state.lang].cashout;
+                document.getElementById('crash-btn').classList.replace('neon-btn', 'bg-white');
+
+                crashInterval = setInterval(() => {
+                    state.multiplier += 0.02;
+                    document.getElementById('mult-display').innerText = state.multiplier.toFixed(2) + 'x';
+                    
+                    if (state.multiplier >= crashPoint) {
+                        clearInterval(crashInterval);
+                        document.getElementById('mult-display').classList.add('text-red-600');
+                        document.getElementById('game-status').innerText = "CRASHED!";
+                        state.isGaming = false;
+                        setTimeout(resetCrash, 2000);
+                    }
+                }, 50);
+            } else {
+                // Cash Out
+                let win = state.currentBet * state.multiplier;
+                state.balance += win;
+                clearInterval(crashInterval);
+                state.isGaming = false;
+                alert("Won: " + win.toFixed(2));
+                resetCrash();
+                updateBalanceUI();
             }
+        }
 
+        function resetCrash() {
+            document.getElementById('mult-display').classList.remove('text-red-600');
+            document.getElementById('mult-display').innerText = "1.00x";
+            document.getElementById('crash-btn').innerText = texts[state.lang].bet;
+            document.getElementById('crash-btn').classList.replace('bg-white', 'neon-btn');
+            document.getElementById('game-status').innerText = "Ready to play";
+        }
+
+        // --- CASES LOGIC ---
+        function openCase(cost) {
+            if (state.balance < cost) return alert("Low balance!");
+            state.balance -= cost;
+            updateBalanceUI();
+            
+            // Алгоритм кейса: чаще всего выпадает 0.8x от стоимости
+            let prizes = [cost*0.2, cost*0.5, cost*0.8, cost*1.2, cost*2];
+            let win = prizes[Math.floor(Math.random() * 3)]; // Чаще первые 3 (убыточные)
+            
+            alert("Opening case...");
             setTimeout(() => {
-                resetUI();
-            }, 2000);
+                state.balance += win;
+                updateBalanceUI();
+                alert("You found: " + win.toFixed(2) + " ⭐");
+            }, 1000);
         }
 
-        function resetUI() {
-            multText.innerText = "1.00x";
-            multText.classList.remove('text-red-600');
-            statusText.innerText = "Waiting for bet...";
-            actionBtn.disabled = false;
-            actionBtn.innerText = "Place Bet";
-            actionBtn.className = "bg-[#39FF14] text-black font-bold rounded-xl uppercase neon-btn";
-        }
-
-        function addToHistory(val, win) {
-            const item = document.createElement('div');
-            item.className = `history-item px-3 py-1 rounded-full text-[10px] font-bold border ${win ? 'border-[#39FF14] text-[#39FF14]' : 'border-red-600 text-red-600'} bg-black`;
-            item.innerText = val + 'x';
-            historyList.prepend(item);
-        }
-
-        // --- Canvas Visual (Simplified) ---
-        const canvas = document.getElementById('crashCanvas');
-        const ctx = canvas.getContext('2d');
-        function draw() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            if(isGaming) {
-                ctx.strokeStyle = '#39FF14';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(0, 180);
-                ctx.quadraticCurveTo(canvas.width/2, 180, canvas.width, 180 - (currentMultiplier * 20));
-                ctx.stroke();
-            }
-            requestAnimationFrame(draw);
-        }
-        draw();
     </script>
 </body>
 </html>
