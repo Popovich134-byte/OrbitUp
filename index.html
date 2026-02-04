@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OrbitUp Final</title>
+    <title>OrbitUp App</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
@@ -31,8 +31,6 @@
         /* UI Styles */
         .glass-panel { background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .orbit-card { background: var(--card-bg); border-radius: 24px; }
-        .action-btn { font-weight: 800; border-radius: 14px; transition: 0.1s; }
-        .action-btn:active { transform: scale(0.95); opacity: 0.9; }
         
         /* Buttons */
         .primary-btn { background: var(--blue-btn); color: white; font-weight: 600; border-radius: 14px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
@@ -43,6 +41,8 @@
 
         .neon-btn { background: var(--neon); color: black; box-shadow: 0 0 15px rgba(57, 255, 20, 0.3); }
         .ton-btn { background: var(--ton); color: white; box-shadow: 0 0 15px rgba(0, 152, 234, 0.3); }
+        .action-btn { font-weight: 800; border-radius: 14px; transition: 0.1s; }
+        .action-btn:active { transform: scale(0.95); opacity: 0.9; }
 
         /* Nav Dock */
         .nav-dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 380px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; display: flex; justify-content: space-around; padding: 12px 0; z-index: 50; }
@@ -70,6 +70,9 @@
         .p-tabs { background: #111; padding: 4px; border-radius: 12px; display: flex; margin-bottom: 15px; border: 1px solid #222; }
         .p-tab { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 600; color: #666; border-radius: 8px; transition: 0.2s; }
         .p-tab.active { background: #2C2C2E; color: white; }
+        
+        /* Ton Connect Button Customization override */
+        #ton-connect-btn-wrap button { width: 100% !important; justify-content: center; border-radius: 14px !important; font-weight: bold !important; }
     </style>
 </head>
 <body>
@@ -80,10 +83,10 @@
     </div>
 
     <header class="pt-3 px-5 flex justify-between items-center z-20 relative">
-        <div class="glass-panel rounded-xl py-2 px-3 flex items-center gap-3 border-l-2 border-[#39FF14]" id="balance-container">
+        <div onclick="nav('profile')" class="glass-panel rounded-xl py-2 px-3 flex items-center gap-3 border-l-2 border-[#39FF14]" id="balance-container">
             <div id="headerIcon" class="w-6 h-6 flex items-center justify-center"></div>
             <div class="flex flex-col leading-none">
-                <span class="text-[8px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Ваш Баланс</span>
+                <span class="text-[8px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Баланс</span>
                 <span class="font-tech font-bold text-lg text-white" id="headerBalance">0</span>
             </div>
         </div>
@@ -215,12 +218,16 @@
                 <button onclick="switchWalletCurr('ton')" id="wc-ton" class="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition">TON</button>
             </div>
 
-            <div id="ton-connect-container" class="hidden text-center mb-6">
-                <p class="text-xs text-gray-400 mb-2">Подключите кошелек для оплаты</p>
-                <div id="ton-connect-button-root" class="flex justify-center"></div>
+            <div id="ton-area" class="hidden flex flex-col gap-4">
+                <div id="ton-connect-btn-wrap"></div>
+                <div class="bg-[#111] p-3 rounded-xl border border-gray-800 text-center">
+                    <p class="text-[10px] text-gray-500 mb-2">Введите сумму TON после подключения</p>
+                    <input id="wallet-input-ton" type="number" placeholder="0.00" class="w-full bg-transparent text-center text-white font-bold text-xl outline-none">
+                </div>
+                <button onclick="processTonPayment()" class="w-full primary-btn py-4 rounded-xl font-bold">Оплатил</button>
             </div>
 
-            <div id="manual-input-container">
+            <div id="stars-area">
                 <input id="wallet-input" type="number" placeholder="Сумма" class="w-full bg-black p-4 rounded-xl text-center text-white font-bold text-xl outline-none mb-4 border border-[#333]">
                 <button onclick="processWallet()" class="w-full primary-btn py-4 rounded-xl font-bold" id="wallet-action-btn">Подтвердить</button>
             </div>
@@ -242,17 +249,17 @@
     </div>
 
     <script>
-        // === TON CONNECT INIT ===
+        // === INITIALIZE TON CONNECT ===
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json', 
-            buttonRootId: 'ton-connect-button-root'
+            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json', // USE YOUR MANIFEST URL HERE
+            buttonRootId: 'ton-connect-btn-wrap'
         });
 
-        // === STATE ===
-        let state = { balances: { stars: 1000, ton: 5.0 }, lastDaily: 0, history: [] };
-        const saved = localStorage.getItem('orbitUpV3');
+        // === STATE & STORAGE ===
+        let state = { balances: { stars: 0, ton: 0.0 }, lastDaily: 0, history: [] };
+        const saved = localStorage.getItem('orbitUpVFinal');
         if(saved) { try { state = JSON.parse(saved); } catch(e){} }
-        function saveState() { localStorage.setItem('orbitUpV3', JSON.stringify(state)); }
+        function saveState() { localStorage.setItem('orbitUpVFinal', JSON.stringify(state)); }
 
         let activeCurr = 'stars'; 
         let walletCurr = 'stars';
@@ -273,6 +280,7 @@
         window.onload = () => {
             const tg = window.Telegram.WebApp;
             tg.ready();
+            tg.expand();
             const user = tg.initDataUnsafe.user;
             if(user) {
                 document.getElementById('user-name').innerText = user.first_name;
@@ -296,7 +304,7 @@
             updateHistoryUI();
         };
 
-        // === NAVIGATION ===
+        // === NAV ===
         function nav(page) {
             if(page==='rating') return alert('Лидеры скоро...');
             document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
@@ -348,18 +356,15 @@
             window.Telegram.WebApp.openTelegramLink(url);
         }
 
-        // === CRASH GAME ===
+        // === CRASH ===
         function startCrashLoop() {
             game.state = 'waiting'; game.myBet = 0; game.cashedOut = false; game.mult = 1.0;
-            
             document.getElementById('mult-display').innerText = "1.00x";
             document.getElementById('mult-display').className = "relative z-10 text-6xl font-black font-tech text-white transition-transform";
             document.getElementById('game-status').innerText = "ОЖИДАНИЕ...";
             document.getElementById('rocket').style.opacity = '0';
-            
             const bar = document.getElementById('timer-bar');
             bar.style.transition = 'none'; bar.style.width = '100%';
-            
             setTimeout(() => { bar.style.transition = 'width 5s linear'; bar.style.width = '0%'; }, 100);
             updateBtn();
             setTimeout(launchRocket, 5000);
@@ -499,13 +504,12 @@
             document.getElementById('cases-list').classList.remove('hidden');
         }
 
-        // === WALLET & TABS ===
+        // === WALLET ===
         function openWallet(mode) { 
             walletMode = mode;
             document.getElementById('wallet-modal').classList.remove('hidden'); 
             document.getElementById('wallet-title').innerText = mode === 'dep' ? "Пополнение" : "Вывод средств";
-            document.getElementById('wallet-action-btn').innerText = mode === 'dep' ? "Пополнить" : "Вывести";
-            switchWalletCurr('stars'); // default
+            switchWalletCurr('stars'); // reset to default
         }
         function openGiftModal() { document.getElementById('gift-modal').classList.remove('hidden'); }
         
@@ -516,22 +520,23 @@
                 document.getElementById('wc-ton').className="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition";
                 
                 // Show Input
-                document.getElementById('manual-input-container').classList.remove('hidden');
-                document.getElementById('ton-connect-container').classList.add('hidden');
+                document.getElementById('stars-area').classList.remove('hidden');
+                document.getElementById('ton-area').classList.add('hidden');
             } else {
                 document.getElementById('wc-ton').className="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition";
                 document.getElementById('wc-stars').className="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition";
                 
-                // Show Connect Button if Deposit, else show Input for Withdraw
+                // Show Connect
                 if(walletMode === 'dep') {
-                    document.getElementById('manual-input-container').classList.add('hidden');
-                    document.getElementById('ton-connect-container').classList.remove('hidden');
+                    document.getElementById('stars-area').classList.add('hidden');
+                    document.getElementById('ton-area').classList.remove('hidden');
                 } else {
-                    document.getElementById('manual-input-container').classList.remove('hidden');
-                    document.getElementById('ton-connect-container').classList.add('hidden');
+                    document.getElementById('stars-area').classList.remove('hidden'); // Withdraw for TON same input for now
+                    document.getElementById('ton-area').classList.add('hidden');
                 }
             }
         }
+
         function processWallet() {
             let val = parseFloat(document.getElementById('wallet-input').value);
             if(val > 0) {
@@ -547,6 +552,23 @@
                 document.getElementById('wallet-modal').classList.add('hidden');
             }
         }
+
+        async function processTonPayment() {
+            // Emulate Check
+            let val = parseFloat(document.getElementById('wallet-input-ton').value);
+            if(!val || val <= 0) return alert('Введите сумму');
+            
+            const wallet = tonConnectUI.wallet;
+            if(!wallet) return alert('Сначала подключите кошелек!');
+
+            // In real app -> Send Transaction here via SDK
+            // Simulation of success:
+            state.balances.ton += val;
+            saveState(); updateHeader();
+            alert('Транзакция проверена! Баланс пополнен.');
+            document.getElementById('wallet-modal').classList.add('hidden');
+        }
+
         function switchTab(t, btn) {
             document.querySelectorAll('#tab-gifts, #tab-friends, #tab-history').forEach(e=>e.classList.add('hidden'));
             document.getElementById('tab-'+t).classList.remove('hidden');
