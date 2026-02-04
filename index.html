@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OrbitUp Ultimate</title>
+    <title>OrbitUp Final</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
@@ -11,52 +11,91 @@
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600;700&display=swap');
-        :root { --neon: #39FF14; --ton: #0098EA; --bg: #000000; --card-bg: #1C1C1E; --blue-btn: #007AFF; --stars: #FFD700; }
+        
+        :root { 
+            --neon: #39FF14; 
+            --ton: #0098EA; 
+            --bg: #000000; 
+            --card-bg: #1C1C1E; 
+            --blue-btn: #007AFF; 
+            --stars: #FFD700;
+        }
+
         body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; margin: 0; user-select: none; }
         .font-tech { font-family: 'Orbitron', sans-serif; }
+        
         #loading-screen { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-col; align-items: center; justify-content: center; transition: opacity 0.5s ease; }
         .loading-bar-bg { width: 160px; height: 4px; background: #222; border-radius: 10px; margin-top: 20px; overflow: hidden; }
         .loading-bar-fill { height: 100%; background: var(--blue-btn); width: 0%; transition: width 0.5s ease; box-shadow: 0 0 15px var(--blue-btn); }
+
         .glass-panel { background: rgba(28, 28, 30, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
         .orbit-card { background: var(--card-bg); border-radius: 24px; }
+        
         .primary-btn { background: var(--blue-btn); color: white; font-weight: 600; border-radius: 14px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
         .primary-btn:active { transform: scale(0.98); opacity: 0.9; }
+        
         .secondary-btn { background: #2C2C2E; color: white; font-weight: 600; border-radius: 14px; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
         .secondary-btn:active { transform: scale(0.98); opacity: 0.8; }
+
         .neon-btn { background: var(--neon); color: black; box-shadow: 0 0 15px rgba(57, 255, 20, 0.3); }
         .ton-btn { background: var(--ton); color: white; box-shadow: 0 0 15px rgba(0, 152, 234, 0.3); }
         .action-btn { font-weight: 800; border-radius: 14px; transition: 0.1s; }
         .action-btn:active { transform: scale(0.95); opacity: 0.9; }
+
         .nav-dock { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 380px; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; display: flex; justify-content: space-around; padding: 12px 0; z-index: 50; }
         .nav-item { color: #555; padding: 8px; border-radius: 12px; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-item span { font-size: 9px; font-weight: 600; }
         .nav-item.active { color: white; }
+        .nav-item.active svg { filter: drop-shadow(0 0 6px white); }
+
         .tab-content { display: none; height: calc(100vh - 90px); overflow-y: auto; padding: 20px; padding-bottom: 120px; }
         .tab-content.active { display: block; animation: fadeUp 0.3s ease; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
         .crash-switch { background: #111; border-radius: 12px; padding: 3px; display: inline-flex; border: 1px solid #333; margin-bottom: 15px; }
         .switch-opt { padding: 8px 16px; border-radius: 9px; font-size: 11px; font-weight: bold; color: #666; transition: 0.2s; }
         .switch-opt.active-s { background: rgba(57, 255, 20, 0.15); color: var(--neon); border: 1px solid var(--neon); }
         .switch-opt.active-t { background: rgba(0, 152, 234, 0.15); color: var(--ton); border: 1px solid var(--ton); }
+        
         .roulette-wrapper { position: relative; width: 100%; height: 110px; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid #333; margin-bottom: 20px; }
         .roulette-track { display: flex; position: absolute; height: 100%; align-items: center; left: 0; will-change: transform; }
         .roulette-item { min-width: 90px; height: 90px; margin: 0 4px; background: #151515; border-radius: 12px; border: 1px solid #222; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .roulette-marker { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: white; z-index: 10; transform: translateX(-50%); box-shadow: 0 0 10px white; }
+
         .p-tabs { background: #111; padding: 4px; border-radius: 12px; display: flex; margin-bottom: 15px; border: 1px solid #222; }
         .p-tab { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 600; color: #666; border-radius: 8px; transition: 0.2s; }
         .p-tab.active { background: #2C2C2E; color: white; }
     </style>
 </head>
 <body>
-    <div id="loading-screen"><h1 class="font-tech text-4xl font-bold text-white tracking-widest">Orbit<span style="color:var(--blue-btn)">Up</span></h1><div class="loading-bar-bg"><div class="loading-bar-fill" id="loader-fill"></div></div></div>
+
+    <div id="loading-screen">
+        <h1 class="font-tech text-4xl font-bold text-white tracking-widest">Orbit<span style="color:var(--blue-btn)">Up</span></h1>
+        <div class="loading-bar-bg"><div class="loading-bar-fill" id="loader-fill"></div></div>
+    </div>
+
     <header class="pt-3 px-5 flex justify-between items-center z-20 relative">
         <div class="glass-panel rounded-xl py-2 px-3 flex items-center gap-3 border-l-2 border-[#39FF14]" id="balance-container">
-            <div id="headerIcon" class="w-6 h-6 flex items-center justify-center"></div><div class="flex flex-col leading-none"><span class="text-[8px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Баланс</span><span class="font-tech font-bold text-lg text-white" id="headerBalance">0</span></div>
+            <div id="headerIcon" class="w-6 h-6 flex items-center justify-center"></div>
+            <div class="flex flex-col leading-none">
+                <span class="text-[8px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Баланс</span>
+                <span class="font-tech font-bold text-lg text-white" id="headerBalance">0</span>
+            </div>
         </div>
-        <div class="text-right"><p class="text-[8px] text-gray-500 uppercase font-bold mb-1">Уровень 1</p><div class="w-16 h-1.5 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-white w-1/3 shadow-[0_0_10px_white]"></div></div></div>
+        <div class="text-right">
+            <p class="text-[8px] text-gray-500 uppercase font-bold mb-1">Уровень 1</p>
+            <div class="w-16 h-1.5 bg-gray-800 rounded-full overflow-hidden"><div class="h-full bg-white w-1/3 shadow-[0_0_10px_white]"></div></div>
+        </div>
     </header>
+
     <main>
         <section id="page-crash" class="tab-content active">
-            <div class="flex justify-center mb-4"><div class="crash-switch"><button onclick="setCurrency('stars')" id="sw-stars" class="switch-opt active-s">STARS</button><button onclick="setCurrency('ton')" id="sw-ton" class="switch-opt">TON</button></div></div>
+            <div class="flex justify-center mb-4">
+                <div class="crash-switch">
+                    <button onclick="setCurrency('stars')" id="sw-stars" class="switch-opt active-s">STARS</button>
+                    <button onclick="setCurrency('ton')" id="sw-ton" class="switch-opt">TON</button>
+                </div>
+            </div>
             <div class="relative w-full h-72 bg-[#080808] rounded-[30px] border border-gray-800 mb-5 overflow-hidden flex flex-col items-center justify-center shadow-2xl">
                 <div class="absolute inset-0" style="background-image: radial-gradient(#222 1px, transparent 1px); background-size: 24px 24px; opacity: 0.4;"></div>
                 <div id="rocket" class="absolute text-5xl transition-all duration-75 ease-linear" style="bottom: 10%; left: 10%; opacity: 0;">🚀</div>
@@ -65,114 +104,251 @@
                 <div id="timer-bar" class="absolute bottom-0 left-0 h-1.5 bg-[#39FF14] w-0 shadow-[0_0_10px_#39FF14]"></div>
             </div>
             <div class="glass-panel rounded-[24px] p-5">
-                <div class="flex justify-between text-[9px] text-gray-500 font-bold uppercase mb-2"><span>Сумма ставки</span><span id="min-bet-label" class="text-white">Min: 25</span></div>
-                <div class="flex gap-3"><input id="betInput" type="number" class="w-full bg-[#050505] border border-gray-700 rounded-2xl p-4 text-center text-xl font-bold text-white outline-none focus:border-white transition" value="25"><button onclick="handleBetClick()" id="crashBtn" class="w-1/2 action-btn neon-btn uppercase text-sm tracking-wider shadow-lg">ЖДИТЕ</button></div>
+                <div class="flex justify-between text-[9px] text-gray-500 font-bold uppercase mb-2">
+                    <span>Сумма ставки</span><span id="min-bet-label" class="text-white">Min: 25</span>
+                </div>
+                <div class="flex gap-3">
+                    <input id="betInput" type="number" class="w-full bg-[#050505] border border-gray-700 rounded-2xl p-4 text-center text-xl font-bold text-white outline-none focus:border-white transition" value="25">
+                    <button onclick="handleBetClick()" id="crashBtn" class="w-1/2 action-btn neon-btn uppercase text-sm tracking-wider shadow-lg">ЖДИТЕ</button>
+                </div>
             </div>
         </section>
+
         <section id="page-cases" class="tab-content">
-            <div id="cases-list"><h2 class="text-center font-tech text-xl font-black uppercase text-white mb-6">Mystery Boxes</h2><div class="grid gap-3">
-                <div onclick="openCaseView(3)" class="glass-panel p-4 rounded-[24px] flex items-center gap-4 border border-gray-800 active:scale-95 transition cursor-pointer border-l-4 border-l-white"><div class="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center text-3xl">📅</div><div class="flex-grow"><h3 class="font-bold text-lg text-white">Ежедневный</h3><p class="text-[10px] text-gray-400">Бесплатно 24ч</p></div><span class="text-[9px] font-bold bg-white text-black px-3 py-1 rounded-full uppercase">Free</span></div>
-                <div onclick="openCaseView(0)" class="glass-panel p-4 rounded-[24px] flex items-center gap-4 border border-gray-800 active:scale-95 transition cursor-pointer hover:border-green-500"><div class="w-16 h-16 rounded-2xl bg-[#39FF14]/10 flex items-center justify-center text-3xl">📦</div><div class="flex-grow"><h3 class="font-bold text-lg">Новичок</h3><p class="text-[10px] text-gray-500">Цена: 15 Stars</p></div><span class="text-[9px] font-bold bg-[#39FF14] text-black px-3 py-1 rounded-full uppercase">Открыть</span></div>
-                <div onclick="openCaseView(1)" class="glass-panel p-4 rounded-[24px] flex items-center gap-4 border border-gray-800 active:scale-95 transition cursor-pointer hover:border-blue-500"><div class="w-16 h-16 rounded-2xl bg-[#0098EA]/10 flex items-center justify-center text-3xl">💎</div><div class="flex-grow"><h3 class="font-bold text-lg">Трейдер</h3><p class="text-[10px] text-gray-500">Цена: 0.5 TON</p></div><span class="text-[9px] font-bold bg-[#0098EA] text-white px-3 py-1 rounded-full uppercase">Открыть</span></div>
-            </div></div>
-            <div id="case-roulette-view" class="hidden h-full flex flex-col"><button onclick="closeCaseView()" class="mb-6 text-[10px] font-bold text-gray-500 flex items-center gap-1 hover:text-white uppercase tracking-widest">← Назад</button><div class="flex-grow flex flex-col justify-center pb-20"><h2 id="active-case-name" class="text-center text-3xl font-black font-tech mb-8 uppercase tracking-wider">Case</h2><div class="roulette-wrapper"><div class="roulette-marker"></div><div id="rouletteTrack" class="roulette-track"></div></div><div class="text-center mt-4"><button onclick="spinRoulette()" id="spinBtn" class="w-full py-5 rounded-2xl font-black uppercase text-sm tracking-widest shadow-xl transition transform active:scale-95 text-black">КРУТИТЬ</button></div></div></div>
+            <div id="cases-list">
+                <h2 class="text-center font-tech text-xl font-black uppercase text-white mb-6">Mystery Boxes</h2>
+                <div class="grid gap-3">
+                    <div onclick="openCaseView(3)" class="glass-panel p-4 rounded-[24px] flex items-center gap-4 border border-gray-800 active:scale-95 transition cursor-pointer border-l-4 border-l-white">
+                        <div class="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center text-3xl">📅</div>
+                        <div class="flex-grow"><h3 class="font-bold text-lg text-white">Ежедневный</h3><p class="text-[10px] text-gray-400">Бесплатно 24ч</p></div>
+                        <span class="text-[9px] font-bold bg-white text-black px-3 py-1 rounded-full uppercase">Free</span>
+                    </div>
+                    <div onclick="openCaseView(0)" class="glass-panel p-4 rounded-[24px] flex items-center gap-4 border border-gray-800 active:scale-95 transition cursor-pointer hover:border-green-500">
+                        <div class="w-16 h-16 rounded-2xl bg-[#39FF14]/10 flex items-center justify-center text-3xl">📦</div>
+                        <div class="flex-grow"><h3 class="font-bold text-lg">Новичок</h3><p class="text-[10px] text-gray-500">Цена: 15 Stars</p></div>
+                        <span class="text-[9px] font-bold bg-[#39FF14] text-black px-3 py-1 rounded-full uppercase">Открыть</span>
+                    </div>
+                    <div onclick="openCaseView(1)" class="glass-panel p-4 rounded-[24px] flex items-center gap-4 border border-gray-800 active:scale-95 transition cursor-pointer hover:border-blue-500">
+                        <div class="w-16 h-16 rounded-2xl bg-[#0098EA]/10 flex items-center justify-center text-3xl">💎</div>
+                        <div class="flex-grow"><h3 class="font-bold text-lg">Трейдер</h3><p class="text-[10px] text-gray-500">Цена: 0.5 TON</p></div>
+                        <span class="text-[9px] font-bold bg-[#0098EA] text-white px-3 py-1 rounded-full uppercase">Открыть</span>
+                    </div>
+                </div>
+            </div>
+            <div id="case-roulette-view" class="hidden h-full flex flex-col">
+                <button onclick="closeCaseView()" class="mb-6 text-[10px] font-bold text-gray-500 flex items-center gap-1 hover:text-white uppercase tracking-widest">← Назад</button>
+                <div class="flex-grow flex flex-col justify-center pb-20">
+                    <h2 id="active-case-name" class="text-center text-3xl font-black font-tech mb-8 uppercase tracking-wider">Case</h2>
+                    <div class="roulette-wrapper"><div class="roulette-marker"></div><div id="rouletteTrack" class="roulette-track"></div></div>
+                    <div class="text-center mt-4">
+                        <button onclick="spinRoulette()" id="spinBtn" class="w-full py-5 rounded-2xl font-black uppercase text-sm tracking-widest shadow-xl transition transform active:scale-95 text-black">КРУТИТЬ</button>
+                    </div>
+                </div>
+            </div>
         </section>
+
         <section id="page-profile" class="tab-content">
             <div class="glass-panel p-5 rounded-[24px] mb-4 relative overflow-hidden">
-                <div class="flex items-center gap-4 relative z-10"><div class="w-14 h-14 rounded-full bg-gray-800 border-2 border-[#333] overflow-hidden flex items-center justify-center text-2xl"><img id="user-avatar" src="" class="w-full h-full object-cover hidden"><span id="user-avatar-placeholder">👤</span></div><div><h2 class="text-lg font-bold text-white" id="user-name">Guest</h2><div class="flex items-center gap-2 mt-1"><p class="text-[10px] text-gray-400">ID: <span id="user-id">...</span></p><div class="w-16 h-1 bg-gray-700 rounded-full"><div class="w-1/4 h-full bg-[#007AFF] rounded-full"></div></div></div></div></div>
-                <div class="flex gap-3 mt-6"><button onclick="openWallet('dep')" class="flex-1 primary-btn py-3 text-xs shadow-lg shadow-blue-900/40">Пополнить баланс</button><button onclick="openWallet('with')" class="flex-1 secondary-btn py-3 text-xs shadow-lg border border-white/5 text-gray-400">Вывод средств</button></div>
+                <div class="flex items-center gap-4 relative z-10">
+                    <div class="w-14 h-14 rounded-full bg-gray-800 border-2 border-[#333] overflow-hidden flex items-center justify-center text-2xl">
+                        <img id="user-avatar" src="" class="w-full h-full object-cover hidden">
+                        <span id="user-avatar-placeholder">👤</span>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-white" id="user-name">Guest</h2>
+                        <div class="flex items-center gap-2 mt-1">
+                            <p class="text-[10px] text-gray-400">ID: <span id="user-id">...</span></p>
+                            <div class="w-16 h-1 bg-gray-700 rounded-full"><div class="w-1/4 h-full bg-[#007AFF] rounded-full"></div></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button onclick="openWallet('dep')" class="flex-1 primary-btn py-3 text-xs shadow-lg shadow-blue-900/40">Пополнить баланс</button>
+                    <button onclick="openWallet('with')" class="flex-1 secondary-btn py-3 text-xs shadow-lg border border-white/5 text-gray-400">Вывод средств</button>
+                </div>
             </div>
-            <div class="bg-gradient-to-r from-[#007AFF] to-[#00C6FF] rounded-2xl p-4 mb-4 text-center shadow-lg relative overflow-hidden"><h3 class="font-bold text-sm text-white mb-1 relative z-10">Приглашай друзей</h3><p class="text-[10px] text-white/90 mb-3 relative z-10">10% от их депозитов твои</p><button onclick="shareLink()" class="bg-white/20 border border-white/40 text-white text-xs font-bold px-6 py-2 rounded-full w-full backdrop-blur-sm relative z-10 hover:bg-white/30 transition">Пригласить друзей</button></div>
-            <div class="p-tabs"><div class="p-tab active" onclick="switchTab('gifts', this)">Подарки</div><div class="p-tab" onclick="switchTab('friends', this)">Друзья</div><div class="p-tab" onclick="switchTab('history', this)">История</div></div>
-            <div id="tab-gifts" class="mt-4"><div class="text-center py-6 border border-dashed border-gray-800 rounded-2xl mb-4"><div class="text-3xl mb-2 opacity-30">🎁</div><p class="text-xs text-gray-500">У вас нет подарков</p></div><button onclick="openGiftModal()" class="w-full primary-btn py-3.5 text-sm font-bold uppercase tracking-wide">ДОБАВИТЬ ПОДАРОК</button></div>
+
+            <div class="bg-gradient-to-r from-[#007AFF] to-[#00C6FF] rounded-2xl p-4 mb-4 text-center shadow-lg relative overflow-hidden">
+                <h3 class="font-bold text-sm text-white mb-1 relative z-10">Приглашай друзей</h3>
+                <p class="text-[10px] text-white/90 mb-3 relative z-10">10% от их депозитов твои</p>
+                <button onclick="shareLink()" class="bg-white/20 border border-white/40 text-white text-xs font-bold px-6 py-2 rounded-full w-full backdrop-blur-sm relative z-10 hover:bg-white/30 transition">Пригласить друзей</button>
+            </div>
+
+            <div class="p-tabs">
+                <div class="p-tab active" onclick="switchTab('gifts', this)">Подарки</div>
+                <div class="p-tab" onclick="switchTab('friends', this)">Друзья</div>
+                <div class="p-tab" onclick="switchTab('history', this)">История</div>
+            </div>
+
+            <div id="tab-gifts" class="mt-4">
+                <div class="text-center py-6 border border-dashed border-gray-800 rounded-2xl mb-4">
+                    <div class="text-3xl mb-2 opacity-30">🎁</div><p class="text-xs text-gray-500">У вас нет подарков</p>
+                </div>
+                <button onclick="openGiftModal()" class="w-full primary-btn py-3.5 text-sm font-bold uppercase tracking-wide">ДОБАВИТЬ ПОДАРОК</button>
+            </div>
             <div id="tab-friends" class="hidden mt-4 text-center"><p class="text-xs text-gray-500">У вас 0 друзей</p></div>
             <div id="tab-history" class="hidden mt-4 space-y-2"></div>
         </section>
     </main>
-    <nav class="nav-dock"><div onclick="alert('Скоро')" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><rect x="4" y="14" width="16" height="6" rx="2"/></svg><span>Лидеры</span></div><div onclick="nav('cases')" id="nav-cases" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg><span>Розыгрыши</span></div><div onclick="nav('crash')" id="nav-crash" class="nav-item active"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.48-.56.93-1.23 1.35-2h4.65c.96 0 1.88.38 2.59 1.06l.32.32a.75.75 0 0 0 1.06 0l2.12-2.12a.75.75 0 0 0 0-1.06l-.32-.32a3.68 3.68 0 0 0-1.06-2.59V8.15c.77-.42 1.44-.87 2-1.35 1.5-1.26 2-5 2-5s-3.74.5-5 2c-.48.56-.93 1.23-1.35 2H9.85c-.96 0-1.88-.38-2.59-1.06l-.32-.32a.75.75 0 0 0-1.06 0L3.76 6.54a.75.75 0 0 0 0 1.06l.32.32c.68.71 1.06 1.63 1.06 2.59v4.65c-.42.77-.87 1.44-1.35 2z"/></svg><span>Играть</span></div><div onclick="alert('Скоро')" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Задания</span></div><div onclick="nav('profile')" id="nav-profile" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Профиль</span></div></nav>
+
+    <nav class="nav-dock">
+        <div onclick="alert('Скоро')" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><rect x="4" y="14" width="16" height="6" rx="2"/></svg><span>Лидеры</span></div>
+        <div onclick="nav('cases')" id="nav-cases" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg><span>Розыгрыши</span></div>
+        <div onclick="nav('crash')" id="nav-crash" class="nav-item active"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.48-.56.93-1.23 1.35-2h4.65c.96 0 1.88.38 2.59 1.06l.32.32a.75.75 0 0 0 1.06 0l2.12-2.12a.75.75 0 0 0 0-1.06l-.32-.32a3.68 3.68 0 0 0-1.06-2.59V8.15c.77-.42 1.44-.87 2-1.35 1.5-1.26 2-5 2-5s-3.74.5-5 2c-.48.56-.93 1.23-1.35 2H9.85c-.96 0-1.88-.38-2.59-1.06l-.32-.32a.75.75 0 0 0-1.06 0L3.76 6.54a.75.75 0 0 0 0 1.06l.32.32c.68.71 1.06 1.63 1.06 2.59v4.65c-.42.77-.87 1.44-1.35 2z"/></svg><span>Играть</span></div>
+        <div onclick="alert('Скоро')" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Задания</span></div>
+        <div onclick="nav('profile')" id="nav-profile" class="nav-item"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Профиль</span></div>
+    </nav>
 
     <div id="wallet-modal" class="hidden fixed inset-0 bg-black/90 z-[100] flex items-end">
         <div class="bg-[#1C1C1E] w-full rounded-t-[32px] p-6 pb-12 border-t border-gray-800">
             <div class="w-12 h-1 bg-gray-600 mx-auto rounded-full mb-6" onclick="document.getElementById('wallet-modal').classList.add('hidden')"></div>
             <h3 class="text-center font-bold text-white mb-6 uppercase tracking-widest text-lg" id="wallet-title">Пополнение</h3>
-            <div class="flex gap-2 mb-6"><button onclick="switchWalletCurr('stars')" id="wc-stars" class="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition">STARS</button><button onclick="switchWalletCurr('ton')" id="wc-ton" class="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition">TON</button></div>
-            <div id="ton-area" class="hidden flex flex-col gap-4">
-                <div class="text-center mb-2 text-xs text-gray-400">1. Подключите кошелек</div><div id="ton-connect-btn-wrap" class="w-full flex justify-center"></div>
-                <div class="text-center mt-4 text-xs text-gray-400">2. Введите сумму TON и оплатите</div><input id="wallet-input-ton" type="number" placeholder="Сумма в TON" class="w-full bg-black p-4 rounded-xl text-center text-white font-bold text-xl outline-none border border-[#333]"><button onclick="processTonPayment()" class="w-full primary-btn py-4 rounded-xl font-bold">ОПЛАТИТЬ</button>
+            
+            <div class="flex gap-2 mb-6">
+                <button onclick="switchWalletCurr('stars')" id="wc-stars" class="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition">STARS</button>
+                <button onclick="switchWalletCurr('ton')" id="wc-ton" class="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition">TON</button>
             </div>
+
+            <div id="ton-area" class="hidden flex flex-col gap-4">
+                <div class="text-center mb-2 text-xs text-gray-400">1. Подключите кошелек</div>
+                <div id="ton-connect-btn-wrap" class="w-full flex justify-center"></div>
+                <div class="text-center mt-4 text-xs text-gray-400">2. Введите сумму TON и оплатите</div>
+                <input id="wallet-input-ton" type="number" placeholder="Сумма в TON" class="w-full bg-black p-4 rounded-xl text-center text-white font-bold text-xl outline-none border border-[#333]">
+                <button onclick="processTonPayment()" class="w-full primary-btn py-4 rounded-xl font-bold">ОПЛАТИТЬ</button>
+            </div>
+
             <div id="stars-area">
-                <div class="text-center mb-4"><p class="text-xs text-gray-400 mb-2">Выберите пакет Звезд</p>
+                <div class="text-center mb-4">
+                    <p class="text-xs text-gray-400 mb-2">Выберите пакет Звезд</p>
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="payStars(15)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center"><span>15 ⭐</span><span class="text-[9px] text-gray-500 font-normal">Новичок</span></button>
-                        <button onclick="payStars(25)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center"><span>25 ⭐</span><span class="text-[9px] text-gray-500 font-normal">Любитель</span></button>
-                        <button onclick="payStars(50)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center"><span>50 ⭐</span><span class="text-[9px] text-gray-500 font-normal">Профи</span></button>
-                        <button onclick="payStars(100)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center"><span>100 ⭐</span><span class="text-[9px] text-gray-500 font-normal">Магнат</span></button>
+                        <button onclick="payStars(15)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center">
+                            <span>15 ⭐</span><span class="text-[9px] text-gray-500 font-normal">Новичок</span>
+                        </button>
+                        <button onclick="payStars(25)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center">
+                            <span>25 ⭐</span><span class="text-[9px] text-gray-500 font-normal">Любитель</span>
+                        </button>
+                        <button onclick="payStars(50)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center">
+                            <span>50 ⭐</span><span class="text-[9px] text-gray-500 font-normal">Профи</span>
+                        </button>
+                        <button onclick="payStars(100)" class="bg-[#333] py-4 rounded-xl border border-white/5 hover:border-yellow-500 transition text-white font-bold text-lg flex flex-col items-center">
+                            <span>100 ⭐</span><span class="text-[9px] text-gray-500 font-normal">Магнат</span>
+                        </button>
                     </div>
                 </div>
+                <p class="text-[10px] text-gray-500 text-center">Оплата через Telegram Stars</p>
             </div>
         </div>
     </div>
 
-    <div id="gift-modal" class="hidden fixed inset-0 bg-black/95 z-[100] flex flex-col justify-center px-6"><div class="bg-[#1C1C1E] rounded-3xl p-6 border border-gray-800 text-center relative"><button onclick="document.getElementById('gift-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-500 font-bold">✕</button><div class="flex justify-center items-center gap-4 mb-6 mt-4"><div class="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center text-3xl">🎁</div><div class="text-gray-500">➜</div><div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center text-3xl">🤖</div></div><h3 class="text-lg font-bold mb-2">Отправьте подарок боту</h3><p class="text-xs text-gray-400 mb-6">Перейдите к боту @GiftsToOrbitUp.</p><a href="https://t.me/GiftsToOrbitUp" target="_blank" class="w-full primary-btn py-4 rounded-xl font-bold uppercase tracking-wide mb-3">ПЕРЕЙТИ К БОТУ</a></div></div>
+    <div id="gift-modal" class="hidden fixed inset-0 bg-black/95 z-[100] flex flex-col justify-center px-6">
+        <div class="bg-[#1C1C1E] rounded-3xl p-6 border border-gray-800 text-center relative">
+            <button onclick="document.getElementById('gift-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-500 font-bold">✕</button>
+            <div class="flex justify-center items-center gap-4 mb-6 mt-4">
+                <div class="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center text-3xl">🎁</div>
+                <div class="text-gray-500">➜</div>
+                <div class="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center text-3xl">🤖</div>
+            </div>
+            <h3 class="text-lg font-bold mb-2">Отправьте подарок боту</h3>
+            <p class="text-xs text-gray-400 mb-6">Перейдите к боту @GiftsToOrbitUp. Количество подарков не ограничено.</p>
+            <a href="https://t.me/GiftsToOrbitUp" target="_blank" class="w-full primary-btn py-4 rounded-xl font-bold uppercase tracking-wide mb-3">ПЕРЕЙТИ К БОТУ</a>
+        </div>
+    </div>
 
     <script>
-        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({ manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json', buttonRootId: 'ton-connect-btn-wrap' });
+        // === TON CONNECT ===
+        const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json', 
+            buttonRootId: 'ton-connect-btn-wrap'
+        });
+
+        // ⚠️ ТВОЙ КОШЕЛЕК
         const MY_WALLET_ADDRESS = "UQBLYVXsKcTwo2vegPZKQkR3lFowRYa2IK5_6OC8sXOyMh0p"; 
+
+        // === STATE ===
         let state = { balances: { stars: 0, ton: 0.0 }, lastDaily: 0, history: [] };
-        const saved = localStorage.getItem('orbitUpFinalV22'); if(saved) { try { state = JSON.parse(saved); } catch(e){} }
-        function saveState() { localStorage.setItem('orbitUpFinalV22', JSON.stringify(state)); }
-        let activeCurr = 'stars', walletCurr = 'stars', walletMode = 'dep', game = { state: 'waiting', mult: 1.0, crashAt: 0, myBet: 0, cashedOut: false }, activeCase = null;
-        const casesData = [{ id: 0, name: "Новичок", price: 15, curr: 'stars', color: '#39FF14', prizes: [5, 10, 15, 25, 50] }, { id: 1, name: "Трейдер", price: 0.5, curr: 'ton', color: '#0098EA', prizes: [0.1, 0.2, 0.5, 0.8, 1.5] }, { id: 3, name: "Ежедневный", price: 0, curr: 'stars', color: '#FFFFFF', prizes: [2, 5, 5, 2, 10] }];
+        const saved = localStorage.getItem('orbitUpFinalV17');
+        if(saved) { try { state = JSON.parse(saved); } catch(e){} }
+        function saveState() { localStorage.setItem('orbitUpFinalV17', JSON.stringify(state)); }
+
+        let activeCurr = 'stars', walletCurr = 'stars', walletMode = 'dep';
+        let game = { state: 'waiting', mult: 1.0, crashAt: 0, myBet: 0, cashedOut: false };
+        let activeCase = null;
+
+        const casesData = [
+            { id: 0, name: "Новичок", price: 15, curr: 'stars', color: '#39FF14', prizes: [5, 10, 15, 25, 50] },
+            { id: 1, name: "Трейдер", price: 0.5, curr: 'ton', color: '#0098EA', prizes: [0.1, 0.2, 0.5, 0.8, 1.5] },
+            { id: 3, name: "Ежедневный", price: 0, curr: 'stars', color: '#FFFFFF', prizes: [2, 5, 5, 2, 10] }
+        ];
+
         const iconTon = `<svg viewBox="0 0 48 48" fill="none" class="w-full h-full"><circle cx="24" cy="24" r="24" fill="#0098EA"/><path d="M24 11L14 28L24 40L34 28L24 11Z" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 28L24 18L34 28" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 40V28" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
         const iconStars = `<span class="text-xl">⭐</span>`;
 
+        // === INIT ===
         window.onload = () => {
-            const tg = window.Telegram.WebApp; tg.ready(); tg.expand();
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
             const user = tg.initDataUnsafe.user;
             if(user) {
-                document.getElementById('user-name').innerText = user.first_name; document.getElementById('user-id').innerText = user.id;
-                if(user.photo_url) { document.getElementById('user-avatar').src = user.photo_url; document.getElementById('user-avatar').classList.remove('hidden'); document.getElementById('user-avatar-placeholder').classList.add('hidden'); }
+                document.getElementById('user-name').innerText = user.first_name;
+                document.getElementById('user-id').innerText = user.id;
+                if(user.photo_url) {
+                    document.getElementById('user-avatar').src = user.photo_url;
+                    document.getElementById('user-avatar').classList.remove('hidden');
+                    document.getElementById('user-avatar-placeholder').classList.add('hidden');
+                }
             }
+            
             tg.onEvent('invoiceClosed', (object) => {
                 if (object.status === 'paid') {
                     let pending = localStorage.getItem('pendingStarAmount');
-                    if(pending) { let amount = parseInt(pending); state.balances.stars += amount; saveState(); updateHeader(); localStorage.removeItem('pendingStarAmount'); alert(`Успешно! Начислено ${amount} Stars.`); }
-                } else { alert("Оплата отменена или не завершена"); }
+                    if(pending) {
+                        let amount = parseInt(pending);
+                        state.balances.stars += amount;
+                        saveState(); updateHeader();
+                        localStorage.removeItem('pendingStarAmount');
+                        alert(`Успешно! Начислено ${amount} Stars.`);
+                    }
+                }
             });
-            let fill = document.getElementById('loader-fill'); setTimeout(() => fill.style.width = "100%", 100);
-            setTimeout(() => { document.getElementById('loading-screen').style.opacity=0; setTimeout(()=> { document.getElementById('loading-screen').style.display='none'; startCrashLoop(); }, 500); }, 2000);
-            updateHeader(); updateHistoryUI();
+
+            let fill = document.getElementById('loader-fill');
+            setTimeout(() => fill.style.width = "100%", 100);
+            setTimeout(() => { 
+                document.getElementById('loading-screen').style.opacity=0; 
+                setTimeout(()=> { document.getElementById('loading-screen').style.display='none'; startCrashLoop(); }, 500); 
+            }, 2000);
+            updateHeader();
+            updateHistoryUI();
         };
 
-        // --- ИСПРАВЛЕННАЯ ЛОГИКА ОПЛАТЫ ---
+        // === PAYMENT LOGIC ===
         function payStars(amount) {
             let invoiceUrl = "";
-            if (amount === 15) invoiceUrl = "https://t.me/$lyU_Dq--IUiUEwAA3ZTutSKcfr4";
-            if (amount === 25) invoiceUrl = "https://t.me/$ODOkK6--IUiSEwAAHMNcfl54R9k";
-            if (amount === 50) invoiceUrl = "https://t.me/$mQWcsK--IUiVEwAADpCsqi3H3NM";
-            if (amount === 100) invoiceUrl = "https://t.me/$ng-PnK--IUiWEwAAjNUHmmsvyJI";
+            
+            // 👇👇👇 ВСТАВЛЯЙ ССЫЛКИ СЮДА 👇👇👇
+            if (amount === 15) invoiceUrl = ""; // Вставь ссылку в кавычки
+            if (amount === 25) invoiceUrl = ""; // Вставь ссылку в кавычки
+            if (amount === 50) invoiceUrl = ""; // Вставь ссылку в кавычки
+            if (amount === 100) invoiceUrl = ""; // Вставь ссылку в кавычки
 
             localStorage.setItem('pendingStarAmount', amount);
 
-            if (!invoiceUrl) { alert("Ошибка: Ссылка не найдена!"); return; }
-
-            // ВАЖНО: Берем только код ($...) чтобы убрать ошибку InvalidUrl
-            let slug = "";
-            if (invoiceUrl.startsWith("https://t.me/")) {
-                slug = invoiceUrl.split("https://t.me/")[1];
-            } else { slug = invoiceUrl; }
-
-            alert("Открываю счет: " + slug); // ДЕБАГ: Если видишь это окно, код сработал
-
-            window.Telegram.WebApp.openInvoice(slug, (status) => {
-                if (status == 'paid') { document.getElementById('wallet-modal').classList.add('hidden'); }
-                else if (status == 'failed') { alert("Ошибка: Платеж не прошел"); }
-                else if (status == 'cancelled') { alert("Отменено"); }
-                else { alert("Статус: " + status); }
-            });
+            if (invoiceUrl && invoiceUrl.startsWith("https://t.me/")) {
+                window.Telegram.WebApp.openInvoice(invoiceUrl);
+                document.getElementById('wallet-modal').classList.add('hidden');
+            } else {
+                // FALLBACK DEMO MODE (Если ссылок нет)
+                if(confirm("Ссылка не настроена. Включить Демо-пополнение?")) {
+                    state.balances.stars += amount;
+                    saveState(); updateHeader();
+                    document.getElementById('wallet-modal').classList.add('hidden');
+                }
+            }
         }
 
-        // --- ОСТАЛЬНОЕ ---
+        // === NAV ===
         function nav(page) {
             if(page==='rating') return alert('Лидеры скоро...');
             document.querySelectorAll('.tab-content').forEach(e=>e.classList.remove('active'));
@@ -182,53 +358,111 @@
             if(page === 'cases') document.getElementById('nav-cases').classList.add('active');
             if(page === 'profile') document.getElementById('nav-profile').classList.add('active');
         }
+
         function updateHeader() {
-            const iconContainer = document.getElementById('headerIcon'); const balanceText = document.getElementById('headerBalance'); const container = document.getElementById('balance-container');
-            if(activeCurr === 'stars') { iconContainer.innerHTML = iconStars; balanceText.innerText = state.balances.stars.toFixed(0); balanceText.style.color = 'white'; container.style.borderLeftColor = '#39FF14'; } 
-            else { iconContainer.innerHTML = iconTon; balanceText.innerText = state.balances.ton.toFixed(2); balanceText.style.color = '#0098EA'; container.style.borderLeftColor = '#0098EA'; }
+            const iconContainer = document.getElementById('headerIcon');
+            const balanceText = document.getElementById('headerBalance');
+            const container = document.getElementById('balance-container');
+            
+            if(activeCurr === 'stars') {
+                iconContainer.innerHTML = iconStars;
+                balanceText.innerText = state.balances.stars.toFixed(0);
+                balanceText.style.color = 'white';
+                container.style.borderLeftColor = '#39FF14';
+            } else {
+                iconContainer.innerHTML = iconTon;
+                balanceText.innerText = state.balances.ton.toFixed(2);
+                balanceText.style.color = '#0098EA';
+                container.style.borderLeftColor = '#0098EA';
+            }
         }
+
         function setCurrency(c) {
             activeCurr = c;
-            if(c==='stars') { document.getElementById('sw-stars').className="switch-opt active-s"; document.getElementById('sw-ton').className="switch-opt"; document.getElementById('min-bet-label').innerText = "Min: 25 Stars"; document.getElementById('betInput').value = 25; } 
-            else { document.getElementById('sw-ton').className="switch-opt active-t"; document.getElementById('sw-stars').className="switch-opt"; document.getElementById('min-bet-label').innerText = "Min: 0.1 TON"; document.getElementById('betInput').value = 0.1; }
-            updateHeader(); updateBtn();
+            if(c==='stars') {
+                document.getElementById('sw-stars').className="switch-opt active-s";
+                document.getElementById('sw-ton').className="switch-opt";
+                document.getElementById('min-bet-label').innerText = "Min: 25 Stars";
+                document.getElementById('betInput').value = 25;
+            } else {
+                document.getElementById('sw-ton').className="switch-opt active-t";
+                document.getElementById('sw-stars').className="switch-opt";
+                document.getElementById('min-bet-label').innerText = "Min: 0.1 TON";
+                document.getElementById('betInput').value = 0.1;
+            }
+            updateHeader();
+            updateBtn();
         }
-        function shareLink() { window.Telegram.WebApp.openTelegramLink("https://t.me/share/url?url=https://t.me/orbitupbot&text=Получай Звезды Бесплатно! в боте @OrbitUpBot"); }
+
+        function shareLink() {
+            const url = "https://t.me/share/url?url=https://t.me/orbitupbot&text=Получай Звезды Бесплатно! в боте @OrbitUpBot";
+            window.Telegram.WebApp.openTelegramLink(url);
+        }
+
+        // === CRASH ===
         function startCrashLoop() {
             game.state = 'waiting'; game.myBet = 0; game.cashedOut = false; game.mult = 1.0;
-            document.getElementById('mult-display').innerText = "1.00x"; document.getElementById('mult-display').className = "relative z-10 text-6xl font-black font-tech text-white transition-transform";
-            document.getElementById('game-status').innerText = "ОЖИДАНИЕ..."; document.getElementById('rocket').style.opacity = '0';
-            const bar = document.getElementById('timer-bar'); bar.style.transition = 'none'; bar.style.width = '100%';
+            document.getElementById('mult-display').innerText = "1.00x";
+            document.getElementById('mult-display').className = "relative z-10 text-6xl font-black font-tech text-white transition-transform";
+            document.getElementById('game-status').innerText = "ОЖИДАНИЕ...";
+            document.getElementById('rocket').style.opacity = '0';
+            const bar = document.getElementById('timer-bar');
+            bar.style.transition = 'none'; bar.style.width = '100%';
             setTimeout(() => { bar.style.transition = 'width 5s linear'; bar.style.width = '0%'; }, 100);
-            updateBtn(); setTimeout(launchRocket, 5000);
+            updateBtn();
+            setTimeout(launchRocket, 5000);
         }
+
         function launchRocket() {
-            game.state = 'flying'; document.getElementById('game-status').innerText = "ПОЛЕТ"; document.getElementById('rocket').style.opacity = '1';
+            game.state = 'flying';
+            document.getElementById('game-status').innerText = "ПОЛЕТ";
+            document.getElementById('rocket').style.opacity = '1';
             let r = Math.random();
-            if (r < 0.30) game.crashAt = 1.00 + Math.random() * 0.20; else if (r < 0.70) game.crashAt = 1.20 + Math.random() * 0.40; else if (r < 0.90) game.crashAt = 1.60 + Math.random() * 0.90; else game.crashAt = 2.50 + Math.random() * 4.0;
+            if (r < 0.30) game.crashAt = 1.00 + Math.random() * 0.20; 
+            else if (r < 0.70) game.crashAt = 1.20 + Math.random() * 0.40;
+            else if (r < 0.90) game.crashAt = 1.60 + Math.random() * 0.90;
+            else game.crashAt = 2.50 + Math.random() * 4.0;
             updateBtn();
             let loop = setInterval(() => {
                 if(game.state !== 'flying') { clearInterval(loop); return; }
-                game.mult += 0.01; document.getElementById('mult-display').innerText = game.mult.toFixed(2) + 'x';
-                let p = Math.min(80, (game.mult - 1) * 30); document.getElementById('rocket').style.bottom = (10 + p/2) + '%'; document.getElementById('rocket').style.left = (10 + p) + '%';
+                game.mult += 0.01;
+                document.getElementById('mult-display').innerText = game.mult.toFixed(2) + 'x';
+                let p = Math.min(80, (game.mult - 1) * 30);
+                document.getElementById('rocket').style.bottom = (10 + p/2) + '%';
+                document.getElementById('rocket').style.left = (10 + p) + '%';
                 if(game.mult >= game.crashAt) { clearInterval(loop); doCrash(); }
             }, 50);
         }
+
         function doCrash() {
-            game.state = 'crashed'; document.getElementById('mult-display').classList.add('text-red-600'); document.getElementById('mult-display').innerText = "CRASHED"; document.getElementById('rocket').style.opacity = '0';
-            updateBtn(); setTimeout(startCrashLoop, 2000);
+            game.state = 'crashed';
+            document.getElementById('mult-display').classList.add('text-red-600');
+            document.getElementById('mult-display').innerText = "CRASHED";
+            document.getElementById('rocket').style.opacity = '0';
+            updateBtn();
+            setTimeout(startCrashLoop, 2000);
         }
+
         function handleBetClick() {
             if(game.state === 'waiting') {
                 if(game.myBet > 0) return;
-                let val = parseFloat(document.getElementById('betInput').value); let min = activeCurr === 'stars' ? 25 : 0.1;
-                if(val < min) return alert("Мин: " + min); if(val > state.balances[activeCurr]) return alert("Мало средств");
-                state.balances[activeCurr] -= val; game.myBet = val; saveState(); updateHeader(); updateBtn();
+                let val = parseFloat(document.getElementById('betInput').value);
+                let min = activeCurr === 'stars' ? 25 : 0.1;
+                if(val < min) return alert("Мин: " + min);
+                if(val > state.balances[activeCurr]) return alert("Мало средств");
+                state.balances[activeCurr] -= val;
+                game.myBet = val;
+                saveState(); updateHeader(); updateBtn();
             } else if(game.state === 'flying' && game.myBet > 0 && !game.cashedOut) {
-                let win = game.myBet * game.mult; state.balances[activeCurr] += win; game.cashedOut = true;
-                addHistory('Crash', win, 'win'); document.getElementById('mult-display').classList.add('text-[#39FF14]'); saveState(); updateHeader(); updateBtn();
+                let win = game.myBet * game.mult;
+                state.balances[activeCurr] += win;
+                game.cashedOut = true;
+                addHistory('Crash', win, 'win');
+                document.getElementById('mult-display').classList.add('text-[#39FF14]');
+                saveState(); updateHeader(); updateBtn();
             }
         }
+
         function updateBtn() {
             const btn = document.getElementById('crashBtn');
             if(game.state === 'waiting') {
@@ -238,51 +472,156 @@
                 if(game.myBet > 0 && !game.cashedOut) { btn.innerText = "ЗАБРАТЬ"; btn.className = "w-1/2 action-btn bg-white text-black text-sm font-black shadow-[0_0_20px_white]"; btn.disabled = false; }
                 else if (game.cashedOut) { btn.innerText = "ВЫИГРЫШ"; btn.className = "w-1/2 action-btn bg-[#39FF14] text-black text-xs font-bold"; btn.disabled = true; }
                 else { btn.innerText = "ИДЕТ ИГРА"; btn.className = "w-1/2 action-btn bg-gray-800 text-gray-500 text-xs"; btn.disabled = true; }
-            } else { btn.innerText = "КРУШЕНИЕ"; btn.className = "w-1/2 action-btn bg-red-900 text-white text-xs"; btn.disabled = true; }
+            } else {
+                btn.innerText = "КРУШЕНИЕ"; btn.className = "w-1/2 action-btn bg-red-900 text-white text-xs"; btn.disabled = true;
+            }
         }
+
         function openCaseView(id) {
             activeCase = casesData.find(c => c.id === id);
-            if(activeCase.id === 3) { const now = Date.now(); if(now - state.lastDaily < 86400000) return alert('Бонус доступен раз в 24 часа!'); }
-            document.getElementById('cases-list').classList.add('hidden'); document.getElementById('case-roulette-view').classList.remove('hidden');
-            document.getElementById('active-case-name').innerText = activeCase.name; document.getElementById('active-case-name').style.color = activeCase.color;
-            const btn = document.getElementById('spinBtn'); btn.innerText = activeCase.price === 0 ? "КРУТИТЬ БЕСПЛАТНО" : `КРУТИТЬ ЗА ${activeCase.price} ${activeCase.curr.toUpperCase()}`;
-            btn.style.backgroundColor = activeCase.color; btn.disabled = false; initRoulette();
+            if(activeCase.id === 3) {
+                const now = Date.now();
+                if(now - state.lastDaily < 86400000) return alert('Бонус доступен раз в 24 часа!');
+            }
+            document.getElementById('cases-list').classList.add('hidden');
+            document.getElementById('case-roulette-view').classList.remove('hidden');
+            document.getElementById('active-case-name').innerText = activeCase.name;
+            document.getElementById('active-case-name').style.color = activeCase.color;
+            const btn = document.getElementById('spinBtn');
+            btn.innerText = activeCase.price === 0 ? "КРУТИТЬ БЕСПЛАТНО" : `КРУТИТЬ ЗА ${activeCase.price} ${activeCase.curr.toUpperCase()}`;
+            btn.style.backgroundColor = activeCase.color;
+            btn.disabled = false;
+            initRoulette();
         }
+
         function initRoulette() {
-            const track = document.getElementById('rouletteTrack'); track.innerHTML = '';
-            for(let i=0; i<60; i++) { let p = activeCase.prizes[Math.floor(Math.random()*activeCase.prizes.length)]; let d = document.createElement('div'); d.className = 'roulette-item'; d.innerHTML = `<span class="text-xs font-bold text-gray-500">${p}</span>`; track.appendChild(d); }
+            const track = document.getElementById('rouletteTrack');
+            track.innerHTML = '';
+            for(let i=0; i<60; i++) {
+                let p = activeCase.prizes[Math.floor(Math.random()*activeCase.prizes.length)];
+                let d = document.createElement('div');
+                d.className = 'roulette-item';
+                d.innerHTML = `<span class="text-xs font-bold text-gray-500">${p}</span>`;
+                track.appendChild(d);
+            }
             track.style.transition = 'none'; track.style.transform = 'translateX(0)';
         }
+
         function spinRoulette() {
             if(activeCase.price > 0 && state.balances[activeCase.curr] < activeCase.price) return alert('Недостаточно средств');
-            if(activeCase.price > 0) state.balances[activeCase.curr] -= activeCase.price; saveState(); updateHeader();
-            const btn = document.getElementById('spinBtn'); btn.disabled = true; const track = document.getElementById('rouletteTrack');
-            let r = Math.random(); let winIdx = r < 0.5 ? 0 : (r < 0.8 ? 1 : (r < 0.95 ? 2 : 4)); if(winIdx >= activeCase.prizes.length) winIdx = 0; let winAmount = activeCase.prizes[winIdx]; let targetIdx = 45; 
-            track.children[targetIdx].innerHTML = `<span class="text-xl font-bold text-white">${winAmount}</span>`; track.children[targetIdx].style.background = activeCase.color; if(activeCase.color === '#FFFFFF') track.children[targetIdx].style.color = 'black';
+            if(activeCase.price > 0) state.balances[activeCase.curr] -= activeCase.price;
+            saveState(); updateHeader();
+            const btn = document.getElementById('spinBtn');
+            btn.disabled = true;
+            const track = document.getElementById('rouletteTrack');
+            
+            let r = Math.random();
+            let winIdx = r < 0.5 ? 0 : (r < 0.8 ? 1 : (r < 0.95 ? 2 : 4));
+            if(winIdx >= activeCase.prizes.length) winIdx = 0;
+            let winAmount = activeCase.prizes[winIdx];
+            let targetIdx = 45; 
+            
+            track.children[targetIdx].innerHTML = `<span class="text-xl font-bold text-white">${winAmount}</span>`;
+            track.children[targetIdx].style.background = activeCase.color;
+            if(activeCase.color === '#FFFFFF') track.children[targetIdx].style.color = 'black';
+            
             let offset = (targetIdx * 98) - (track.parentElement.offsetWidth / 2) + 49;
-            track.style.transition = 'transform 4s cubic-bezier(0.1,0,0,1)'; track.style.transform = `translateX(-${offset}px)`;
+            track.style.transition = 'transform 4s cubic-bezier(0.1,0,0,1)';
+            track.style.transform = `translateX(-${offset}px)`;
+            
             setTimeout(() => {
-                state.balances[activeCase.curr] += winAmount; if(activeCase.id === 3) state.lastDaily = Date.now(); addHistory('Case', winAmount, 'win'); saveState(); updateHeader(); alert(`Выигрыш: ${winAmount}`); btn.disabled = false; closeCaseView();
+                state.balances[activeCase.curr] += winAmount;
+                if(activeCase.id === 3) state.lastDaily = Date.now();
+                addHistory('Case', winAmount, 'win');
+                saveState(); updateHeader();
+                alert(`Выигрыш: ${winAmount}`);
+                btn.disabled = false;
+                closeCaseView();
             }, 4200);
         }
-        function closeCaseView() { document.getElementById('case-roulette-view').classList.add('hidden'); document.getElementById('cases-list').classList.remove('hidden'); }
-        function openWallet(mode) { walletMode = mode; document.getElementById('wallet-modal').classList.remove('hidden'); document.getElementById('wallet-title').innerText = mode === 'dep' ? "Пополнение" : "Вывод средств"; switchWalletCurr('stars'); }
+
+        function closeCaseView() {
+            document.getElementById('case-roulette-view').classList.add('hidden');
+            document.getElementById('cases-list').classList.remove('hidden');
+        }
+
+        function openWallet(mode) { 
+            walletMode = mode;
+            document.getElementById('wallet-modal').classList.remove('hidden'); 
+            document.getElementById('wallet-title').innerText = mode === 'dep' ? "Пополнение" : "Вывод средств";
+            switchWalletCurr('stars'); 
+        }
         function openGiftModal() { document.getElementById('gift-modal').classList.remove('hidden'); }
+        
         function switchWalletCurr(c) {
             walletCurr = c;
-            if(c==='stars') { document.getElementById('wc-stars').className="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition"; document.getElementById('wc-ton').className="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition"; document.getElementById('stars-area').classList.remove('hidden'); document.getElementById('ton-area').classList.add('hidden'); } 
-            else { document.getElementById('wc-ton').className="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition"; document.getElementById('wc-stars').className="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition"; if(walletMode === 'dep') { document.getElementById('stars-area').classList.add('hidden'); document.getElementById('ton-area').classList.remove('hidden'); } else { document.getElementById('stars-area').classList.remove('hidden'); document.getElementById('ton-area').classList.add('hidden'); } }
+            if(c==='stars') {
+                document.getElementById('wc-stars').className="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition";
+                document.getElementById('wc-ton').className="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition";
+                document.getElementById('stars-area').classList.remove('hidden');
+                document.getElementById('ton-area').classList.add('hidden');
+            } else {
+                document.getElementById('wc-ton').className="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition";
+                document.getElementById('wc-stars').className="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition";
+                if(walletMode === 'dep') {
+                    document.getElementById('stars-area').classList.add('hidden');
+                    document.getElementById('ton-area').classList.remove('hidden');
+                } else {
+                    document.getElementById('stars-area').classList.remove('hidden'); 
+                    document.getElementById('ton-area').classList.add('hidden');
+                }
+            }
         }
+
         async function processTonPayment() {
-            const amount = parseFloat(document.getElementById('wallet-input-ton').value); if(!amount || amount <= 0) return alert("Введите сумму");
-            const transaction = { validUntil: Math.floor(Date.now() / 1000) + 600, messages: [ { address: MY_WALLET_ADDRESS, amount: (amount * 1000000000).toString() } ] };
-            try { await tonConnectUI.sendTransaction(transaction); state.balances.ton += amount; saveState(); updateHeader(); alert("Успешно пополнено!"); document.getElementById('wallet-modal').classList.add('hidden'); } catch (e) { alert("Ошибка или отмена транзакции"); }
+            const amount = parseFloat(document.getElementById('wallet-input-ton').value);
+            if(!amount || amount <= 0) return alert("Введите сумму");
+
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 600,
+                messages: [
+                    {
+                        address: MY_WALLET_ADDRESS,
+                        amount: (amount * 1000000000).toString() 
+                    }
+                ]
+            };
+
+            try {
+                const result = await tonConnectUI.sendTransaction(transaction);
+                state.balances.ton += amount;
+                saveState(); updateHeader();
+                alert("Успешно пополнено!");
+                document.getElementById('wallet-modal').classList.add('hidden');
+            } catch (e) {
+                alert("Ошибка или отмена транзакции");
+            }
         }
-        function switchTab(t, btn) { document.querySelectorAll('#tab-gifts, #tab-friends, #tab-history').forEach(e=>e.classList.add('hidden')); document.getElementById('tab-'+t).classList.remove('hidden'); document.querySelectorAll('.p-tab').forEach(e=>e.classList.remove('active')); btn.classList.add('active'); }
-        function addHistory(gameName, amount, type) { state.history.unshift({ game: gameName, amount: amount, type: type, time: new Date().toLocaleTimeString().slice(0,5) }); if(state.history.length > 5) state.history.pop(); updateHistoryUI(); }
+
+        function switchTab(t, btn) {
+            document.querySelectorAll('#tab-gifts, #tab-friends, #tab-history').forEach(e=>e.classList.add('hidden'));
+            document.getElementById('tab-'+t).classList.remove('hidden');
+            document.querySelectorAll('.p-tab').forEach(e=>e.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        function addHistory(gameName, amount, type) {
+            state.history.unshift({ game: gameName, amount: amount, type: type, time: new Date().toLocaleTimeString().slice(0,5) });
+            if(state.history.length > 5) state.history.pop();
+            updateHistoryUI();
+        }
         function updateHistoryUI() {
-            const div = document.getElementById('tab-history'); div.innerHTML = '';
-            state.history.forEach(h => { div.innerHTML += `<div class="glass-panel p-3 rounded-xl flex justify-between items-center mb-2"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-green-500/20 text-green-500 flex items-center justify-center text-xs font-bold">W</div><div><p class="text-xs font-bold">${h.game}</p><p class="text-[9px] text-gray-500">${h.time}</p></div></div><span class="text-green-500 text-xs font-bold">+${h.amount.toFixed(2)}</span></div>`; });
+            const div = document.getElementById('tab-history');
+            div.innerHTML = '';
+            state.history.forEach(h => {
+                div.innerHTML += `
+                <div class="glass-panel p-3 rounded-xl flex justify-between items-center mb-2">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-green-500/20 text-green-500 flex items-center justify-center text-xs font-bold">W</div>
+                        <div><p class="text-xs font-bold">${h.game}</p><p class="text-[9px] text-gray-500">${h.time}</p></div>
+                    </div>
+                    <span class="text-green-500 text-xs font-bold">+${h.amount.toFixed(2)}</span>
+                </div>`;
+            });
         }
     </script>
 </body>
