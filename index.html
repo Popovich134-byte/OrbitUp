@@ -1,175 +1,188 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Neon Gaming Ecosystem</title>
+    <title>Neon Gaming</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;700&display=swap');
         
         :root { --neon: #39FF14; --dark: #050505; }
-        body { background: var(--dark); color: white; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; }
+        body { background: var(--dark); color: white; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; margin: 0; }
         .neon-text { font-family: 'Orbitron', sans-serif; color: var(--neon); text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
-        .neon-btn { background: var(--neon); color: black; font-weight: bold; box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); }
+        .neon-btn { background: var(--neon); color: black; font-weight: bold; box-shadow: 0 0 15px rgba(57, 255, 20, 0.4); border-radius: 12px; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .tab-content { display: none; height: calc(100vh - 160px); overflow-y: auto; }
+        
+        /* Навигация */
+        .tab-content { display: none; height: calc(100vh - 180px); overflow-y: auto; padding-bottom: 40px; }
         .tab-content.active { display: block; }
-        
-        /* Анимация кейса */
-        .case-spin { display: flex; transition: transform 4s cubic-bezier(0.15, 0, 0.05, 1); }
-        
-        /* Скрытие скроллбара */
-        ::-webkit-scrollbar { display: none; }
+
+        /* Рулетка Кейса */
+        .roulette-container {
+            position: relative;
+            width: 100%;
+            height: 100px;
+            background: #000;
+            border: 2px solid #1a1a1a;
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+        .roulette-track {
+            display: flex;
+            position: absolute;
+            left: 0;
+            transition: transform 4s cubic-bezier(0.15, 0, 0.05, 1);
+            will-change: transform;
+        }
+        .roulette-item {
+            min-width: 80px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: rgba(255,255,255,0.05);
+            margin: 0 5px;
+            border-radius: 10px;
+        }
+        .roulette-marker {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--neon);
+            z-index: 10;
+            box-shadow: 0 0 10px var(--neon);
+            transform: translateX(-50%);
+        }
     </style>
 </head>
 <body>
 
-    <div id="setup-layer" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-6 text-center">
-        <div id="loader" class="flex flex-col items-center">
-            <div class="w-16 h-16 border-4 border-t-[#39FF14] border-gray-900 rounded-full animate-spin mb-4"></div>
-            <h2 class="neon-text tracking-widest uppercase">Initializing...</h2>
-        </div>
-        
-        <div id="lang-select" class="hidden animate-fade-in">
-            <h2 class="text-2xl font-bold mb-8 neon-text">CHOOSE LANGUAGE</h2>
-            <div class="grid gap-4 w-64">
-                <button onclick="setLanguage('ru')" class="p-4 glass rounded-xl hover:border-[#39FF14] transition">🇷🇺 РУССКИЙ</button>
-                <button onclick="setLanguage('en')" class="p-4 glass rounded-xl hover:border-[#39FF14] transition">🇺🇸 ENGLISH</button>
-            </div>
-        </div>
+    <div id="splash" class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="w-16 h-16 border-4 border-t-[#39FF14] border-gray-900 rounded-full animate-spin mb-4"></div>
+        <h2 class="neon-text tracking-widest">ЗАГРУЗКА...</h2>
     </div>
 
     <div id="wallet-modal" class="fixed inset-0 z-[90] bg-black/90 hidden flex items-end">
-        <div class="w-full glass rounded-t-3xl p-6 border-t border-[#39FF14]/30 animate-slide-up">
-            <div class="w-12 h-1 bg-gray-700 mx-auto mb-6 rounded-full"></div>
-            <h3 class="text-xl font-bold mb-4 neon-text" id="modal-title">Wallet</h3>
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <button class="p-4 bg-gray-900 rounded-2xl border border-gray-800 text-center">
-                    <span class="block text-2xl mb-1">➕</span> <span id="btn-deposit">Deposit</span>
-                </button>
-                <button class="p-4 bg-gray-900 rounded-2xl border border-gray-800 text-center">
-                    <span class="block text-2xl mb-1">💸</span> <span id="btn-withdraw">Withdraw</span>
-                </button>
+        <div class="w-full glass rounded-t-3xl p-6 border-t border-[#39FF14]/30">
+            <h3 class="text-xl font-bold mb-6 neon-text text-center">Кошелек</h3>
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="p-4 bg-gray-900 rounded-2xl text-center border border-gray-800">
+                    <p class="text-[10px] text-gray-400 uppercase">Пополнить</p>
+                    <p class="text-xs mt-1">Telegram Stars</p>
+                </div>
+                <div class="p-4 bg-gray-900 rounded-2xl text-center border border-gray-800 opacity-50">
+                    <p class="text-[10px] text-gray-400 uppercase">Вывод</p>
+                    <p class="text-xs mt-1">Доступно от 50 ⭐</p>
+                </div>
             </div>
-            <button onclick="toggleWallet()" class="w-full p-4 text-gray-400">Close</button>
+            <button onclick="toggleWallet()" class="w-full p-3 text-gray-500 font-bold uppercase text-xs">Закрыть</button>
         </div>
     </div>
 
-    <div class="p-4 h-full flex flex-col">
-        <header class="flex justify-between items-center mb-4">
-            <div onclick="toggleWallet()" class="cursor-pointer">
-                <p class="text-[10px] text-gray-500 uppercase font-bold" id="label-balance">Your Balance</p>
+    <div class="p-4 flex flex-col h-full">
+        <header class="flex justify-between items-center mb-6">
+            <div onclick="toggleWallet()" class="cursor-pointer active:scale-95 transition">
+                <p class="text-[10px] text-gray-500 uppercase font-bold">Баланс</p>
                 <div class="flex items-center gap-2">
-                    <span class="text-2xl font-black neon-text" id="balance">2.00</span>
-                    <span class="text-xs text-yellow-500">⭐</span>
+                    <span class="text-3xl font-black neon-text" id="balance">2.00</span>
+                    <span class="text-lg">⭐</span>
                 </div>
             </div>
-            <div class="w-10 h-10 rounded-full glass border border-gray-700 flex items-center justify-center">👤</div>
+            <div class="w-10 h-10 rounded-full glass border border-gray-700 flex items-center justify-center text-xl">🦊</div>
         </header>
 
         <main class="flex-grow">
             <section id="page-crash" class="tab-content active">
-                <div class="relative bg-black rounded-3xl p-4 border border-gray-900 mb-4 overflow-hidden h-64 flex flex-col items-center justify-center">
-                    <canvas id="crashCanvas" class="absolute inset-0 w-full h-full opacity-40"></canvas>
-                    <div id="mult-display" class="text-5xl font-black neon-text z-10">1.00x</div>
-                    <div id="game-status" class="text-[10px] text-gray-500 uppercase mt-2 z-10">Ready to play</div>
+                <div class="bg-black rounded-3xl p-4 border border-gray-800 mb-4 h-60 flex flex-col items-center justify-center relative overflow-hidden">
+                    <canvas id="crashCanvas" class="absolute inset-0 opacity-30"></canvas>
+                    <div id="mult-display" class="text-6xl font-black neon-text z-10">1.00x</div>
+                    <div id="game-status" class="text-[10px] text-gray-500 uppercase mt-2 font-bold">Готов к игре</div>
                 </div>
                 
                 <div class="glass rounded-2xl p-4">
-                    <div class="flex gap-2 mb-4">
-                        <div class="flex-grow bg-black/50 rounded-xl p-2 border border-gray-800">
-                            <input id="bet-amount" type="number" value="0.1" step="0.1" class="bg-transparent w-full text-center font-bold outline-none">
+                    <div class="flex gap-2 mb-2">
+                        <div class="flex-grow bg-black rounded-xl p-3 border border-gray-800">
+                            <input id="bet-amount" type="number" value="0.1" step="0.1" class="bg-transparent w-full text-center font-bold outline-none text-[#39FF14]">
                         </div>
-                        <button onclick="handleCrashAction()" id="crash-btn" class="w-1/2 p-4 rounded-xl neon-btn uppercase tracking-tighter">Place Bet</button>
+                        <button onclick="handleCrashAction()" id="crash-btn" class="w-1/2 p-4 neon-btn uppercase text-sm">Ставка</button>
                     </div>
                 </div>
             </section>
 
             <section id="page-cases" class="tab-content">
-                <h2 class="text-xl font-bold mb-4 neon-text">Mystery Boxes</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="glass p-4 rounded-2xl text-center border-b-2 border-yellow-500">
-                        <div class="text-4xl mb-2">🎁</div>
-                        <p class="font-bold text-sm">Starter Box</p>
-                        <button onclick="openCase(0.5)" class="mt-2 w-full py-2 bg-yellow-500/20 text-yellow-500 rounded-lg text-xs font-bold">0.5 ⭐</button>
+                <div class="mb-6">
+                    <div class="roulette-container mb-4">
+                        <div class="roulette-marker"></div>
+                        <div id="rouletteTrack" class="roulette-track">
+                            </div>
                     </div>
-                    <div class="glass p-4 rounded-2xl text-center border-b-2 border-blue-500">
-                        <div class="text-4xl mb-2">💎</div>
-                        <p class="font-bold text-sm">Elite Case</p>
-                        <button onclick="openCase(5)" class="mt-2 w-full py-2 bg-blue-500/20 text-blue-500 rounded-lg text-xs font-bold">5.0 ⭐</button>
+                    <div id="case-result" class="text-center h-6 text-sm font-bold text-[#39FF14]"></div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="glass p-6 rounded-3xl flex justify-between items-center border-l-4 border-[#39FF14]">
+                        <div>
+                            <h3 class="font-bold">Кейс "Новичок"</h3>
+                            <p class="text-xs text-gray-500">Шанс на ⭐⭐⭐</p>
+                        </div>
+                        <button onclick="openCase(0.5)" id="open-btn" class="px-6 py-3 neon-btn text-xs uppercase">0.5 ⭐</button>
                     </div>
                 </div>
             </section>
 
-            <section id="page-profile" class="tab-content text-center">
-                <div class="w-20 h-20 bg-gray-800 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl">🦊</div>
-                <h2 class="text-xl font-bold">Player #721</h2>
-                <p class="text-gray-500 text-sm mb-6">Status: <span class="text-[#39FF14]">Diamond VIP</span></p>
-                <div class="grid grid-cols-2 gap-2 text-left">
-                    <div class="glass p-3 rounded-xl"><p class="text-[10px] text-gray-500">Total Wins</p><p class="font-bold">142 ⭐</p></div>
-                    <div class="glass p-3 rounded-xl"><p class="text-[10px] text-gray-500">Games</p><p class="font-bold">1,024</p></div>
+            <section id="page-profile" class="tab-content">
+                <div class="glass p-6 rounded-3xl text-center">
+                    <div class="w-20 h-20 bg-gray-800 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl">🦊</div>
+                    <h2 class="text-xl font-bold neon-text">ИГРОК #1337</h2>
+                    <p class="text-xs text-gray-500 mt-1 uppercase tracking-widest">Статус: Новичок</p>
+                    <div class="mt-6 pt-6 border-t border-gray-800 grid grid-cols-2 gap-4 text-left">
+                        <div><p class="text-[10px] text-gray-500">Игр</p><p class="font-bold">12</p></div>
+                        <div><p class="text-[10px] text-gray-500">Выиграно</p><p class="font-bold text-[#39FF14]">5.4 ⭐</p></div>
+                    </div>
                 </div>
             </section>
         </main>
 
-        <nav class="fixed bottom-6 left-4 right-4 h-16 glass rounded-2xl flex justify-around items-center border border-white/10">
-            <button onclick="nav('crash')" class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#39FF14]">
-                <span class="text-xl">📈</span><span class="text-[10px] font-bold uppercase">Crash</span>
+        <nav class="fixed bottom-6 left-4 right-4 h-16 glass rounded-2xl flex justify-around items-center border border-white/10 z-50">
+            <button onclick="nav('crash')" class="flex flex-col items-center gap-1 text-gray-500 active:text-[#39FF14] transition">
+                <span class="text-xl">📈</span><span class="text-[9px] font-bold uppercase">Краш</span>
             </button>
-            <button onclick="nav('cases')" class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#39FF14]">
-                <span class="text-xl">📦</span><span class="text-[10px] font-bold uppercase">Cases</span>
+            <button onclick="nav('cases')" class="flex flex-col items-center gap-1 text-gray-500 active:text-[#39FF14] transition">
+                <span class="text-xl">🎁</span><span class="text-[9px] font-bold uppercase">Кейсы</span>
             </button>
-            <button onclick="nav('profile')" class="flex flex-col items-center gap-1 text-gray-500 hover:text-[#39FF14]">
-                <span class="text-xl">👤</span><span class="text-[10px] font-bold uppercase">Profile</span>
+            <button onclick="nav('profile')" class="flex flex-col items-center gap-1 text-gray-500 active:text-[#39FF14] transition">
+                <span class="text-xl">👤</span><span class="text-[9px] font-bold uppercase">Профиль</span>
             </button>
         </nav>
     </div>
 
     <script>
-        // --- DATA & CONFIG ---
-        let state = {
-            balance: 2.0,
-            lang: localStorage.getItem('lang') || null,
-            isGaming: false,
-            multiplier: 1.0,
-            winProbability: 0.65 // 65% шанс на "небольшой выигрыш", остальное - слив
-        };
+        let balance = 2.0;
+        let isGaming = false;
+        let multiplier = 1.0;
+        let crashInterval;
 
-        const texts = {
-            ru: { balance: "Ваш баланс", deposit: "Пополнить", withdraw: "Вывод", bet: "Ставка", cashout: "Забрать", wait: "Ждем ставку..." },
-            en: { balance: "Your Balance", deposit: "Deposit", withdraw: "Withdraw", bet: "Place Bet", cashout: "Cash Out", wait: "Waiting..." }
-        };
-
-        // --- INITIALIZATION ---
+        // Запуск
         window.onload = () => {
-            if (state.lang) {
-                document.getElementById('setup-layer').style.display = 'none';
-                applyLang();
-            } else {
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('lang-select').classList.remove('hidden');
-            }
-            updateBalanceUI();
+            setTimeout(() => {
+                document.getElementById('splash').style.opacity = '0';
+                setTimeout(() => document.getElementById('splash').remove(), 700);
+            }, 1500);
+            updateBalance();
+            initRoulette();
         };
 
-        function setLanguage(l) {
-            state.lang = l;
-            localStorage.setItem('lang', l);
-            document.getElementById('setup-layer').classList.add('opacity-0');
-            setTimeout(() => document.getElementById('setup-layer').remove(), 500);
-            applyLang();
+        function updateBalance() {
+            document.getElementById('balance').innerText = balance.toFixed(2);
         }
 
-        function applyLang() {
-            const t = texts[state.lang];
-            document.getElementById('label-balance').innerText = t.balance;
-            document.getElementById('btn-deposit').innerText = t.deposit;
-            document.getElementById('btn-withdraw').innerText = t.withdraw;
-            document.getElementById('crash-btn').innerText = t.bet;
-        }
-
-        // --- UI NAVIGATION ---
         function nav(page) {
             document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
             document.getElementById('page-' + page).classList.add('active');
@@ -180,86 +193,118 @@
             m.classList.toggle('hidden');
         }
 
-        function updateBalanceUI() {
-            document.getElementById('balance').innerText = state.balance.toFixed(2);
-        }
-
-        // --- CRASH LOGIC WITH "HOUSE EDGE" (Алгоритм выгоды) ---
-        let crashInterval;
+        // --- ЛОГИКА КРАША (С ВЫГОДОЙ) ---
         function handleCrashAction() {
-            if (!state.isGaming) {
+            if (!isGaming) {
                 let bet = parseFloat(document.getElementById('bet-amount').value);
-                if (bet > state.balance || bet <= 0) return alert("Low balance!");
+                if (bet > balance || bet <= 0) return alert("Недостаточно звезд!");
                 
-                state.balance -= bet;
-                state.currentBet = bet;
-                state.isGaming = true;
-                state.multiplier = 1.0;
-                updateBalanceUI();
-
-                // АЛГОРИТМ ВЫГОДЫ:
-                // 1. С шансом 35% игра "крашнется" почти сразу (до 1.2x)
-                // 2. С шансом 60% даст чуть-чуть вырасти (до 1.5x)
-                // 3. Только с шансом 5% даст большой икс.
+                balance -= bet;
+                updateBalance();
+                isGaming = true;
+                multiplier = 1.0;
+                
+                // Шансы: 40% мгновенный краш, 50% небольшой икс, 10% удача
                 let rnd = Math.random();
-                let crashPoint;
-                if (rnd < 0.35) crashPoint = 1.0 + Math.random() * 0.2;
-                else if (rnd < 0.95) crashPoint = 1.2 + Math.random() * 0.4;
-                else crashPoint = 2.0 + Math.random() * 5;
+                let crashAt = rnd < 0.4 ? 1.05 + Math.random()*0.2 : (rnd < 0.9 ? 1.2 + Math.random()*0.5 : 2.0 + Math.random()*3);
 
-                document.getElementById('crash-btn').innerText = texts[state.lang].cashout;
+                document.getElementById('crash-btn').innerText = "ЗАБРАТЬ";
                 document.getElementById('crash-btn').classList.replace('neon-btn', 'bg-white');
 
                 crashInterval = setInterval(() => {
-                    state.multiplier += 0.02;
-                    document.getElementById('mult-display').innerText = state.multiplier.toFixed(2) + 'x';
-                    
-                    if (state.multiplier >= crashPoint) {
+                    multiplier += 0.02;
+                    document.getElementById('mult-display').innerText = multiplier.toFixed(2) + 'x';
+                    if (multiplier >= crashAt) {
                         clearInterval(crashInterval);
+                        isGaming = false;
                         document.getElementById('mult-display').classList.add('text-red-600');
-                        document.getElementById('game-status').innerText = "CRASHED!";
-                        state.isGaming = false;
+                        document.getElementById('game-status').innerText = "КРАШ!";
                         setTimeout(resetCrash, 2000);
                     }
-                }, 50);
+                }, 60);
             } else {
-                // Cash Out
-                let win = state.currentBet * state.multiplier;
-                state.balance += win;
+                let win = (parseFloat(document.getElementById('bet-amount').value) * multiplier);
+                balance += win;
                 clearInterval(crashInterval);
-                state.isGaming = false;
-                alert("Won: " + win.toFixed(2));
+                isGaming = false;
+                updateBalance();
                 resetCrash();
-                updateBalanceUI();
             }
         }
 
         function resetCrash() {
             document.getElementById('mult-display').classList.remove('text-red-600');
             document.getElementById('mult-display').innerText = "1.00x";
-            document.getElementById('crash-btn').innerText = texts[state.lang].bet;
+            document.getElementById('crash-btn').innerText = "СТАВКА";
             document.getElementById('crash-btn').classList.replace('bg-white', 'neon-btn');
-            document.getElementById('game-status').innerText = "Ready to play";
+            document.getElementById('game-status').innerText = "Готов к игре";
         }
 
-        // --- CASES LOGIC ---
+        // --- ЛОГИКА КЕЙСОВ С АНИМАЦИЕЙ ---
+        const items = [
+            { img: '⭐', val: 2.0, weight: 0.8 }, // 80% шанс на звезду (выигрыш 2 звезды)
+            { img: '🧸', val: 10.0, weight: 0.05 }, // 5% мишка
+            { img: '❤️', val: 25.0, weight: 0.03 }, // 3% сердце
+            { img: '🌹', val: 50.0, weight: 0.02 }, // 2% роза
+            { img: '💩', val: 0.0, weight: 0.1 }   // 10% мусор
+        ];
+
+        function initRoulette() {
+            const track = document.getElementById('rouletteTrack');
+            track.innerHTML = '';
+            // Создаем 50 элементов для ленты
+            for (let i = 0; i < 50; i++) {
+                let item = items[0]; // По умолчанию звезда
+                let r = Math.random();
+                if (r < 0.02) item = items[3];
+                else if (r < 0.05) item = items[2];
+                else if (r < 0.1) item = items[1];
+                
+                const div = document.createElement('div');
+                div.className = 'roulette-item';
+                div.innerHTML = `<span>${item.img}</span><span class="text-[8px] mt-1">${item.val}</span>`;
+                track.appendChild(div);
+            }
+        }
+
         function openCase(cost) {
-            if (state.balance < cost) return alert("Low balance!");
-            state.balance -= cost;
-            updateBalanceUI();
+            if (balance < cost) return alert("Мало звезд!");
+            balance -= cost;
+            updateBalance();
             
-            // Алгоритм кейса: чаще всего выпадает 0.8x от стоимости
-            let prizes = [cost*0.2, cost*0.5, cost*0.8, cost*1.2, cost*2];
-            let win = prizes[Math.floor(Math.random() * 3)]; // Чаще первые 3 (убыточные)
+            const track = document.getElementById('rouletteTrack');
+            const btn = document.getElementById('open-btn');
+            btn.disabled = true;
             
-            alert("Opening case...");
-            setTimeout(() => {
-                state.balance += win;
-                updateBalanceUI();
-                alert("You found: " + win.toFixed(2) + " ⭐");
-            }, 1000);
-        }
+            // Генерируем финальный результат (с нашей выгодой)
+            let finalIdx = 40 + Math.floor(Math.random() * 5); // Целимся в конец ленты
+            let randWin = Math.random();
+            let winObj = items[0]; // Чаще всего звезда
+            
+            if (randWin < 0.05) winObj = items[1]; // Редкие
+            else if (randWin < 0.01) winObj = items[3];
 
+            // Подменяем элемент в ленте, на котором остановимся
+            track.children[finalIdx].innerHTML = `<span>${winObj.img}</span><span class="text-[8px] mt-1">${winObj.val}</span>`;
+
+            const offset = (finalIdx * 90) - (track.parentElement.offsetWidth / 2) + 45;
+            track.style.transform = `translateX(-${offset}px)`;
+
+            setTimeout(() => {
+                balance += winObj.val;
+                updateBalance();
+                document.getElementById('case-result').innerText = `ВЫИГРЫШ: ${winObj.img} (${winObj.val} ⭐)`;
+                
+                setTimeout(() => {
+                    track.style.transition = 'none';
+                    track.style.transform = 'translateX(0)';
+                    initRoulette();
+                    setTimeout(() => track.style.transition = 'transform 4s cubic-bezier(0.15, 0, 0.05, 1)', 50);
+                    btn.disabled = false;
+                    document.getElementById('case-result').innerText = '';
+                }, 2000);
+            }, 4100);
+        }
     </script>
 </body>
 </html>
