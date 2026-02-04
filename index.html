@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OrbitUp App</title>
+    <title>OrbitUp Final Production</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
@@ -70,9 +70,6 @@
         .p-tabs { background: #111; padding: 4px; border-radius: 12px; display: flex; margin-bottom: 15px; border: 1px solid #222; }
         .p-tab { flex: 1; text-align: center; padding: 8px 0; font-size: 12px; font-weight: 600; color: #666; border-radius: 8px; transition: 0.2s; }
         .p-tab.active { background: #2C2C2E; color: white; }
-        
-        /* Ton Connect Button Customization override */
-        #ton-connect-btn-wrap button { width: 100% !important; justify-content: center; border-radius: 14px !important; font-weight: bold !important; }
     </style>
 </head>
 <body>
@@ -83,10 +80,10 @@
     </div>
 
     <header class="pt-3 px-5 flex justify-between items-center z-20 relative">
-        <div onclick="nav('profile')" class="glass-panel rounded-xl py-2 px-3 flex items-center gap-3 border-l-2 border-[#39FF14]" id="balance-container">
+        <div class="glass-panel rounded-xl py-2 px-3 flex items-center gap-3 border-l-2 border-[#39FF14]" id="balance-container">
             <div id="headerIcon" class="w-6 h-6 flex items-center justify-center"></div>
             <div class="flex flex-col leading-none">
-                <span class="text-[8px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Баланс</span>
+                <span class="text-[8px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Ваш Баланс</span>
                 <span class="font-tech font-bold text-lg text-white" id="headerBalance">0</span>
             </div>
         </div>
@@ -219,16 +216,16 @@
             </div>
 
             <div id="ton-area" class="hidden flex flex-col gap-4">
-                <div id="ton-connect-btn-wrap"></div>
-                <div class="bg-[#111] p-3 rounded-xl border border-gray-800 text-center">
-                    <p class="text-[10px] text-gray-500 mb-2">Введите сумму TON после подключения</p>
-                    <input id="wallet-input-ton" type="number" placeholder="0.00" class="w-full bg-transparent text-center text-white font-bold text-xl outline-none">
-                </div>
-                <button onclick="processTonPayment()" class="w-full primary-btn py-4 rounded-xl font-bold">Оплатил</button>
+                <div class="text-center mb-2 text-xs text-gray-400">1. Подключите кошелек</div>
+                <div id="ton-connect-btn-wrap" class="w-full flex justify-center"></div>
+                
+                <div class="text-center mt-4 text-xs text-gray-400">2. Введите сумму TON и оплатите</div>
+                <input id="wallet-input-ton" type="number" placeholder="Сумма в TON" class="w-full bg-black p-4 rounded-xl text-center text-white font-bold text-xl outline-none border border-[#333]">
+                <button onclick="processTonPayment()" class="w-full primary-btn py-4 rounded-xl font-bold">ОПЛАТИТЬ</button>
             </div>
 
             <div id="stars-area">
-                <input id="wallet-input" type="number" placeholder="Сумма" class="w-full bg-black p-4 rounded-xl text-center text-white font-bold text-xl outline-none mb-4 border border-[#333]">
+                <input id="wallet-input" type="number" placeholder="Сумма в Stars" class="w-full bg-black p-4 rounded-xl text-center text-white font-bold text-xl outline-none mb-4 border border-[#333]">
                 <button onclick="processWallet()" class="w-full primary-btn py-4 rounded-xl font-bold" id="wallet-action-btn">Подтвердить</button>
             </div>
         </div>
@@ -251,15 +248,18 @@
     <script>
         // === INITIALIZE TON CONNECT ===
         const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json', // USE YOUR MANIFEST URL HERE
+            manifestUrl: 'https://ton-connect.github.io/demo-dapp-with-react-ui/tonconnect-manifest.json', // Required for TonConnect
             buttonRootId: 'ton-connect-btn-wrap'
         });
 
+        // ⚠️ YOUR WALLET ADDRESS
+        const MY_WALLET_ADDRESS = "UQBLYVXsKcTwo2vegPZKQkR3lFowRYa2IK5_6OC8sXOyMh0p"; 
+
         // === STATE & STORAGE ===
         let state = { balances: { stars: 0, ton: 0.0 }, lastDaily: 0, history: [] };
-        const saved = localStorage.getItem('orbitUpVFinal');
+        const saved = localStorage.getItem('orbitUpFinalV12');
         if(saved) { try { state = JSON.parse(saved); } catch(e){} }
-        function saveState() { localStorage.setItem('orbitUpVFinal', JSON.stringify(state)); }
+        function saveState() { localStorage.setItem('orbitUpFinalV12', JSON.stringify(state)); }
 
         let activeCurr = 'stars'; 
         let walletCurr = 'stars';
@@ -472,22 +472,17 @@
             const btn = document.getElementById('spinBtn');
             btn.disabled = true;
             const track = document.getElementById('rouletteTrack');
-            
-            // House Edge
             let r = Math.random();
             let winIdx = r < 0.5 ? 0 : (r < 0.8 ? 1 : (r < 0.95 ? 2 : 4));
             if(winIdx >= activeCase.prizes.length) winIdx = 0;
             let winAmount = activeCase.prizes[winIdx];
             let targetIdx = 45; 
-            
             track.children[targetIdx].innerHTML = `<span class="text-xl font-bold text-white">${winAmount}</span>`;
             track.children[targetIdx].style.background = activeCase.color;
             if(activeCase.color === '#FFFFFF') track.children[targetIdx].style.color = 'black';
-            
             let offset = (targetIdx * 98) - (track.parentElement.offsetWidth / 2) + 49;
             track.style.transition = 'transform 4s cubic-bezier(0.1,0,0,1)';
             track.style.transform = `translateX(-${offset}px)`;
-            
             setTimeout(() => {
                 state.balances[activeCase.curr] += winAmount;
                 if(activeCase.id === 3) state.lastDaily = Date.now();
@@ -504,12 +499,13 @@
             document.getElementById('cases-list').classList.remove('hidden');
         }
 
-        // === WALLET ===
+        // === WALLET & REAL TON ===
         function openWallet(mode) { 
             walletMode = mode;
             document.getElementById('wallet-modal').classList.remove('hidden'); 
             document.getElementById('wallet-title').innerText = mode === 'dep' ? "Пополнение" : "Вывод средств";
-            switchWalletCurr('stars'); // reset to default
+            document.getElementById('wallet-action-btn').innerText = mode === 'dep' ? "Пополнить" : "Вывести";
+            switchWalletCurr('stars'); 
         }
         function openGiftModal() { document.getElementById('gift-modal').classList.remove('hidden'); }
         
@@ -518,20 +514,16 @@
             if(c==='stars') {
                 document.getElementById('wc-stars').className="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition";
                 document.getElementById('wc-ton').className="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition";
-                
-                // Show Input
                 document.getElementById('stars-area').classList.remove('hidden');
                 document.getElementById('ton-area').classList.add('hidden');
             } else {
                 document.getElementById('wc-ton').className="flex-1 py-3 rounded-xl border border-[#007AFF] bg-[#007AFF]/10 text-[#007AFF] font-bold text-xs transition";
                 document.getElementById('wc-stars').className="flex-1 py-3 rounded-xl border border-gray-700 bg-transparent text-gray-500 font-bold text-xs transition";
-                
-                // Show Connect
                 if(walletMode === 'dep') {
                     document.getElementById('stars-area').classList.add('hidden');
                     document.getElementById('ton-area').classList.remove('hidden');
                 } else {
-                    document.getElementById('stars-area').classList.remove('hidden'); // Withdraw for TON same input for now
+                    document.getElementById('stars-area').classList.remove('hidden'); 
                     document.getElementById('ton-area').classList.add('hidden');
                 }
             }
@@ -554,19 +546,28 @@
         }
 
         async function processTonPayment() {
-            // Emulate Check
-            let val = parseFloat(document.getElementById('wallet-input-ton').value);
-            if(!val || val <= 0) return alert('Введите сумму');
-            
-            const wallet = tonConnectUI.wallet;
-            if(!wallet) return alert('Сначала подключите кошелек!');
+            const amount = parseFloat(document.getElementById('wallet-input-ton').value);
+            if(!amount || amount <= 0) return alert("Введите сумму");
 
-            // In real app -> Send Transaction here via SDK
-            // Simulation of success:
-            state.balances.ton += val;
-            saveState(); updateHeader();
-            alert('Транзакция проверена! Баланс пополнен.');
-            document.getElementById('wallet-modal').classList.add('hidden');
+            const transaction = {
+                validUntil: Math.floor(Date.now() / 1000) + 600,
+                messages: [
+                    {
+                        address: MY_WALLET_ADDRESS,
+                        amount: (amount * 1000000000).toString() 
+                    }
+                ]
+            };
+
+            try {
+                const result = await tonConnectUI.sendTransaction(transaction);
+                state.balances.ton += amount;
+                saveState(); updateHeader();
+                alert("Успешно пополнено!");
+                document.getElementById('wallet-modal').classList.add('hidden');
+            } catch (e) {
+                alert("Ошибка или отмена транзакции");
+            }
         }
 
         function switchTab(t, btn) {
