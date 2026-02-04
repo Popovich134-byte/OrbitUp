@@ -3,186 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Neon Gaming TMA</title>
+    <title>Neon Gaming Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;700&display=swap');
-        :root { --neon: #39FF14; --gold: #FFD700; --dark: #050505; }
-        body { background: var(--dark); color: white; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; margin: 0; }
-        .neon-text { font-family: 'Orbitron', sans-serif; color: var(--neon); text-shadow: 0 0 10px rgba(57, 255, 20, 0.5); }
-        .neon-btn { background: var(--neon); color: black; font-weight: bold; border-radius: 12px; transition: all 0.2s; }
-        .neon-btn:disabled { background: #1a1a1a; color: #444; box-shadow: none; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .tab-content { display: none; height: calc(100vh - 170px); overflow-y: auto; padding: 20px; }
-        .tab-content.active { display: block; }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600&display=swap');
+        
+        :root { 
+            --neon: #39FF14; 
+            --neon-dim: rgba(57, 255, 20, 0.1);
+            --gold: #FFD700; 
+            --bg: #050505; 
+            --panel: #0f0f0f;
+        }
+
+        body { 
+            background: var(--bg); 
+            color: white; 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        
+        /* Типографика */
+        .font-tech { font-family: 'Orbitron', sans-serif; }
+        .text-neon { color: var(--neon); text-shadow: 0 0 12px rgba(57, 255, 20, 0.6); }
+        
+        /* Элементы интерфейса */
+        .glass-panel { 
+            background: rgba(20, 20, 20, 0.6); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+        }
+
+        .neon-btn { 
+            background: var(--neon); 
+            color: black; 
+            font-weight: 800; 
+            border-radius: 16px; 
+            transition: transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 0 20px rgba(57, 255, 20, 0.3);
+        }
+        .neon-btn:active { transform: scale(0.96); }
+
+        /* Навигация (Bottom Dock) */
+        .nav-dock {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            background: rgba(15, 15, 15, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 24px;
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.8);
+            z-index: 50;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .nav-item.active {
+            color: var(--neon);
+            text-shadow: 0 0 10px var(--neon-dim);
+        }
+        .nav-item.active svg {
+            filter: drop-shadow(0 0 5px var(--neon));
+        }
 
         /* Рулетка */
-        .roulette-container { position: relative; width: 100%; height: 130px; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #222; }
-        .roulette-track { display: flex; position: absolute; left: 0; align-items: center; height: 100%; will-change: transform; }
-        .roulette-item { min-width: 90px; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111; margin: 0 5px; border-radius: 15px; border: 1px solid #222; }
-        .gold-border { border: 2px solid var(--gold) !important; box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.3); }
+        .roulette-container { position: relative; width: 100%; height: 120px; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid #222; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
+        .roulette-track { display: flex; position: absolute; left: 0; align-items: center; height: 100%; transition: transform 4s cubic-bezier(0.15, 0, 0.05, 1); }
+        .roulette-item { min-width: 90px; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111; margin: 0 5px; border-radius: 16px; border: 1px solid #222; }
+        .gold-border { border: 2px solid var(--gold) !important; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); background: radial-gradient(circle at center, rgba(255,215,0,0.1), #111); }
         .roulette-marker { position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: var(--neon); z-index: 10; transform: translateX(-50%); box-shadow: 0 0 15px var(--neon); }
-        
-        /* Ракета */
-        #rocket { position: absolute; font-size: 2.5rem; z-index: 5; pointer-events: none; filter: drop-shadow(0 0 10px var(--neon)); transition: opacity 0.3s; }
+
+        /* Вкладки */
+        .tab-content { display: none; height: calc(100vh - 180px); overflow-y: auto; padding: 20px; padding-bottom: 100px; }
+        .tab-content.active { display: block; animation: fadeUp 0.3s ease; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Wallet Modal */
+        #wallet-overlay { transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); transform: translateY(100%); }
+        #wallet-overlay.open { transform: translateY(0); }
+
+        /* Rocket */
+        #rocket { position: absolute; font-size: 3rem; transition: opacity 0.2s; z-index: 5; pointer-events: none; filter: drop-shadow(0 0 8px var(--neon)); }
     </style>
 </head>
 <body>
 
-    <header class="p-4 flex justify-between items-center border-b border-gray-900 bg-black/50">
-        <div>
-            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Баланс</p>
-            <div class="flex items-center gap-2">
-                <span class="text-2xl font-black neon-text" id="balanceDisplay">10.00</span>
-                <span class="text-sm">⭐</span>
+    <header class="pt-4 px-6 pb-2 flex justify-between items-center z-10 relative">
+        <div onclick="openWallet()" class="glass-panel rounded-2xl p-1 pr-4 pl-1 flex items-center gap-3 cursor-pointer active:scale-95 transition">
+            <div class="bg-[#1a1a1a] rounded-xl p-2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#39FF14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2" /><line x1="2" y1="10" x2="22" y2="10" /></svg>
+            </div>
+            <div>
+                <p class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Balance</p>
+                <div class="flex items-center gap-1">
+                    <span class="font-tech font-bold text-lg text-white" id="balanceDisplay">10.00</span>
+                    <span class="text-xs text-yellow-400">⭐</span>
+                </div>
             </div>
         </div>
-        <div class="flex items-center gap-2 glass px-3 py-1 rounded-full text-[10px] font-bold">
-            <span class="text-[#39FF14] animate-pulse">●</span> LIVE
+
+        <div class="text-right">
+            <div class="flex items-center justify-end gap-2 mb-1">
+                <span class="text-[10px] text-gray-500 font-bold uppercase">Lvl <span id="lvlDisplay" class="text-white text-sm">1</span></span>
+            </div>
+            <div class="w-24 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                <div id="xpBar" class="h-full bg-[#39FF14] shadow-[0_0_8px_#39FF14]" style="width: 0%;"></div>
+            </div>
         </div>
     </header>
 
     <main>
         <section id="page-crash" class="tab-content active">
-            <div class="bg-[#080808] rounded-[2rem] p-4 border border-gray-900 mb-6 h-64 relative overflow-hidden flex flex-col items-center justify-center">
+            <div class="relative w-full h-80 bg-[#080808] rounded-[30px] border border-gray-800 mb-6 overflow-hidden flex flex-col items-center justify-center shadow-2xl">
+                <div class="absolute inset-0" style="background-image: radial-gradient(#1a1a1a 1px, transparent 1px); background-size: 20px 20px; opacity: 0.5;"></div>
+                
                 <div id="rocket" style="bottom: 10%; left: 10%; opacity: 0;">🚀</div>
-                <div id="mult-display" class="text-6xl font-black neon-text z-10">1.00x</div>
-                <div id="game-status" class="text-[10px] text-gray-500 uppercase mt-2 font-bold tracking-widest">Ожидание...</div>
-                <div id="timer-bar" class="absolute bottom-0 left-0 h-1 bg-[#39FF14] w-0"></div>
+                <div id="mult-display" class="relative z-10 text-6xl font-black font-tech text-white">1.00x</div>
+                <div id="game-status" class="relative z-10 text-[10px] text-gray-500 font-bold uppercase tracking-[0.2em] mt-2">Connecting...</div>
+
+                <div id="timer-bar" class="absolute bottom-0 left-0 h-1.5 bg-[#39FF14] w-0 shadow-[0_0_10px_#39FF14]"></div>
             </div>
 
-            <div class="glass rounded-3xl p-6">
-                <p class="text-[10px] text-gray-500 mb-2 uppercase font-bold">Ваша ставка</p>
-                <div class="flex gap-3">
-                    <input id="betInput" type="number" value="1.0" class="bg-black border border-gray-800 rounded-xl flex-grow p-4 text-center font-bold outline-none focus:border-[#39FF14]">
-                    <button onclick="handleBetClick()" id="crashBtn" class="w-1/2 neon-btn uppercase text-sm shadow-lg shadow-green-900/20">Ставка</button>
+            <div class="glass-panel rounded-[24px] p-5">
+                <div class="flex gap-4">
+                    <div class="relative flex-grow">
+                        <input id="betInput" type="number" value="1.0" class="w-full bg-[#050505] border border-gray-700 rounded-2xl p-4 text-center text-xl font-bold text-white outline-none focus:border-[#39FF14] transition">
+                        <span class="absolute top-1/2 -translate-y-1/2 right-4 text-xs text-gray-600 font-bold">STARS</span>
+                    </div>
+                    <button onclick="handleBetClick()" id="crashBtn" class="w-1/2 neon-btn text-sm uppercase tracking-wider">Ставка</button>
                 </div>
             </div>
         </section>
 
         <section id="page-cases" class="tab-content">
-            <h2 class="text-xl font-black mb-4 uppercase text-center neon-text">Mystery Box</h2>
-            <div class="roulette-container mb-6">
+            <h2 class="text-center font-tech text-2xl font-black italic uppercase text-white mb-6">Mystery <span class="text-neon">Box</span></h2>
+            
+            <div class="roulette-container mb-8">
                 <div class="roulette-marker"></div>
-                <div id="rouletteTrack" class="roulette-track" style="transition: transform 4s cubic-bezier(0.15, 0, 0.05, 1);"></div>
+                <div id="rouletteTrack" class="roulette-track"></div>
             </div>
 
-            <div class="bg-gradient-to-b from-gray-900 to-black p-6 rounded-[2rem] border border-gray-800 text-center">
-                <p class="text-gray-400 text-xs mb-1">Стоимость открытия</p>
-                <p class="text-xl font-bold mb-4">5.00 ⭐</p>
-                <button onclick="openCase()" id="caseBtn" class="w-full py-4 neon-btn uppercase tracking-widest">Открыть кейс</button>
+            <div class="glass-panel p-1 rounded-[32px] border border-[#39FF14]/20 relative overflow-hidden group">
+                <div class="bg-[#0a0a0a] rounded-[28px] p-6 text-center relative z-10">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-[#39FF14]/10 rounded-full flex items-center justify-center text-3xl animate-pulse">🎁</div>
+                    <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Стоимость</p>
+                    <p class="text-3xl font-tech font-bold text-white mb-6">5.00 <span class="text-yellow-500 text-lg">⭐</span></p>
+                    <button onclick="openCase()" id="caseBtn" class="w-full py-4 neon-btn text-black uppercase font-black tracking-widest shadow-lg">Открыть</button>
+                </div>
+                <div class="absolute inset-0 bg-[#39FF14] opacity-5 blur-xl"></div>
             </div>
         </section>
 
-        <section id="page-profile" class="tab-content text-center">
-            <div class="w-24 h-24 bg-gray-900 rounded-full mx-auto mb-4 border-2 border-[#39FF14] flex items-center justify-center text-4xl">🤴</div>
-            <h2 class="text-xl font-bold uppercase tracking-widest">Player One</h2>
-            <p class="text-[#39FF14] text-xs">VIP Статус</p>
-            <div class="mt-10 grid grid-cols-2 gap-4">
-                <div class="glass p-5 rounded-2xl border-b-2 border-green-500"><p class="text-xs text-gray-500 uppercase">Игр</p><p class="text-xl font-bold">48</p></div>
-                <div class="glass p-5 rounded-2xl border-b-2 border-yellow-500"><p class="text-xs text-gray-500 uppercase">Рекорд</p><p class="text-xl font-bold">12.5x</p></div>
+        <section id="page-profile" class="tab-content">
+            <div class="flex flex-col items-center mt-4 mb-8">
+                <div class="w-28 h-28 rounded-full p-1 bg-gradient-to-br from-[#39FF14] to-black mb-4 shadow-[0_0_30px_rgba(57,255,20,0.15)]">
+                    <div class="w-full h-full bg-[#0a0a0a] rounded-full flex items-center justify-center text-5xl">
+                        🦊
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold text-white">Crypto Master</h2>
+                <div class="flex items-center gap-2 mt-2 px-3 py-1 bg-[#39FF14]/10 rounded-full border border-[#39FF14]/30">
+                    <span class="w-2 h-2 bg-[#39FF14] rounded-full animate-pulse"></span>
+                    <span class="text-[#39FF14] text-xs font-bold uppercase tracking-wide">Online</span>
+                </div>
             </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-panel p-5 rounded-3xl border-l-4 border-[#39FF14]">
+                    <div class="text-gray-500 mb-2">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
+                    </div>
+                    <p class="text-xs text-gray-400 uppercase font-bold">Всего игр</p>
+                    <p class="text-2xl font-tech font-bold text-white mt-1" id="totalGames">0</p>
+                </div>
+                <div class="glass-panel p-5 rounded-3xl border-l-4 border-yellow-500">
+                    <div class="text-gray-500 mb-2">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><rect x="4" y="14" width="16" height="6" rx="2"/></svg>
+                    </div>
+                    <p class="text-xs text-gray-400 uppercase font-bold">Выиграно</p>
+                    <p class="text-2xl font-tech font-bold text-[#39FF14] mt-1" id="totalWins">0</p>
+                </div>
+            </div>
+            
+            <button class="w-full mt-6 py-4 rounded-2xl border border-gray-800 text-gray-500 font-bold uppercase text-xs hover:bg-white/5 transition">Настройки</button>
         </section>
     </main>
 
-    <nav class="fixed bottom-6 left-6 right-6 h-18 glass rounded-[2rem] flex justify-around items-center border border-white/10 z-50 p-2">
-        <button onclick="nav('crash')" class="p-3">📈</button>
-        <button onclick="nav('cases')" class="p-3">🎁</button>
-        <button onclick="nav('profile')" class="p-3">👤</button>
+    <nav class="nav-dock">
+        <button onclick="nav('crash')" id="nav-crash" class="nav-item active">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.48-.56.93-1.23 1.35-2h4.65c.96 0 1.88.38 2.59 1.06l.32.32a.75.75 0 0 0 1.06 0l2.12-2.12a.75.75 0 0 0 0-1.06l-.32-.32a3.68 3.68 0 0 0-1.06-2.59V8.15c.77-.42 1.44-.87 2-1.35 1.5-1.26 2-5 2-5s-3.74.5-5 2c-.48.56-.93 1.23-1.35 2H9.85c-.96 0-1.88-.38-2.59-1.06l-.32-.32a.75.75 0 0 0-1.06 0L3.76 6.54a.75.75 0 0 0 0 1.06l.32.32c.68.71 1.06 1.63 1.06 2.59v4.65c-.42.77-.87 1.44-1.35 2z"/>
+            </svg>
+        </button>
+        
+        <button onclick="nav('cases')" id="nav-cases" class="nav-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+        </button>
+        
+        <button onclick="nav('profile')" id="nav-profile" class="nav-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+        </button>
     </nav>
+
+    <div id="wallet-overlay" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm hidden flex flex-col justify-end">
+        <div class="bg-[#0f0f0f] rounded-t-[40px] p-8 border-t border-[#39FF14]/30 shadow-[0_-10px_40px_rgba(0,0,0,0.8)]">
+            <div class="w-12 h-1 bg-gray-700 mx-auto mb-8 rounded-full cursor-pointer" onclick="closeWallet()"></div>
+            
+            <div id="wallet-main">
+                <h3 class="text-center font-tech text-xl text-white mb-6">WALLET ACTION</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="showWalletForm('dep')" class="h-32 bg-[#1a1a1a] rounded-3xl border border-gray-800 hover:border-[#39FF14] transition flex flex-col items-center justify-center gap-2 group">
+                        <div class="w-10 h-10 rounded-full bg-[#39FF14]/10 text-[#39FF14] flex items-center justify-center text-xl group-hover:scale-110 transition">↓</div>
+                        <span class="text-xs font-bold uppercase text-gray-400 group-hover:text-white">Пополнить</span>
+                    </button>
+                    <button onclick="showWalletForm('with')" class="h-32 bg-[#1a1a1a] rounded-3xl border border-gray-800 hover:border-white transition flex flex-col items-center justify-center gap-2 group">
+                        <div class="w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center text-xl group-hover:scale-110 transition">↑</div>
+                        <span class="text-xs font-bold uppercase text-gray-400 group-hover:text-white">Вывести</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="wallet-form" class="hidden">
+                <h4 id="form-title" class="text-center font-bold mb-6 uppercase text-[#39FF14] tracking-widest">Пополнение</h4>
+                <div class="relative mb-6">
+                    <input id="wallet-amount" type="number" placeholder="0.00" class="w-full bg-black border border-gray-800 p-6 rounded-3xl text-center text-3xl font-tech font-bold text-white outline-none focus:border-[#39FF14]">
+                </div>
+                <button onclick="processWalletAction()" class="w-full py-4 neon-btn text-black uppercase font-black tracking-widest mb-3">Подтвердить</button>
+                <button onclick="resetWalletUI()" class="w-full text-gray-600 text-xs uppercase font-bold py-3 hover:text-white">Отмена</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // --- ДАННЫЕ ---
-        let balance = 10.0;
+        let user = { balance: 10.00, xp: 0, level: 1, games: 0, wins: 0 };
         let game = { state: 'waiting', mult: 1.0, crashAt: 0, myBet: 0, cashedOut: false };
-        const casePrizes = [
-            { s: '⭐', n: '2 звезды', v: 2.0, w: 0.85, gold: false },
-            { s: '🧸', n: '15 звезд', v: 15.0, w: 0.08, gold: false },
-            { s: '💖', n: '15 звезд', v: 15.0, w: 0.05, gold: true },
-            { s: '🌹', n: '25 звезд', v: 25.0, w: 0.02, gold: false }
-        ];
+        let walletMode = '';
 
-        // --- КРАШ ЛОГИКА ---
-        function runCrashCycle() {
-            game.state = 'waiting';
-            game.cashedOut = false;
-            game.mult = 1.0;
+        // --- ЛОГИКА ---
+        function updateUI() {
+            document.getElementById('balanceDisplay').innerText = user.balance.toFixed(2);
+            document.getElementById('lvlDisplay').innerText = user.level;
+            document.getElementById('xpBar').style.width = user.xp + '%';
+            document.getElementById('totalGames').innerText = user.games;
+            document.getElementById('totalWins').innerText = user.wins.toFixed(0);
+
+            const btn = document.getElementById('crashBtn');
+            if (game.state === 'waiting') {
+                btn.innerText = game.myBet > 0 ? 'Ждем...' : 'СТАВКА';
+                btn.className = game.myBet > 0 ? 'w-1/2 bg-[#1a1a1a] text-gray-400 rounded-xl font-bold text-sm' : 'w-1/2 neon-btn text-sm uppercase tracking-wider';
+            } else if (game.state === 'flying') {
+                btn.innerText = (game.myBet > 0 && !game.cashedOut) ? `ЗАБРАТЬ ${(game.myBet*game.mult).toFixed(1)}` : 'ПОЛЕТ...';
+                btn.className = (game.myBet > 0 && !game.cashedOut) ? 'w-1/2 bg-white text-black font-black rounded-xl uppercase text-sm shadow-[0_0_20px_white]' : 'w-1/2 bg-[#1a1a1a] text-gray-500 rounded-xl font-bold text-sm';
+            } else {
+                btn.innerText = 'КРАШ!';
+                btn.className = 'w-1/2 bg-red-600/20 text-red-500 border border-red-500 rounded-xl uppercase text-sm font-bold';
+            }
+        }
+
+        function nav(p) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('page-'+p).classList.add('active');
             
-            let timer = 5000;
+            // Обновление иконок
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            document.getElementById('nav-'+p).classList.add('active');
+        }
+
+        // --- GAME CYCLES ---
+        function runCrashCycle() {
+            game.state = 'waiting'; game.cashedOut = false; game.mult = 1.0;
             const bar = document.getElementById('timer-bar');
-            bar.style.width = '100%';
-            bar.style.transition = 'width 5s linear';
-            document.getElementById('game-status').innerText = 'Старт через 5.0с';
+            bar.style.width = '100%'; bar.style.transition = 'width 5s linear';
+            document.getElementById('game-status').innerText = 'ПОДГОТОВКА К ЗАПУСКУ';
             document.getElementById('rocket').style.opacity = '0';
-            document.getElementById('mult-display').classList.remove('text-red-600', 'text-[#39FF14]');
+            document.getElementById('mult-display').className = 'relative z-10 text-6xl font-black font-tech text-white';
+            updateUI();
 
             setTimeout(() => {
-                bar.style.transition = 'none';
-                bar.style.width = '0%';
+                bar.style.transition = 'none'; bar.style.width = '0%';
                 launchRocket();
             }, 5000);
         }
 
         function launchRocket() {
             game.state = 'flying';
-            // Алгоритм выгоды (RTP)
             let r = Math.random();
-            game.crashAt = r < 0.35 ? 1.0 + Math.random()*0.2 : (r < 0.9 ? 1.2 + Math.random()*0.8 : 2.0 + Math.random()*4);
+            game.crashAt = r < 0.4 ? 1.1 + Math.random()*0.3 : (r < 0.9 ? 1.4 + Math.random() : 2.5 + Math.random()*5);
             
-            document.getElementById('game-status').innerText = 'В ПОЛЕТЕ';
-            const rocket = document.getElementById('rocket');
-            rocket.style.opacity = '1';
-
-            const interval = setInterval(() => {
-                if (game.state !== 'flying') { clearInterval(interval); return; }
-                
+            document.getElementById('rocket').style.opacity = '1';
+            document.getElementById('game-status').innerText = 'НАБОР ВЫСОТЫ';
+            
+            const intrvl = setInterval(() => {
+                if (game.state !== 'flying') { clearInterval(intrvl); return; }
                 game.mult += 0.02;
                 document.getElementById('mult-display').innerText = game.mult.toFixed(2) + 'x';
                 
-                // Движение ракеты
-                let pos = Math.min(75, game.mult * 8);
-                rocket.style.bottom = (10 + pos/2) + '%';
-                rocket.style.left = (10 + pos) + '%';
+                let p = Math.min(75, game.mult * 8);
+                document.getElementById('rocket').style.bottom = (10 + p/2) + '%';
+                document.getElementById('rocket').style.left = (10 + p) + '%';
 
                 if (game.mult >= game.crashAt) {
                     game.state = 'crashed';
                     document.getElementById('mult-display').innerText = 'CRASH';
-                    document.getElementById('mult-display').classList.add('text-red-600');
-                    rocket.style.opacity = '0';
-                    game.myBet = 0;
-                    updateUI();
+                    document.getElementById('mult-display').className = 'relative z-10 text-6xl font-black font-tech text-red-500';
+                    document.getElementById('rocket').style.opacity = '0';
+                    document.getElementById('game-status').innerText = 'КРУШЕНИЕ';
+                    if(game.myBet > 0) user.xp += 2;
+                    game.myBet = 0; updateUI();
                     setTimeout(runCrashCycle, 3000);
-                    clearInterval(interval);
+                    clearInterval(intrvl);
                 }
             }, 60);
         }
 
         function handleBetClick() {
-            const amt = parseFloat(document.getElementById('betInput').value);
+            let amt = parseFloat(document.getElementById('betInput').value);
             if (game.state === 'waiting' && game.myBet === 0) {
-                if (amt > balance) return alert('Недостаточно звезд!');
-                balance -= amt;
-                game.myBet = amt;
-                updateUI();
+                if (amt > user.balance) return alert('Мало денег!');
+                user.balance -= amt; game.myBet = amt; user.games++; updateUI();
             } else if (game.state === 'flying' && game.myBet > 0 && !game.cashedOut) {
                 let win = game.myBet * game.mult;
-                balance += win;
-                game.cashedOut = true;
-                document.getElementById('mult-display').classList.add('text-[#39FF14]');
-                alert('Выигрыш: ' + win.toFixed(2) + ' ⭐');
+                user.balance += win; user.wins += win; game.cashedOut = true;
+                user.xp += 10;
+                if(user.xp >= 100) { user.xp=0; user.level++; }
                 updateUI();
             }
         }
 
-        // --- КЕЙС ЛОГИКА ---
-        function createItem(itemData) {
-            const div = document.createElement('div');
-            div.className = `roulette-item ${itemData.gold ? 'gold-border' : ''}`;
-            div.innerHTML = `
-                <span class="text-3xl">${itemData.s}</span>
-                <span class="text-[8px] mt-2 font-bold uppercase text-gray-400">${itemData.n}</span>
-            `;
-            return div;
+        // --- CASES ---
+        const prizes = [
+            { s: '⭐', n: '2 STARS', v: 2.0, w: 0.8, gold: false },
+            { s: '🧸', n: '15 STARS', v: 15.0, w: 0.1, gold: false },
+            { s: '💖', n: '15 STARS', v: 15.0, w: 0.07, gold: true },
+            { s: '🌹', n: '25 STARS', v: 25.0, w: 0.03, gold: false }
+        ];
+
+        function createCaseItem(p) {
+            const d = document.createElement('div');
+            d.className = `roulette-item ${p.gold ? 'gold-border' : ''}`;
+            d.innerHTML = `<span class="text-3xl">${p.s}</span><span class="text-[7px] mt-2 text-gray-500 font-bold uppercase">${p.n}</span>`;
+            return d;
         }
 
         function initRoulette() {
@@ -190,79 +376,50 @@
             track.innerHTML = '';
             for(let i=0; i<60; i++) {
                 let r = Math.random();
-                let prize = casePrizes[0];
-                if(r < 0.02) prize = casePrizes[3];
-                else if(r < 0.07) prize = casePrizes[2];
-                else if(r < 0.15) prize = casePrizes[1];
-                track.appendChild(createItem(prize));
+                let p = prizes[0];
+                if(r < 0.05) p = prizes[3]; else if(r < 0.1) p = prizes[2]; else if(r < 0.2) p = prizes[1];
+                track.appendChild(createCaseItem(p));
             }
         }
 
         function openCase() {
-            if(balance < 5) return alert('Нужно 5.00 ⭐');
-            balance -= 5;
-            updateUI();
-            
-            const btn = document.getElementById('caseBtn');
-            btn.disabled = true;
-            
+            if(user.balance < 5) return alert('Нужно 5.00 ⭐');
+            user.balance -= 5; user.games++; updateUI();
             const track = document.getElementById('rouletteTrack');
-            let targetIdx = 45 + Math.floor(Math.random() * 5);
+            document.getElementById('caseBtn').disabled = true;
             
-            // Наша выгода: в 90% случаев выигрыш - звезда (2 звезды)
-            let finalWin = Math.random() > 0.1 ? casePrizes[0] : casePrizes[Math.floor(Math.random()*3)];
-            
-            // Заменяем элемент в рулетке
-            track.children[targetIdx].replaceWith(createItem(finalWin));
+            let targetIdx = 48;
+            let finalWin = Math.random() > 0.15 ? prizes[0] : prizes[1];
+            track.children[targetIdx].replaceWith(createCaseItem(finalWin));
 
-            const offset = (targetIdx * 100) - (track.parentElement.offsetWidth / 2) + 50;
-            track.style.transition = 'transform 4s cubic-bezier(0.15, 0, 0.05, 1)';
-            track.style.transform = `translateX(-${offset}px)`;
+            const x = (targetIdx * 100) - (track.parentElement.offsetWidth / 2) + 50;
+            track.style.transform = `translateX(-${x}px)`;
 
             setTimeout(() => {
-                balance += finalWin.v;
+                user.balance += finalWin.v; user.wins += finalWin.v; user.xp += 15;
                 updateUI();
-                alert(`Вам выпало: ${finalWin.s} (${finalWin.n})`);
-                btn.disabled = false;
-                // Сброс рулетки
-                setTimeout(() => {
-                    track.style.transition = 'none';
-                    track.style.transform = 'translateX(0)';
-                    initRoulette();
-                }, 1000);
+                alert(`Выигрыш: ${finalWin.n}`);
+                document.getElementById('caseBtn').disabled = false;
+                track.style.transition = 'none'; track.style.transform = 'translateX(0)';
+                initRoulette();
+                setTimeout(()=>track.style.transition='transform 4s cubic-bezier(0.15, 0, 0.05, 1)', 50);
             }, 4500);
         }
 
-        // --- СИСТЕМНОЕ ---
-        function updateUI() {
-            document.getElementById('balanceDisplay').innerText = balance.toFixed(2);
-            const btn = document.getElementById('crashBtn');
-            if (game.state === 'waiting') {
-                btn.innerText = game.myBet > 0 ? 'ЖДЕМ...' : 'СТАВКА';
-                btn.className = game.myBet > 0 ? 'w-1/2 bg-gray-800 rounded-xl uppercase text-sm' : 'w-1/2 neon-btn uppercase text-sm';
-            } else if (game.state === 'flying') {
-                if (game.myBet > 0 && !game.cashedOut) {
-                    btn.innerText = 'ЗАБРАТЬ';
-                    btn.className = 'w-1/2 bg-white text-black font-bold rounded-xl uppercase text-sm';
-                } else {
-                    btn.innerText = 'ПОЛЕТ...';
-                    btn.className = 'w-1/2 bg-gray-800 rounded-xl uppercase text-sm';
-                }
-            } else {
-                btn.innerText = 'КРАШ!';
-                btn.className = 'w-1/2 bg-red-900 rounded-xl uppercase text-sm';
-            }
+        // --- WALLET ---
+        function openWallet() { document.getElementById('wallet-overlay').classList.remove('hidden'); setTimeout(()=>document.getElementById('wallet-overlay').classList.add('open'),10); }
+        function closeWallet() { document.getElementById('wallet-overlay').classList.remove('open'); setTimeout(()=>document.getElementById('wallet-overlay').classList.add('hidden'),400); resetWalletUI(); }
+        function showWalletForm(m) { walletMode=m; document.getElementById('wallet-main').classList.add('hidden'); document.getElementById('wallet-form').classList.remove('hidden'); document.getElementById('form-title').innerText = m==='dep'?'Пополнение':'Вывод'; }
+        function resetWalletUI() { document.getElementById('wallet-main').classList.remove('hidden'); document.getElementById('wallet-form').classList.add('hidden'); document.getElementById('wallet-amount').value=''; }
+        function processWalletAction() {
+            let val = parseFloat(document.getElementById('wallet-amount').value);
+            if(!val || val<=0) return;
+            if(walletMode==='dep') { user.balance += val; } 
+            else { if(val>user.balance) return alert('Нет средств'); user.balance -= val; }
+            updateUI(); closeWallet();
         }
 
-        function nav(p) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.getElementById('page-'+p).classList.add('active');
-        }
-
-        window.onload = () => {
-            initRoulette();
-            runCrashCycle();
-        };
+        window.onload = () => { initRoulette(); runCrashCycle(); updateUI(); };
     </script>
 </body>
 </html>
