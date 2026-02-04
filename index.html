@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OrbitUp Ultimate</title>
+    <title>OrbitUp Final</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
@@ -68,10 +68,7 @@
 
         /* Tasks Styles */
         .task-card { background: #151517; border-radius: 20px; padding: 16px; margin-bottom: 12px; border: 1px solid #2A2A2C; display: flex; align-items: center; justify-content: space-between; }
-        .task-icon { width: 42px; height: 42px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-right: 12px; }
         .task-btn { background: var(--blue-btn); color: white; font-size: 11px; font-weight: 700; padding: 8px 16px; border-radius: 20px; transition: 0.2s; min-width: 80px; text-align: center; }
-        .task-btn.completed { background: #22c55e; color: black; pointer-events: none; }
-        .task-btn.check { background: #eab308; color: black; }
     </style>
 </head>
 <body>
@@ -168,7 +165,7 @@
                         <span class="text-[#FFD700]">⭐</span>
                         <span class="text-sm font-bold">+1 Stars</span>
                     </div>
-                    <button id="task-btn-channel" onclick="handleTask('channel', 'https://t.me/orbitinstats')" class="task-btn">ВЫПОЛНИТЬ</button>
+                    <button onclick="handleTask()" class="task-btn">ВЫПОЛНИТЬ</button>
                 </div>
             </div>
 
@@ -183,7 +180,7 @@
                         <span class="text-[#FFD700]">⭐</span>
                         <span class="text-sm font-bold">+1 Stars</span>
                     </div>
-                    <button id="task-btn-chat" onclick="handleTask('chat', 'https://t.me/orbitinchat')" class="task-btn">ВЫПОЛНИТЬ</button>
+                    <button onclick="handleTask()" class="task-btn">ВЫПОЛНИТЬ</button>
                 </div>
             </div>
 
@@ -308,14 +305,10 @@
 
         const MY_WALLET_ADDRESS = "UQBLYVXsKcTwo2vegPZKQkR3lFowRYa2IK5_6OC8sXOyMh0p"; 
 
-        let state = { balances: { stars: 0, ton: 0.0 }, lastDaily: 0, history: [], tasks: { channel: false, chat: false } };
-        const saved = localStorage.getItem('orbitUpFinalV25');
+        let state = { balances: { stars: 0, ton: 0.0 }, lastDaily: 0, history: [] };
+        const saved = localStorage.getItem('orbitUpFinalV26');
         if(saved) { try { state = JSON.parse(saved); } catch(e){} }
-        
-        // Ensure tasks object exists in old saves
-        if(!state.tasks) state.tasks = { channel: false, chat: false };
-
-        function saveState() { localStorage.setItem('orbitUpFinalV25', JSON.stringify(state)); }
+        function saveState() { localStorage.setItem('orbitUpFinalV26', JSON.stringify(state)); }
 
         let activeCurr = 'stars', walletCurr = 'stars', walletMode = 'dep';
         let game = { state: 'waiting', mult: 1.0, crashAt: 0, myBet: 0, cashedOut: false };
@@ -366,51 +359,17 @@
             
             updateHeader();
             updateHistoryUI();
-            checkTasksUI();
         };
 
-        // === TASKS LOGIC ===
-        function handleTask(taskId, link) {
-            if(state.tasks[taskId]) return; // Already done
-
-            let btn = document.getElementById(`task-btn-${taskId}`);
-            
-            // Step 1: Open Link
-            if (btn.innerText === "ВЫПОЛНИТЬ") {
-                window.Telegram.WebApp.openTelegramLink(link);
-                btn.innerText = "ПРОВЕРИТЬ";
-                btn.classList.add("check");
-            } 
-            // Step 2: Check (Simulation)
-            else if (btn.innerText === "ПРОВЕРИТЬ") {
-                btn.innerText = "⏳";
-                setTimeout(() => {
-                    state.tasks[taskId] = true;
-                    state.balances.stars += 1;
-                    saveState();
-                    updateHeader();
-                    checkTasksUI();
-                    alert("Задание выполнено! Начислена 1 звезда.");
-                }, 1500);
-            }
+        // === TASKS (SAFE MODE) ===
+        function handleTask() {
+            alert("Эта функция в разработке");
         }
 
-        function checkTasksUI() {
-            if(state.tasks.channel) {
-                const btn = document.getElementById('task-btn-channel');
-                btn.innerText = "ГОТОВО";
-                btn.className = "task-btn completed";
-            }
-            if(state.tasks.chat) {
-                const btn = document.getElementById('task-btn-chat');
-                btn.innerText = "ГОТОВО";
-                btn.className = "task-btn completed";
-            }
-        }
-
-        // === PAYMENT LOGIC ===
+        // === PAYMENT (SAFE MODE) ===
         function payStars(amount) {
             let invoiceUrl = "";
+            // Вставлять ссылки сюда (когда будут)
             if (amount === 15) invoiceUrl = ""; 
             if (amount === 25) invoiceUrl = ""; 
             if (amount === 50) invoiceUrl = ""; 
@@ -422,11 +381,8 @@
                 window.Telegram.WebApp.openInvoice(invoiceUrl);
                 document.getElementById('wallet-modal').classList.add('hidden');
             } else {
-                if(confirm("Ссылка не настроена. Включить Демо-пополнение?")) {
-                    state.balances.stars += amount;
-                    saveState(); updateHeader();
-                    document.getElementById('wallet-modal').classList.add('hidden');
-                }
+                // БЕЗОПАСНЫЙ РЕЖИМ: Просто ошибка, без демо-денег
+                alert("Пополнение временно недоступно (Технические работы)");
             }
         }
 
